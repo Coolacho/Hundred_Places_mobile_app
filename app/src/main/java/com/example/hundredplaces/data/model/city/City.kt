@@ -4,11 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 /**
  * Entity data class represents a single row (city)
  * in the cities table of the database.
  */
+@Serializable
 @Entity(
     tableName = "cities",
     indices = [
