@@ -2,6 +2,7 @@ package com.example.hundredplaces.fakedata
 
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.city.repositories.RemoteCitiesRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -17,17 +18,13 @@ class RemoteCitiesRepositoryTest {
     @Test
     fun remoteCitiesRepository_getAllCities_verifyCities() =
         runTest {
-            repository.getAllCitiesStream().collect {
-                assertEquals(it, FakeCityDataSource.citiesList)
-            }
+            assertEquals(repository.getAllCitiesStream().first(), FakeCityDataSource.citiesList)
         }
 
     @Test
     fun remoteCitiesRepository_getCity_verifyCity() =
         runTest {
-            repository.getCityStream(0).collect {
-                assertEquals(it, FakeCityDataSource.citiesList[0])
-            }
+            assertEquals(repository.getCityStream(0).first(), FakeCityDataSource.citiesList[0])
         }
 
     @Test
