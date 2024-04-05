@@ -2,7 +2,7 @@ package com.example.hundredplaces.fakedata
 
 import com.example.hundredplaces.data.model.city.City
 
-object FakeDataSource {
+object FakeCityDataSource {
 
     //Cities' ids
     private const val ID_ONE = 1

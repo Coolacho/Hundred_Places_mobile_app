@@ -7,32 +7,32 @@ import kotlinx.coroutines.flow.flowOf
 
 class FakeCityRestApiService : CityRestApiService {
     override suspend fun getAllCities(): Flow<List<City>> {
-        return flowOf(FakeDataSource.citiesList)
+        return flowOf(FakeCityDataSource.citiesList)
     }
 
     override suspend fun getCity(id: Int): Flow<City> {
-        return flowOf(FakeDataSource.citiesList[0])
+        return flowOf(FakeCityDataSource.citiesList[0])
     }
 
     override suspend fun insertCity(city: City) {
-        FakeDataSource.citiesList.forEach { it ->
+        FakeCityDataSource.citiesList.forEach { it ->
             if ((it.id == city.id) or (it.name == city.name)) {
                 throw IllegalArgumentException("City's id and name should be unique!")
             }
         }
-        FakeDataSource.citiesList.add(city)
+        FakeCityDataSource.citiesList.add(city)
     }
 
     override suspend fun updateCity(city: City) {
-        FakeDataSource.citiesList.forEachIndexed { index, oldCity ->
+        FakeCityDataSource.citiesList.forEachIndexed { index, oldCity ->
             if (oldCity.id == city.id) {
-                FakeDataSource.citiesList[index] = city
+                FakeCityDataSource.citiesList[index] = city
             }
         }
     }
 
     override suspend fun deleteCity(city: City) {
-        if (!FakeDataSource.citiesList.remove(city)) {
+        if (!FakeCityDataSource.citiesList.remove(city)) {
             throw NoSuchElementException("This element doesn't exist!")
         }
     }

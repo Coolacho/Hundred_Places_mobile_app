@@ -18,7 +18,7 @@ class RemoteCitiesRepositoryTest {
     fun remoteCitiesRepository_getAllCities_verifyCities() =
         runTest {
             repository.getAllCitiesStream().collect {
-                assertEquals(it, FakeDataSource.citiesList)
+                assertEquals(it, FakeCityDataSource.citiesList)
             }
         }
 
@@ -26,7 +26,7 @@ class RemoteCitiesRepositoryTest {
     fun remoteCitiesRepository_getCity_verifyCity() =
         runTest {
             repository.getCityStream(0).collect {
-                assertEquals(it, FakeDataSource.citiesList[0])
+                assertEquals(it, FakeCityDataSource.citiesList[0])
             }
         }
 
@@ -38,7 +38,7 @@ class RemoteCitiesRepositoryTest {
                 name = "Burgas"
             )
             repository.insertCity(city)
-            assertTrue(FakeDataSource.citiesList.contains(city))
+            assertTrue(FakeCityDataSource.citiesList.contains(city))
         }
 
     @Test
@@ -74,7 +74,7 @@ class RemoteCitiesRepositoryTest {
                 name = "Stara Zagora"
             )
             repository.updateCity(city)
-            assertEquals(FakeDataSource.citiesList[1], city)
+            assertEquals(FakeCityDataSource.citiesList[1], city)
         }
 
     @Test
@@ -85,7 +85,7 @@ class RemoteCitiesRepositoryTest {
                 name = "Sofia"
             )
             repository.deleteCity(city)
-            assertFalse(FakeDataSource.citiesList.contains(city))
+            assertFalse(FakeCityDataSource.citiesList.contains(city))
         }
 
     @Test
