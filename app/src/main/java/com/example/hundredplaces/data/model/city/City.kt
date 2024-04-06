@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 data class City (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int = 0,
+    private val id: Int = 0,
     @ColumnInfo(name = "name")
-    val name: String
+    private val name: String
 )
