@@ -20,8 +20,8 @@ import kotlinx.serialization.Serializable
     foreignKeys = [
         ForeignKey(
             entity = City::class,
-            parentColumns = ["city_id"],
-            childColumns = ["id"],
+            parentColumns = ["id"],
+            childColumns = ["city_id"],
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.SET_NULL
         )
