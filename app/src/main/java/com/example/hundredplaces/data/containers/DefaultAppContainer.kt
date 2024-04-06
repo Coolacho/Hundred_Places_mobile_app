@@ -1,7 +1,11 @@
 package com.example.hundredplaces.data.containers
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.hundredplaces.data.LocalDatabase
+import com.example.hundredplaces.data.UserPreferencesRepository
 import com.example.hundredplaces.data.model.city.CityRestApiService
 import com.example.hundredplaces.data.model.city.repositories.CitiesDataRepository
 import com.example.hundredplaces.data.model.city.repositories.CitiesLocalRepository
@@ -27,8 +31,12 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.create
 
+//Datastore constants
+private const val USER_PREFERENCES_NAME = "user_preferences"
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = USER_PREFERENCES_NAME
+)
 /**
  * [AppContainer] implementation that provides instances of repositories
  */
@@ -36,6 +44,7 @@ class DefaultAppContainer(
     private val context: Context
 ) : AppContainer{
 
+    //Retrofit Rest constants
     private val baseUrl =
         "http://" //TODO complete the url
     private val retrofit = Retrofit.Builder()
@@ -45,6 +54,10 @@ class DefaultAppContainer(
 
     private val localDatabase by lazy {
         LocalDatabase.getDatabase(context)
+    }
+
+    override val userPreferencesRepository: UserPreferencesRepository by lazy {
+        UserPreferencesRepository(context.dataStore)
     }
 
     override val networkConnection by lazy {
