@@ -4,7 +4,9 @@ import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.city.CityDao
 import kotlinx.coroutines.flow.Flow
 
-class CitiesLocalRepository(private val cityDao: CityDao) : CitiesRepository {
+class CitiesLocalRepository(
+    private val cityDao: CityDao
+) : CitiesRepository {
 
     override suspend fun getAllCitiesStream(): Flow<List<City>> = cityDao.getAllCities()
 
