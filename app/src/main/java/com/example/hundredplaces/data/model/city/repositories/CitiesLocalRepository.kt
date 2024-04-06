@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Repository that provides insert, update, delete, and retrieve of [City] from a local data source.
  */
-class LocalCitiesRepository(private val cityDao: CityDao) : CitiesRepository {
+class CitiesLocalRepository(private val cityDao: CityDao) : CitiesRepository {
     /**
      * Retrieve all the cities from the local data source.
      */

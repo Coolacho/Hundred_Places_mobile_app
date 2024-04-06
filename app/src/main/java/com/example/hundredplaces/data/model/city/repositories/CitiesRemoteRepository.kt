@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Repository that provides insert, update, delete, and retrieve of [City] from a remote data source.
  */
-class RemoteCitiesRepository(
+class CitiesRemoteRepository(
     private val cityRestApiService: CityRestApiService
 ) : CitiesRepository {
     /**

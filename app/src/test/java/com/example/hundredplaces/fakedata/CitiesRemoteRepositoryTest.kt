@@ -1,7 +1,7 @@
 package com.example.hundredplaces.fakedata
 
 import com.example.hundredplaces.data.model.city.City
-import com.example.hundredplaces.data.model.city.repositories.RemoteCitiesRepository
+import com.example.hundredplaces.data.model.city.repositories.CitiesRemoteRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -10,25 +10,25 @@ import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class RemoteCitiesRepositoryTest {
+class CitiesRemoteRepositoryTest {
 
-    private val repository = RemoteCitiesRepository(
+    private val repository = CitiesRemoteRepository(
         cityRestApiService = FakeCityRestApiService()
     )
     @Test
-    fun remoteCitiesRepository_getAllCities_verifyCities() =
+    fun citiesRemoteRepository_getAllCities_verifyCities() =
         runTest {
             assertEquals(repository.getAllCitiesStream().first(), FakeCityDataSource.citiesList)
         }
 
     @Test
-    fun remoteCitiesRepository_getCity_verifyCity() =
+    fun citiesRemoteRepository_getCity_verifyCity() =
         runTest {
             assertEquals(repository.getCityStream(0).first(), FakeCityDataSource.citiesList[0])
         }
 
     @Test
-    fun remoteCitiesRepository_insertCity_verifyCityInserted() =
+    fun citiesRemoteRepository_insertCity_verifyCityInserted() =
         runTest {
             val city = City(
                 id = 4,
@@ -39,7 +39,7 @@ class RemoteCitiesRepositoryTest {
         }
 
     @Test
-    fun remoteCitiesRepository_insertCity_verifyCityUnique()
+    fun citiesRemoteRepository_insertCity_verifyCityUnique()
         {
             //Test with existing id
             assertThrows(IllegalArgumentException::class.java) {
@@ -64,7 +64,7 @@ class RemoteCitiesRepositoryTest {
         }
 
     @Test
-    fun remoteCitiesRepository_updateCity_verifyCityUpdated() =
+    fun citiesRemoteRepository_updateCity_verifyCityUpdated() =
         runTest {
             val city = City(
                 id = 2,
@@ -75,7 +75,7 @@ class RemoteCitiesRepositoryTest {
         }
 
     @Test
-    fun remoteCitiesRepository_deleteCity_verifyCityDeleted() =
+    fun citiesRemoteRepository_deleteCity_verifyCityDeleted() =
         runTest {
             val city = City(
                 id = 1,
@@ -86,7 +86,7 @@ class RemoteCitiesRepositoryTest {
         }
 
     @Test
-    fun remoteCitiesRepository_deleteCity_verifyCityNotExists()
+    fun citiesRemoteRepository_deleteCity_verifyCityNotExists()
         {
             assertThrows(NoSuchElementException::class.java) {
                 runTest {
