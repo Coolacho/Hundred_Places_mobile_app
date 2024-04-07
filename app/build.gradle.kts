@@ -63,6 +63,10 @@ dependencies {
     implementation(libs.androidx.material3)
     //WindowSizeClass
     implementation(libs.androidx.material3.window.size)
+    //ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    //Navhost and NavController
+    implementation(libs.androidx.navigation.compose)
     //Datastore
     implementation(libs.androidx.datastore.preferences)
     //Room
