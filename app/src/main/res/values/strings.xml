@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Hundred Places</string>
+    <string name="places">Places</string>
+    <string name="map">Map</string>
+    <string name="achievements">Achievements</string>
+    <string name="account">Account</string>
 </resources>
