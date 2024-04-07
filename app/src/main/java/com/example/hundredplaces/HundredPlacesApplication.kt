@@ -7,7 +7,7 @@ class HundredPlacesApplication : Application() {
     /**
      * AppContainer instance used by the rest of classes to obtain dependencies
      */
-    private lateinit var container: DefaultAppContainer
+    lateinit var container: DefaultAppContainer
 
     override fun onCreate() {
         super.onCreate()
