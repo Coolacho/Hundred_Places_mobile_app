@@ -1,4 +1,4 @@
-package com.example.hundredplaces.ui
+package com.example.hundredplaces.ui.navigation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -14,22 +14,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.example.hundredplaces.R
 
 @Composable
 fun AppBottomNavigationBar(
-    navigationItemContentList: List<NavigationItemContent>,
+    currentDestination: String,
+    navigationItemContentList: List<NavigationDestination>,
+    onTabPressed: (NavigationDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(modifier = modifier) {
         for (navItem in navigationItemContentList) {
             NavigationBarItem(
-                selected = false,
-                onClick = { /*TODO add onClick*/ },
+                selected = currentDestination == navItem.route,
+                onClick = { },
                 icon = {
                     Icon(
-                        imageVector = navItem.icon,
-                        contentDescription = navItem.text
+                        painter = painterResource(navItem.iconRes),
+                        contentDescription = navItem.route
                     )
                 }
             )
@@ -39,18 +43,20 @@ fun AppBottomNavigationBar(
 
 @Composable
 fun AppNavigationRail(
-    navigationItemContentList: List<NavigationItemContent>,
+    currentDestination: String,
+    navigationItemContentList: List<NavigationDestination>,
+    onTabPressed: (NavigationDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationRail(modifier = modifier) {
         for (navItem in navigationItemContentList) {
             NavigationRailItem(
-                selected = false,
-                onClick = { /*TODO add onCLick*/ },
+                selected = currentDestination == navItem.route,
+                onClick = {  },
                 icon = {
                     Icon(
-                        imageVector = navItem.icon,
-                        contentDescription = navItem.text
+                        painter = painterResource(navItem.iconRes),
+                        contentDescription = navItem.route
                     )
                 }
             )
@@ -60,29 +66,31 @@ fun AppNavigationRail(
 
 @Composable
 fun NavigationDrawerContent(
-    navigationItemContentList: List<NavigationItemContent>,
+    currentDestination: String,
+    navigationItemContentList: List<NavigationDestination>,
+    onTabPressed: (NavigationDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         for (navItem in navigationItemContentList) {
             NavigationDrawerItem(
-                selected = false,
+                selected = currentDestination == navItem.route,
                 label = {
                     Text(
-                        text = navItem.text,
+                        text = navItem.route,
                         modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     )
                 },
                 icon = {
                     Icon(
-                        imageVector = navItem.icon,
-                        contentDescription = navItem.text
+                        painter = painterResource(navItem.iconRes),
+                        contentDescription = navItem.route
                     )
                 },
                 colors = NavigationDrawerItemDefaults.colors(
                     unselectedContainerColor = Color.Transparent
                 ),
-                onClick = { /*TODO add onCLick*/ }
+                onClick = {  }
             )
         }
     }
