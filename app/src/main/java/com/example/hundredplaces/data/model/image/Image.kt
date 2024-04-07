@@ -15,6 +15,9 @@ import kotlinx.serialization.Serializable
         Index(
             value = ["image_path"],
             unique = true
+        ),
+        Index(
+            value = ["place_id"]
         )
     ],
     foreignKeys = [

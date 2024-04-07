@@ -15,6 +15,9 @@ import kotlinx.serialization.Serializable
         Index(
             value = ["name"],
             unique = true
+        ),
+        Index(
+            value = ["city_id"]
         )
     ],
     foreignKeys = [
