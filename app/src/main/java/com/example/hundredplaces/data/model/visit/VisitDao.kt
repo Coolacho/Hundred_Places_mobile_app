@@ -20,8 +20,8 @@ interface VisitDao {
     suspend fun delete(visit: Visit)
 
     @Query("SELECT * FROM visits WHERE id = :id")
-    suspend fun getVisit(id: Int): Flow<Visit>
+    fun getVisit(id: Int): Flow<Visit>
 
     @Query("SELECT * FROM visits ORDER BY user_id ASC")
-    suspend fun getAllVisits(): Flow<List<Visit>>
+    fun getAllVisits(): Flow<List<Visit>>
 }

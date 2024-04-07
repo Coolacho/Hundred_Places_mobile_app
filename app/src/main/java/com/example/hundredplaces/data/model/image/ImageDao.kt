@@ -20,8 +20,8 @@ interface ImageDao {
     suspend fun delete(image: Image)
 
     @Query("SELECT * FROM images WHERE id = :id")
-    suspend fun getImage(id: Int): Flow<Image>
+    fun getImage(id: Int): Flow<Image>
 
     @Query("SELECT * FROM images ORDER BY id ASC")
-    suspend fun getAllImages(): Flow<List<Image>>
+    fun getAllImages(): Flow<List<Image>>
 }
