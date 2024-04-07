@@ -1,7 +1,5 @@
 package com.example.hundredplaces.ui.account
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.navigation.NavigationDestination
 
