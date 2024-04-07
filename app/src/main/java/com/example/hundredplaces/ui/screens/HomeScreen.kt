@@ -8,38 +8,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.materialIcon
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.PermanentNavigationDrawer
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import com.example.hundredplaces.ui.AppContentType
-import com.example.hundredplaces.ui.AppNavigationType
-import com.example.hundredplaces.ui.NavigationItemContent
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.AppBottomNavigationBar
+import com.example.hundredplaces.ui.AppContentType
 import com.example.hundredplaces.ui.AppNavigationRail
+import com.example.hundredplaces.ui.AppNavigationType
 import com.example.hundredplaces.ui.NavigationDrawerContent
+import com.example.hundredplaces.ui.NavigationItemContent
 
 @Composable
 fun HomeScreen(
@@ -71,7 +56,7 @@ fun HomeScreen(
             drawerContent = {
                 NavigationDrawerContent(
                     navigationItemContentList = navigationItemContentList,
-                    modifier = Modifier
+                    modifier = modifier
                         .wrapContentWidth()
                         .fillMaxHeight()
                 )
@@ -86,7 +71,9 @@ fun HomeScreen(
         HomeScreenContent(
             contentType = contentType,
             navigationType = navigationType,
-            navigationItemContentList = navigationItemContentList)
+            navigationItemContentList = navigationItemContentList,
+            modifier = modifier
+        )
     }
 }
 
