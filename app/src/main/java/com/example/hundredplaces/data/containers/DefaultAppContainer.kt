@@ -46,7 +46,7 @@ class DefaultAppContainer(
 
     //Retrofit Rest constants
     private val baseUrl =
-        "http://" //TODO complete the url
+        "http://192.168.2.150:8080/api/v1/"
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .baseUrl(baseUrl)
