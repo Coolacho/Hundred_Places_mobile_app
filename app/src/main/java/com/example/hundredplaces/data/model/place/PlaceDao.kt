@@ -22,6 +22,6 @@ interface PlaceDao {
     @Query("SELECT * FROM places WHERE id = :id")
     fun getPlace(id: Int): Flow<Place>
 
-    @Query("SELECT * FROM places ORDER BY name ASC")
+    @Query("SELECT * FROM places ORDER BY id ASC")
     fun getAllPlaces(): Flow<List<Place>>
 }
