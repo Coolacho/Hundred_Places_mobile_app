@@ -30,21 +30,21 @@ import kotlinx.serialization.Serializable
 data class Place(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private val id: Int = 0,
+    val id: Int = 0,
     @ColumnInfo(name = "name")
-    private val name: String,
+    val name: String,
     @ColumnInfo(name = "latitude")
-    private val latitude: Double,
+    val latitude: Double,
     @ColumnInfo(name = "longitude")
-    private val longitude: Double,
+    val longitude: Double,
     @ColumnInfo(name = "rating")
-    private val rating: Double,
+    val rating: Double,
     @ColumnInfo(name = "description_path")
-    private val descriptionPath: String,
+    val descriptionPath: String,
     @ColumnInfo(name = "is_100_places")
-    private val is100Places: Boolean,
+    val is100Places: Boolean,
     @ColumnInfo(name = "type")
-    private val type: PlaceTypeEnum,
+    val type: PlaceTypeEnum,
     @ColumnInfo(name = "city_id")
-    private val cityId: Int
+    val cityId: Int
 )

@@ -19,11 +19,11 @@ import kotlinx.serialization.Serializable
 data class User(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private val id: Int = 0,
+    val id: Int = 0,
     @ColumnInfo(name = "name")
-    private val name: String,
+    val name: String,
     @ColumnInfo(name = "email")
-    private val email: String,
+    val email: String,
     @ColumnInfo(name = "password")
-    private val password: String
+    val password: String
 )

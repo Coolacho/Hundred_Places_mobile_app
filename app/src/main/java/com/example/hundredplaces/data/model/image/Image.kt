@@ -30,9 +30,9 @@ import kotlinx.serialization.Serializable
 data class Image (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private val id: Int = 0,
+    val id: Int = 0,
     @ColumnInfo(name = "image_path")
-    private val imagePath: String,
+    val imagePath: String,
     @ColumnInfo(name = "place_id")
-    private val placeId: Int
+    val placeId: Int
 )

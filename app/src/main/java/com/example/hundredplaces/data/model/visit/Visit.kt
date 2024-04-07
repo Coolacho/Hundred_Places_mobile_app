@@ -33,12 +33,12 @@ import java.time.LocalDateTime
 data class Visit(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    private val id: Int = 0,
+    val id: Int = 0,
     @ColumnInfo(name = "user_id")
-    private val userId: Int,
+    val userId: Int,
     @ColumnInfo(name = "place_id")
-    private val placeId: Int,
+    val placeId: Int,
     @Contextual
     @ColumnInfo(name = "date_visited")
-    private val dateVisited: LocalDateTime
+    val dateVisited: LocalDateTime
 )
