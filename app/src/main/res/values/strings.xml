@@ -4,4 +4,7 @@
     <string name="map">Map</string>
     <string name="achievements">Achievements</string>
     <string name="account">Account</string>
+    <string name="back_button">Back</string>
+    <string name="grid_layout_toggle">Grid layout</string>
+    <string name="linear_layout_toggle">Linear layout</string>
 </resources>
