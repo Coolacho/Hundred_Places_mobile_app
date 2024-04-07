@@ -26,7 +26,7 @@ import com.example.hundredplaces.data.model.visit.VisitDao
     version = 1,
     exportSchema = false
 )
-abstract class LocalDatabase : RoomDatabase() {
+abstract class HundredPlacesLocalDatabase : RoomDatabase() {
     abstract fun cityDao(): CityDao
     abstract fun placeDao(): PlaceDao
     abstract fun imageDao(): ImageDao
@@ -35,11 +35,11 @@ abstract class LocalDatabase : RoomDatabase() {
 
     companion object{
         @Volatile
-        private var Instance: LocalDatabase? = null
+        private var Instance: HundredPlacesLocalDatabase? = null
 
-        fun getDatabase(context: Context) : LocalDatabase {
+        fun getDatabase(context: Context) : HundredPlacesLocalDatabase {
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, LocalDatabase::class.java, "local_database")
+                Room.databaseBuilder(context, HundredPlacesLocalDatabase::class.java, "local_database")
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }

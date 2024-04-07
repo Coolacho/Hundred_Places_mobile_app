@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.hundredplaces.data.LocalDatabase
+import com.example.hundredplaces.data.HundredPlacesLocalDatabase
 import com.example.hundredplaces.data.UserPreferencesRepository
 import com.example.hundredplaces.data.model.city.CityRestApiService
 import com.example.hundredplaces.data.model.city.repositories.CitiesDataRepository
@@ -52,8 +52,8 @@ class DefaultAppContainer(
         .baseUrl(baseUrl)
         .build()
 
-    private val localDatabase by lazy {
-        LocalDatabase.getDatabase(context)
+    private val hundredPlacesLocalDatabase by lazy {
+        HundredPlacesLocalDatabase.getDatabase(context)
     }
 
     override val userPreferencesRepository: UserPreferencesRepository by lazy {
@@ -66,35 +66,35 @@ class DefaultAppContainer(
 
     override val citiesRepository: CitiesDataRepository by lazy {
         CitiesDataRepository(
-            CitiesLocalRepository(localDatabase.cityDao()),
+            CitiesLocalRepository(hundredPlacesLocalDatabase.cityDao()),
             CitiesRemoteRepository(retrofit.create(CityRestApiService::class.java)),
             networkConnection
         )
     }
     override val placesRepository: PlacesDataRepository by lazy {
         PlacesDataRepository(
-            PlacesLocalRepository(localDatabase.placeDao()),
+            PlacesLocalRepository(hundredPlacesLocalDatabase.placeDao()),
             PlacesRemoteRepository(retrofit.create(PlaceRestApiService::class.java)),
             networkConnection
         )
     }
     override val imagesRepository: ImagesDataRepository by lazy {
         ImagesDataRepository(
-            ImagesLocalRepository(localDatabase.imageDao()),
+            ImagesLocalRepository(hundredPlacesLocalDatabase.imageDao()),
             ImagesRemoteRepository(retrofit.create(ImageRestApiService::class.java)),
             networkConnection
         )
     }
     override val usersRepository: UsersDataRepository by lazy {
         UsersDataRepository(
-            UsersLocalRepository(localDatabase.userDao()),
+            UsersLocalRepository(hundredPlacesLocalDatabase.userDao()),
             UsersRemoteRepository(retrofit.create(UserRestApiService::class.java)),
             networkConnection
         )
     }
     override val visitsRepository: VisitsDataRepository by lazy {
         VisitsDataRepository(
-            VisitsLocalRepository(localDatabase.visitDao()),
+            VisitsLocalRepository(hundredPlacesLocalDatabase.visitDao()),
             VisitsRemoteRepository(retrofit.create(VisitRestApiService::class.java)),
             networkConnection
         )
