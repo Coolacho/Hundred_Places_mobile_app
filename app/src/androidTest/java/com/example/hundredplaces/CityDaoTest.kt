@@ -22,8 +22,8 @@ class CityDaoTest {
     private lateinit var cityDao: CityDao
     private lateinit var hundredPlacesLocalDatabase: HundredPlacesLocalDatabase
 
-    private var city1 = City(1, "Sofia")
-    private var city2 = City(2, "Plovdiv")
+    private var city1 = City(1, "Plovdiv")
+    private var city2 = City(2, "Sofia")
 
     private suspend fun addOneCityToDb() {
         cityDao.insert(city1)
