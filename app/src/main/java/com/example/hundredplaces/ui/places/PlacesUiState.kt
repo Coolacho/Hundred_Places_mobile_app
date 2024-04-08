@@ -1,6 +1,5 @@
 package com.example.hundredplaces.ui.places
 
-import com.example.hundredplaces.data.FakePlaceDataSource
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 
 data class PlacesUiState(
