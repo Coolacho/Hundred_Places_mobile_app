@@ -2,6 +2,7 @@ package com.example.hundredplaces.data.model.place.repositories
 
 
 import com.example.hundredplaces.data.model.place.Place
+import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import kotlinx.coroutines.flow.Flow
 
 
@@ -17,7 +18,7 @@ interface PlacesRepository {
     /**
      * Retrieve an place from the given data source that matches with the [id].
      */
-    suspend fun getPlaceStream(id: Int): Flow<Place?>
+    suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?>
 
     /**
      * Insert place in the data source

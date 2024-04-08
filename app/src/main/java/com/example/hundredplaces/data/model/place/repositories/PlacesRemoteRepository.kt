@@ -2,6 +2,7 @@ package com.example.hundredplaces.data.model.place.repositories
 
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceRestApiService
+import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import kotlinx.coroutines.flow.Flow
 
 class PlacesRemoteRepository(
@@ -9,7 +10,7 @@ class PlacesRemoteRepository(
 ) : PlacesRepository {
     override suspend fun getAllPlacesStream(): Flow<List<Place>> = placeRestApiService.getAllPlaces()
 
-    override suspend fun getPlaceStream(id: Int): Flow<Place?> = placeRestApiService.getPlace(id)
+    override suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?> = placeRestApiService.getPlace(id)
 
     override suspend fun insertPlace(place: Place) = placeRestApiService.insertPlace(place)
 

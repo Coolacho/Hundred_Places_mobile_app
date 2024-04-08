@@ -1,6 +1,7 @@
 package com.example.hundredplaces.data.model.place.repositories
 
 import com.example.hundredplaces.data.model.place.Place
+import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.util.NetworkConnection
 import kotlinx.coroutines.flow.Flow
 
@@ -17,7 +18,7 @@ class PlacesDataRepository (
         }
     }
 
-    override suspend fun getPlaceStream(id: Int): Flow<Place?> {
+    override suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?> {
         return if (networkConnection.isNetworkConnected) {
             placesRemoteRepository.getPlaceStream(id)
         } else {

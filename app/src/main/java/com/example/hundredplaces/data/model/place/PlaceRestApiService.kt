@@ -13,7 +13,7 @@ interface PlaceRestApiService {
     suspend fun getAllPlaces(): Flow<List<Place>>
 
     @GET("places/{placeId}")
-    suspend fun getPlace(@Path("placeId") id: Int): Flow<Place>
+    suspend fun getPlace(@Path("placeId") id: Int): Flow<PlaceWithCityAndImages>
 
     @POST("places/new")
     suspend fun insertPlace(@Body place: Place)
