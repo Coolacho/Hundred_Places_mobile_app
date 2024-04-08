@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hundredplaces.HundredPlacesApplication
-import com.example.hundredplaces.ui.home.HomeViewModel
+import com.example.hundredplaces.ui.components.AppContentViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Inventory app
@@ -15,7 +15,7 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         // Initializer for HomeViewModel
         initializer {
-            HomeViewModel(
+            AppContentViewModel(
                 hundredPlacesApplication().container.userPreferencesRepository
             )
         }

@@ -1,8 +1,8 @@
-package com.example.hundredplaces.ui.home
+package com.example.hundredplaces.ui.components
 
 import com.example.hundredplaces.R
 
-data class HomeUiState(
+data class AppContentUiState(
     val isLinearLayout: Boolean = true,
     val toggleContentDescription: Int =
         if (isLinearLayout) R.string.grid_layout_toggle else R.string.linear_layout_toggle,

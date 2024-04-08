@@ -1,4 +1,4 @@
-package com.example.hundredplaces.ui.home
+package com.example.hundredplaces.ui.components
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,31 +10,31 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+class AppContentViewModel(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val _uiState = MutableStateFlow(AppContentUiState())
 
     // UI states access for various [HomeUiState]
-    val uiState: StateFlow<HomeUiState> =
+    val uiState: StateFlow<AppContentUiState> =
         userPreferencesRepository.isLinearLayout
             .map { isLinearLayout ->
-                HomeUiState(isLinearLayout = isLinearLayout)
+                AppContentUiState(isLinearLayout = isLinearLayout)
             }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = HomeUiState()
+                initialValue = AppContentUiState()
             )
 
     /*
      * [selectLayout] change the layout and icons accordingly and
      * save the selection in DataStore through [userPreferencesRepository]
      */
-    fun selectLayout(isLinearLayout: Boolean) {
+    fun selectLayout() {
         viewModelScope.launch {
-            userPreferencesRepository.saveLayoutPreference(isLinearLayout)
+            userPreferencesRepository.saveLayoutPreference(!_uiState.value.isLinearLayout)
         }
     }
 
