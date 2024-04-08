@@ -3,6 +3,15 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.googleDevtoolsKsp)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+
+    // A properties file containing default secret values. This file can be
+    // checked in version control.
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 android {
@@ -81,6 +90,7 @@ dependencies {
     implementation(libs.jakewharton.retrofit2.kotlinx.serialization.converter)
     //Okhttp for JSON media type
     implementation(libs.squareup.okhttp)
+    implementation (libs.play.services.maps)
 
     testImplementation(libs.junit)
     //Coroutines test
