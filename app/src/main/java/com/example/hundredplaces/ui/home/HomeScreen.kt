@@ -98,7 +98,8 @@ private fun HomeScreenContent(
             ) {
                 HundredPlacesNavHost(
                     navController = navController,
-                    contentType = contentType
+                    contentType = contentType,
+                    modifier = Modifier.weight(1f)
                 )
                 AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION) {
                     AppBottomNavigationBar(
