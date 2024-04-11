@@ -54,7 +54,10 @@ fun HundredPlacesNavHost(
         composable(
             route = MapDestination.route
         ) {
-            MapScreen()
+            MapScreen(
+                navigateToPlaceEntry = {
+                    navController.navigate("${PlaceDetailsDestination.route}/${it}")}
+            )
         }
         composable(
             route = AchievementsDestination.route
