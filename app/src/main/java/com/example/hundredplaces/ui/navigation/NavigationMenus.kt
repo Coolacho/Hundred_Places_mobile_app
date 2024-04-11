@@ -57,6 +57,11 @@ fun AppBottomNavigationBar(
                         painter = painterResource(navItem.iconRes),
                         contentDescription = navItem.route
                     )
+                },
+                label = {
+                    Text(
+                        text = navItem.route
+                    )
                 }
             )
         }
@@ -92,6 +97,11 @@ fun AppNavigationRail(
                     Icon(
                         painter = painterResource(navItem.iconRes),
                         contentDescription = navItem.route
+                    )
+                },
+                label = {
+                    Text(
+                        text = navItem.route
                     )
                 }
             )
