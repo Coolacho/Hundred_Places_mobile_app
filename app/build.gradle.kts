@@ -90,7 +90,11 @@ dependencies {
     implementation(libs.jakewharton.retrofit2.kotlinx.serialization.converter)
     //Okhttp for JSON media type
     implementation(libs.squareup.okhttp)
+    //Maps libs
     implementation (libs.play.services.maps)
+    implementation (libs.maps.compose)
+    implementation (libs.maps.compose.utils)
+    implementation (libs.maps.compose.widgets)
 
     testImplementation(libs.junit)
     //Coroutines test
