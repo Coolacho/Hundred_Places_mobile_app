@@ -167,7 +167,7 @@ fun ImageCarousel(
                         .padding(2.dp)
                         .clip(CircleShape)
                         .background(color)
-                        .size(16.dp)
+                        .size(8.dp)
                 )
             }
         }
