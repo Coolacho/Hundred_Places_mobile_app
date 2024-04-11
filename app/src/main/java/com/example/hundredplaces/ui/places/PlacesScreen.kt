@@ -3,6 +3,7 @@ package com.example.hundredplaces.ui.places
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -46,6 +48,7 @@ object PlacesDestination : NavigationDestination {
  */
 @Composable
 fun PlacesScreen(
+    navigateToPlaceEntry: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlacesViewModel = viewModel(
         factory = AppViewModelProvider.Factory
@@ -55,14 +58,15 @@ fun PlacesScreen(
     LazyColumn(
         modifier = modifier
     ) {
-        items(FakePlaceDataSource.PlacesList, key = {it -> it.place.id}) {
+        items(FakePlaceDataSource.PlacesList, key = { it.place.id}) {
             PlaceItem(
                 placeWithCityAndImages = it,
-                onClick = {viewModel.selectPlaceCard(it)},
+                //onClick = {viewModel.selectPlaceCard(it)},
                 selected = uiState.value.currentSelectedPlace?.place?.id == it.place.id,
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .fillMaxWidth()
+                    .clickable { navigateToPlaceEntry(it.place.id) }
             )
         }
     }
@@ -73,7 +77,6 @@ fun PlacesScreen(
  */
 @Composable
 fun PlaceItem(
-    onClick: () -> Unit,
     selected: Boolean,
     placeWithCityAndImages: PlaceWithCityAndImages,
     modifier: Modifier = Modifier
@@ -85,7 +88,6 @@ fun PlaceItem(
     )
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        onClick = onClick,
         modifier = modifier
     ) {
         Row (
@@ -117,7 +119,7 @@ fun PlaceItem(
 }
 
 @Composable
-private fun PlaceInformation(
+fun PlaceInformation(
     placeName: String,
     placeCity: String,
     modifier: Modifier = Modifier
@@ -137,7 +139,7 @@ private fun PlaceInformation(
 }
 
 @Composable
-private fun PlaceRating(
+fun PlaceRating(
     placeRating: Double,
     modifier: Modifier = Modifier
 ) {
@@ -146,7 +148,8 @@ private fun PlaceRating(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.round_star_rate_24),
-            contentDescription = null
+            contentDescription = null,
+            tint = Color.Yellow
         )
         Text(
             text = placeRating.toString()
@@ -163,7 +166,6 @@ private fun PlaceCardPreview() {
     HundredPlacesTheme {
         Surface {
             PlaceItem(
-                onClick = {},
                 selected = true,
                 placeWithCityAndImages = FakePlaceDataSource.PlacesList[0]
             )
@@ -179,7 +181,7 @@ private fun PlaceCardPreview() {
 fun PlaceListPreview() {
     HundredPlacesTheme {
         Surface {
-            PlacesScreen()
+            PlacesScreen({})
         }
     }
 }

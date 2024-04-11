@@ -3,8 +3,10 @@ package com.example.hundredplaces.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.hundredplaces.ui.AppContentType
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountScreen
@@ -14,6 +16,8 @@ import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.map.MapScreen
 import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.places.PlacesScreen
+import com.example.hundredplaces.ui.places.details.PlaceDetailsDestination
+import com.example.hundredplaces.ui.places.details.PlaceDetailsScreen
 
 /**
  * Provides Navigation graph for the application.
@@ -32,7 +36,20 @@ fun HundredPlacesNavHost(
         composable(
             route = PlacesDestination.route
         ) {
-            PlacesScreen()
+            PlacesScreen(
+                navigateToPlaceEntry = {
+                    navController.navigate("${PlaceDetailsDestination.route}/${it}")}
+            )
+        }
+        composable(
+            route = PlaceDetailsDestination.routeWithArgs,
+            arguments = listOf(navArgument(PlaceDetailsDestination.PLACE_ID_ARG) {
+                type = NavType.IntType
+            })
+        ) {
+            PlaceDetailsScreen(
+                navigateBack = { navController.navigateUp() }
+            )
         }
         composable(
             route = MapDestination.route
