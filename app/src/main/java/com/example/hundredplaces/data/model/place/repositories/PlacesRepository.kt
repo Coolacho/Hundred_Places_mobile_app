@@ -13,7 +13,7 @@ interface PlacesRepository {
     /**
      * Retrieve all the places from the given data source.
      */
-    suspend fun getAllPlacesStream(): Flow<List<Place>>
+    suspend fun getAllPlacesStream(): Flow<List<PlaceWithCityAndImages>>
 
     /**
      * Retrieve an place from the given data source that matches with the [id].

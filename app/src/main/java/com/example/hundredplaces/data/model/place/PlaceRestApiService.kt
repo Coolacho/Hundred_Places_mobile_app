@@ -10,7 +10,7 @@ import retrofit2.http.Path
 
 interface PlaceRestApiService {
     @GET("places")
-    suspend fun getAllPlaces(): Flow<List<Place>>
+    suspend fun getAllPlaces(): Flow<List<PlaceWithCityAndImages>>
 
     @GET("places/{placeId}")
     suspend fun getPlace(@Path("placeId") id: Int): Flow<PlaceWithCityAndImages>

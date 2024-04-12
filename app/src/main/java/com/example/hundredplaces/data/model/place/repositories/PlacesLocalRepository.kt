@@ -6,7 +6,7 @@ import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import kotlinx.coroutines.flow.Flow
 
 class PlacesLocalRepository(private val placeDao: PlaceDao) : PlacesRepository {
-    override suspend fun getAllPlacesStream(): Flow<List<Place>> = placeDao.getAllPlaces()
+    override suspend fun getAllPlacesStream(): Flow<List<PlaceWithCityAndImages>> = placeDao.getAllPlaces()
 
     override suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?> = placeDao.getPlace(id)
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class PlacesRemoteRepository(
     private val placeRestApiService: PlaceRestApiService
 ) : PlacesRepository {
-    override suspend fun getAllPlacesStream(): Flow<List<Place>> = placeRestApiService.getAllPlaces()
+    override suspend fun getAllPlacesStream(): Flow<List<PlaceWithCityAndImages>> = placeRestApiService.getAllPlaces()
 
     override suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?> = placeRestApiService.getPlace(id)
 
