@@ -76,7 +76,8 @@ fun AppNavigationRail(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    NavigationRail(modifier = modifier) {
+    NavigationRail(modifier = modifier
+        .padding(dimensionResource(id = R.dimen.padding_small))) {
         for (navItem in navigationItemContentList) {
             NavigationRailItem(
                 selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
