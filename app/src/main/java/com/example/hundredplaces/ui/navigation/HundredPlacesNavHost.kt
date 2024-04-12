@@ -37,6 +37,7 @@ fun HundredPlacesNavHost(
             route = PlacesDestination.route
         ) {
             PlacesScreen(
+                contentType = contentType,
                 navigateToPlaceEntry = {
                     navController.navigate("${PlaceDetailsDestination.route}/${it}")}
             )
@@ -48,6 +49,7 @@ fun HundredPlacesNavHost(
             })
         ) {
             PlaceDetailsScreen(
+                isFullScreen = false,
                 navigateBack = { navController.navigateUp() }
             )
         }
