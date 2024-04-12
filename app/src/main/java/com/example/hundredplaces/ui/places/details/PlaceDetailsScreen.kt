@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -55,66 +56,80 @@ object PlaceDetailsDestination : NavigationDestination {
 @Composable
 fun PlaceDetailsScreen(
     navigateBack: () -> Unit,
+    isFullScreen: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Box {
-        IconButton(
-            onClick = navigateBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .zIndex(3f)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.back_button)
-            )
+    Box(
+        modifier = modifier
+            .padding(dimensionResource(id = R.dimen.padding_medium))
+    ) {
+        if (!isFullScreen) {
+            IconButton(
+                onClick = navigateBack,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .zIndex(3f)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back_button)
+                )
+            }
         }
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
         ) {
             ImageCarousel(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .height(240.dp)
+                    .padding(
+                        bottom = dimensionResource(id = R.dimen.padding_medium)
+                    )
             )
-            Row(
-                modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.padding_medium))
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                ) {
-                    Text(
-                        text = "Национален исторически музей",
-                        fontSize = 24.sp,
-                    )
-                    Text(
-                        text = "гр. София",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+            if (!isFullScreen) {
+                Row {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        Text(
+                            text = "Национален исторически музей",
+                            fontSize = 24.sp,
+                        )
+                        Text(
+                            text = "гр. София",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    PlaceRating(placeRating = 4.7)
                 }
-                PlaceRating(placeRating = 4.7)
             }
             Text(
                 text = "Information",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.padding_medium))
+                    .padding(
+                        vertical = dimensionResource(id = R.dimen.padding_small)
+                    )
             )
-            Text(
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
-                        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." +
-                        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
-                        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                textAlign = TextAlign.Justify,
+            LazyColumn (
                 modifier = Modifier
                     .padding(
                         horizontal = 32.dp
                     )
-
-            )
+            ) {
+                item {
+                    Text(
+                        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
+                                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." +
+                                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
+                                "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                        textAlign = TextAlign.Justify
+                    )
+                }
+            }
         }
     }
 
@@ -189,7 +204,7 @@ private fun ImageCarouselPreview() {
 private fun PlaceDetailsScreenPreview() {
     HundredPlacesTheme {
         Surface {
-            PlaceDetailsScreen({})
+            PlaceDetailsScreen({}, false)
         }
     }
 }
