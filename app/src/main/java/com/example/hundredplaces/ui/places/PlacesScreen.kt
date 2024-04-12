@@ -1,12 +1,11 @@
 package com.example.hundredplaces.ui.places
 
+import android.app.Activity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,8 +34,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.R
 import com.example.hundredplaces.data.FakePlaceDataSource
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
+import com.example.hundredplaces.ui.AppContentType
 import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.places.details.PlaceDetailsScreen
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
 object PlacesDestination : NavigationDestination {
@@ -49,24 +51,90 @@ object PlacesDestination : NavigationDestination {
 @Composable
 fun PlacesScreen(
     navigateToPlaceEntry: (Int) -> Unit,
+    contentType: AppContentType,
     modifier: Modifier = Modifier,
     viewModel: PlacesViewModel = viewModel(
         factory = AppViewModelProvider.Factory
     )
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsState().value
+    if (contentType == AppContentType.LIST_ONLY) {
+        PlacesListOnlyContent(
+            uiState = uiState,
+            cardOnClick = navigateToPlaceEntry,
+            modifier = modifier
+        )
+    }
+    else {
+        PlacesListAndDetailsContent(
+            uiState = uiState,
+            cardOnClick = viewModel::selectPlaceCard,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+private fun PlacesListOnlyContent(
+    uiState: PlacesUiState,
+    cardOnClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier
+            .padding(dimensionResource(id = R.dimen.padding_medium))
     ) {
-        items(FakePlaceDataSource.PlacesList, key = { it.place.id}) {
+        items(FakePlaceDataSource.PlacesList /*uistate.places*/, key = { it.place.id}) {//TODO swap fake data source with ui state places
             PlaceItem(
                 placeWithCityAndImages = it,
-                //onClick = {viewModel.selectPlaceCard(it)},
-                selected = uiState.value.currentSelectedPlace?.place?.id == it.place.id,
+                selected = false,
+                onClick = { cardOnClick(it.place.id) },
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .fillMaxWidth()
-                    .clickable { navigateToPlaceEntry(it.place.id) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlacesListAndDetailsContent(
+    uiState: PlacesUiState,
+    cardOnClick: (PlaceWithCityAndImages) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+    ) {
+        LazyColumn (
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    end = 0.dp,
+                    top = dimensionResource(id = R.dimen.padding_small),
+                    start = dimensionResource(id = R.dimen.padding_small)
+                )
+        ) {
+            items(
+                FakePlaceDataSource.PlacesList /*uistate.places*/,
+                key = { it.place.id }) {//TODO swap fake data source with ui state places
+                PlaceItem(
+                    placeWithCityAndImages = it,
+                    selected = uiState.currentSelectedPlace?.place?.id == it.place.id,
+                    onClick = { cardOnClick(it) },
+                    modifier = Modifier
+                        .padding(dimensionResource(id = R.dimen.padding_small))
+                        .fillMaxWidth()
+                )
+            }
+        }
+        if (uiState.currentSelectedPlace != null) {
+            val activity = LocalContext.current as Activity
+            PlaceDetailsScreen(
+                navigateBack = { activity.finish() },
+                isFullScreen = true,
+                modifier = Modifier
+                    .weight(1f)
             )
         }
     }
@@ -78,6 +146,7 @@ fun PlacesScreen(
 @Composable
 fun PlaceItem(
     selected: Boolean,
+    onClick: () -> Unit,
     placeWithCityAndImages: PlaceWithCityAndImages,
     modifier: Modifier = Modifier
 ) {
@@ -88,6 +157,7 @@ fun PlaceItem(
     )
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        onClick = onClick,
         modifier = modifier
     ) {
         Row (
@@ -106,9 +176,9 @@ fun PlaceItem(
             )
             PlaceInformation(
                 placeName = placeWithCityAndImages.place.name,
-                placeCity = placeWithCityAndImages.city
+                placeCity = placeWithCityAndImages.city,
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.weight(1f))
             PlaceRating(
                 placeRating = placeWithCityAndImages.place.rating,
                 modifier = Modifier
@@ -167,21 +237,9 @@ private fun PlaceCardPreview() {
         Surface {
             PlaceItem(
                 selected = true,
-                placeWithCityAndImages = FakePlaceDataSource.PlacesList[0]
+                placeWithCityAndImages = FakePlaceDataSource.PlacesList[0],
+                onClick = {}
             )
-        }
-    }
-}
-
-/**
- * Preview for place item card
- */
-@Preview(showBackground = true)
-@Composable
-fun PlaceListPreview() {
-    HundredPlacesTheme {
-        Surface {
-            PlacesScreen({})
         }
     }
 }
