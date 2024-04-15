@@ -3,6 +3,7 @@ package com.example.hundredplaces.ui
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.hundredplaces.ui.home.HomeScreen
@@ -10,6 +11,7 @@ import com.example.hundredplaces.ui.home.HomeScreen
 @Composable
 fun HundredPlacesApp(
     windowSize: WindowWidthSizeClass,
+    startDestination: String,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -37,6 +39,7 @@ fun HundredPlacesApp(
     }
 
     HomeScreen(
+        startDestination = startDestination,
         navController = navController,
         navigationType = navigationType,
         contentType = contentType,

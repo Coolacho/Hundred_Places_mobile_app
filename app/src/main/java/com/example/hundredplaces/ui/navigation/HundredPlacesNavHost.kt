@@ -24,13 +24,14 @@ import com.example.hundredplaces.ui.places.details.PlaceDetailsScreen
  */
 @Composable
 fun HundredPlacesNavHost(
+    startDestination: String,
     navController: NavHostController,
     contentType: AppContentType,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = PlacesDestination.route,
+        startDestination = startDestination,
         modifier = modifier
         ) {
         composable(

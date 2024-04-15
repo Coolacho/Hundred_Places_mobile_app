@@ -34,6 +34,7 @@ import com.example.hundredplaces.ui.places.PlacesDestination
 
 @Composable
 fun HomeScreen(
+    startDestination: String,
     navController: NavHostController,
     navigationType: AppNavigationType,
     contentType: AppContentType,
@@ -58,6 +59,7 @@ fun HomeScreen(
                 }
             }) {
             HomeScreenContent(
+                startDestination = startDestination,
                 navController = navController,
                 contentType = contentType,
                 navigationType = navigationType,
@@ -66,6 +68,7 @@ fun HomeScreen(
     }
     else {
         HomeScreenContent(
+            startDestination = startDestination,
             navController = navController,
             contentType = contentType,
             navigationType = navigationType,
@@ -77,6 +80,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenContent(
+    startDestination: String,
     navController: NavHostController,
     contentType: AppContentType,
     navigationType: AppNavigationType,
@@ -97,6 +101,7 @@ private fun HomeScreenContent(
                     .background(MaterialTheme.colorScheme.inverseOnSurface)
             ) {
                 HundredPlacesNavHost(
+                    startDestination = startDestination,
                     navController = navController,
                     contentType = contentType,
                     modifier = Modifier.weight(1f)

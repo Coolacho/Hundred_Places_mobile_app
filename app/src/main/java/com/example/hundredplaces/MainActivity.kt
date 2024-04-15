@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.hundredplaces.ui.HundredPlacesApp
+import com.example.hundredplaces.ui.places.PlacesDestination
+import com.example.hundredplaces.ui.places.details.PlaceDetailsDestination
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,8 +29,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val windowSize = calculateWindowSizeClass(activity = this)
+                    val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
+                    val startDestination = if (navigateToPlaceDetails) PlaceDetailsDestination.routeWithArgs else PlacesDestination.route
                     HundredPlacesApp(
-                        windowSize = windowSize.widthSizeClass
+                        windowSize = windowSize.widthSizeClass,
+                        startDestination = startDestination
                     )
                 }
             }
@@ -42,7 +47,8 @@ fun HundredPlacesAppCompatPreview() {
     HundredPlacesTheme {
         Surface {
             HundredPlacesApp(
-                windowSize = WindowWidthSizeClass.Compact
+                windowSize = WindowWidthSizeClass.Compact,
+                startDestination = PlacesDestination.route
             )
         }
     }
@@ -54,7 +60,8 @@ fun HundredPlacesAppMediumPreview() {
     HundredPlacesTheme {
         Surface {
             HundredPlacesApp(
-                windowSize = WindowWidthSizeClass.Compact
+                windowSize = WindowWidthSizeClass.Compact,
+                startDestination = PlacesDestination.route
             )
         }
     }
@@ -66,7 +73,8 @@ fun HundredPlacesAppExpandedPreview() {
     HundredPlacesTheme {
         Surface {
             HundredPlacesApp(
-                windowSize = WindowWidthSizeClass.Compact
+                windowSize = WindowWidthSizeClass.Compact,
+                startDestination = PlacesDestination.route
             )
         }
     }
