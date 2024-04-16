@@ -54,6 +54,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 object MapDestination : NavigationDestination {
     override val route = "Map"
+    override val title = R.string.map
     override val iconRes = R.drawable.rounded_map_24
 }
 
@@ -62,7 +63,7 @@ object MapDestination : NavigationDestination {
  */
 @Composable
 fun MapScreen(
-    navigateToPlaceEntry: (Int) -> Unit,
+    navigateToPlaceEntry: (Long) -> Unit,
     modifier: Modifier = Modifier,
     placesWithCityAndImages: List<PlaceWithCityAndImages> = FakePlaceDataSource.PlacesList
 ) {

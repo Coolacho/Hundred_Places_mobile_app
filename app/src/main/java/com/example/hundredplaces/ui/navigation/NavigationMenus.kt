@@ -55,12 +55,12 @@ fun AppBottomNavigationBar(
                 icon = {
                     Icon(
                         painter = painterResource(navItem.iconRes),
-                        contentDescription = navItem.route
+                        contentDescription = stringResource(id = navItem.title)
                     )
                 },
                 label = {
                     Text(
-                        text = navItem.route
+                        text = stringResource(id = navItem.title)
                     )
                 }
             )

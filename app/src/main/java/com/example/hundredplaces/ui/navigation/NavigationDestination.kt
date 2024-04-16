@@ -1,15 +1,22 @@
 package com.example.hundredplaces.ui.navigation
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 
 /**
  * Interface to describe the navigation destinations for the app
  */
 interface NavigationDestination {
     /**
-     * Unique String resource id to define the path for a composable and to be displayed for the screen.
+     * Unique String to define the path for a composable and to be displayed for the screen.
      */
     val route: String
+
+    /**
+     * String resource for navigation menu labels
+     */
+    @get:StringRes
+    val title: Int
 
     /**
      * Icon for menu

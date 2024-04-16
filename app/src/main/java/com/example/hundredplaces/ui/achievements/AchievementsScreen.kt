@@ -9,6 +9,7 @@ import com.example.hundredplaces.ui.navigation.NavigationDestination
 
 object AchievementsDestination : NavigationDestination {
     override val route = "Achievements"
+    override val title = R.string.achievements
     override val iconRes = R.drawable.rounded_trophy_24
 }
 
