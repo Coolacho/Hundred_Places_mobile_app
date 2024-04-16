@@ -11,12 +11,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.hundredplaces.R
@@ -78,6 +84,7 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenContent(
     startDestination: String,
@@ -87,32 +94,52 @@ private fun HomeScreenContent(
     navigationItemContentList: List<NavigationDestination>,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            AnimatedVisibility(visible = navigationType == AppNavigationType.NAVIGATION_RAIL) {
-                AppNavigationRail(
-                    navigationItemContentList = navigationItemContentList,
-                    navController = navController,
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.displayLarge
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.inverseOnSurface)
-            ) {
-                HundredPlacesNavHost(
-                    startDestination = startDestination,
-                    navController = navController,
-                    contentType = contentType,
-                    modifier = Modifier.weight(1f)
-                )
-                AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION) {
-                    AppBottomNavigationBar(
+            )
+        },
+        modifier = modifier
+    ) {paddingValues ->
+        Box(
+            modifier = Modifier
+            .padding(paddingValues)
+        ) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                AnimatedVisibility(visible = navigationType == AppNavigationType.NAVIGATION_RAIL) {
+                    AppNavigationRail(
                         navigationItemContentList = navigationItemContentList,
                         navController = navController,
-                        modifier = Modifier
-                            .fillMaxWidth()
                     )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.inverseOnSurface)
+                ) {
+                    HundredPlacesNavHost(
+                        startDestination = startDestination,
+                        navController = navController,
+                        contentType = contentType,
+                        modifier = Modifier.weight(1f)
+                    )
+                    AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION) {
+                        AppBottomNavigationBar(
+                            navigationItemContentList = navigationItemContentList,
+                            navController = navController,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
