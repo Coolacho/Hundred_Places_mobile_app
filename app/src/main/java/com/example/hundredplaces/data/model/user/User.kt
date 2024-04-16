@@ -26,6 +26,8 @@ data class User(
     val email: String,
     @ColumnInfo(name = "password")
     val password: String,
+    @ColumnInfo(name = "hundred_places_visited")
+    val hundredPlacesVisited: Int = 0,
     @ColumnInfo(name = "museums_visited")
     val museumsVisited: Int = 0,
     @ColumnInfo(name = "peaks_visited")
