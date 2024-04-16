@@ -17,7 +17,7 @@ interface PlaceRestApiService {
     suspend fun getAllPlaces(): Flow<List<Place>>
 
     @GET("$baseUrl/place/{placeId}")
-    suspend fun getPlace(@Path("placeId") id: Int): Flow<Place>
+    suspend fun getPlace(@Path("placeId") id: Long): Flow<Place>
 
     @POST("$baseUrl/new")
     suspend fun insertPlace(@Body place: Place)

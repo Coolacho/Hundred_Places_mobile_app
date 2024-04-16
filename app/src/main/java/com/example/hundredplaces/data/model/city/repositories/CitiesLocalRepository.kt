@@ -10,7 +10,7 @@ class CitiesLocalRepository(
 
     override suspend fun getAllCitiesStream(): Flow<List<City>> = cityDao.getAllCities()
 
-    override suspend fun getCityStream(id: Int): Flow<City?> = cityDao.getCity(id)
+    override suspend fun getCityStream(id: Long): Flow<City?> = cityDao.getCity(id)
 
     override suspend fun insertCity(city: City) = cityDao.insert(city)
 

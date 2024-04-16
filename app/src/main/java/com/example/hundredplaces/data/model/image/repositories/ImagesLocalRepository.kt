@@ -9,7 +9,7 @@ class ImagesLocalRepository(
 ) : ImagesRepository{
     override suspend fun getAllImagesStream(): Flow<List<Image>> = imageDao.getAllImages()
 
-    override suspend fun getImageStream(id: Int): Flow<Image?> = imageDao.getImage(id)
+    override suspend fun getImageStream(id: Long): Flow<Image?> = imageDao.getImage(id)
 
     override suspend fun insertImage(image: Image) = imageDao.insert(image)
 

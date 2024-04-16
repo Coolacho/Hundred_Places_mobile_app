@@ -17,7 +17,7 @@ class ImagesDataRepository(
         }
     }
 
-    override suspend fun getImageStream(id: Int): Flow<Image?> {
+    override suspend fun getImageStream(id: Long): Flow<Image?> {
         return if (networkConnection.isNetworkConnected) {
             imagesRemoteRepository.getImageStream(id)
         } else {

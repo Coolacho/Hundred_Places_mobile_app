@@ -12,7 +12,7 @@ class PlacesRemoteRepository(
 
     override suspend fun getAllPlacesStream(): Flow<List<Place>> = placeRestApiService.getAllPlaces()
 
-    override suspend fun getPlaceStream(id: Int): Flow<Place> = placeRestApiService.getPlace(id)
+    override suspend fun getPlaceStream(id: Long): Flow<Place> = placeRestApiService.getPlace(id)
 
     override suspend fun insertPlace(place: Place) = placeRestApiService.insertPlace(place)
 

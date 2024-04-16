@@ -17,7 +17,7 @@ class VisitsDataRepository(
         }
     }
 
-    override suspend fun getVisitStream(id: Int): Flow<Visit?> {
+    override suspend fun getVisitStream(id: Long): Flow<Visit?> {
         return if (networkConnection.isNetworkConnected) {
             visitsRemoteRepository.getVisitStream(id)
         } else {

@@ -17,7 +17,7 @@ class UsersDataRepository(
         }
     }
 
-    override suspend fun getUserStream(id: Int): Flow<User?> {
+    override suspend fun getUserStream(id: Long): Flow<User?> {
         return if (networkConnection.isNetworkConnected) {
             usersRemoteRepository.getUserStream(id)
         } else {

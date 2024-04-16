@@ -10,7 +10,7 @@ class PlacesLocalRepository(private val placeDao: PlaceDao) : PlacesRepository {
 
     override suspend fun getAllPlacesStream(): Flow<List<Place>> = placeDao.getAllPlaces()
 
-    override suspend fun getPlaceStream(id: Int): Flow<Place> = placeDao.getPlace(id)
+    override suspend fun getPlaceStream(id: Long): Flow<Place> = placeDao.getPlace(id)
 
     override suspend fun insertPlace(place: Place) = placeDao.insert(place)
 

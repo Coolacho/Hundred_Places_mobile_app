@@ -26,7 +26,7 @@ class PlacesDataRepository (
         }
     }
 
-    override suspend fun getPlaceStream(id: Int): Flow<Place> {
+    override suspend fun getPlaceStream(id: Long): Flow<Place> {
         return if (networkConnection.isNetworkConnected) {
             placesRemoteRepository.getPlaceStream(id)
         } else {

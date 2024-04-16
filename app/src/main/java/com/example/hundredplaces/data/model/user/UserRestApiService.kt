@@ -13,7 +13,7 @@ interface UserRestApiService {
     suspend fun getAllUsers(): Flow<List<User>>
 
     @GET("users/{userId}")
-    suspend fun getUser(@Path("userId") id: Int): Flow<User>
+    suspend fun getUser(@Path("userId") id: Long): Flow<User>
 
     @POST("users/new")
     suspend fun insertUser(@Body user: User)

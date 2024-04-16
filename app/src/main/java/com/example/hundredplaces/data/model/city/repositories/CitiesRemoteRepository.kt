@@ -10,7 +10,7 @@ class CitiesRemoteRepository(
 
     override suspend fun getAllCitiesStream(): Flow<List<City>> = cityRestApiService.getAllCities()
 
-    override suspend fun getCityStream(id: Int): Flow<City?> = cityRestApiService.getCity(id)
+    override suspend fun getCityStream(id: Long): Flow<City?> = cityRestApiService.getCity(id)
 
     override suspend fun insertCity(city: City) = cityRestApiService.insertCity(city)
 

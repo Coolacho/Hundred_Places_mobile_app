@@ -9,7 +9,7 @@ class ImagesRemoteRepository(
 ) : ImagesRepository{
     override suspend fun getAllImagesStream(): Flow<List<Image>> = imageRestApiService.getAllImages()
 
-    override suspend fun getImageStream(id: Int): Flow<Image?> = imageRestApiService.getImage(id)
+    override suspend fun getImageStream(id: Long): Flow<Image?> = imageRestApiService.getImage(id)
 
     override suspend fun insertImage(image: Image) = imageRestApiService.insertImage(image)
 

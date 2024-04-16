@@ -33,7 +33,7 @@ import kotlinx.serialization.Serializable
 data class Place(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int = 0,
+    val id: Long = 0,
     @ColumnInfo(name = "name")
     val name: String,
     @ColumnInfo(name = "latitude")
@@ -49,5 +49,5 @@ data class Place(
     @ColumnInfo(name = "type")
     val type: PlaceTypeEnum,
     @ColumnInfo(name = "city_id")
-    val cityId: Int
+    val cityId: Long
 )

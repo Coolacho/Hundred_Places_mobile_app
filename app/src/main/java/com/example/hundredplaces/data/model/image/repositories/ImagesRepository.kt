@@ -16,7 +16,7 @@ interface ImagesRepository {
     /**
      * Retrieve an image from the given data source that matches with the [id].
      */
-    suspend fun getImageStream(id: Int): Flow<Image?>
+    suspend fun getImageStream(id: Long): Flow<Image?>
 
     /**
      * Insert image in the data source

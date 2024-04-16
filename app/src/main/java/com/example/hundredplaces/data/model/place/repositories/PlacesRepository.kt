@@ -23,7 +23,7 @@ interface PlacesRepository {
     /**
      * Retrieve a place from the given data source
      */
-    suspend fun getPlaceStream(id: Int): Flow<Place>
+    suspend fun getPlaceStream(id: Long): Flow<Place>
 
     /**
      * Insert place in the data source

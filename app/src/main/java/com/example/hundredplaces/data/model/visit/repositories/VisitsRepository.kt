@@ -16,7 +16,7 @@ interface VisitsRepository {
     /**
      * Retrieve an visit from the given data source that matches with the [id].
      */
-    suspend fun getVisitStream(id: Int): Flow<Visit?>
+    suspend fun getVisitStream(id: Long): Flow<Visit?>
 
     /**
      * Insert visit in the data source

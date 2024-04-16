@@ -15,7 +15,7 @@ interface CitiesRepository {
     /**
      * Retrieve an city from the given data source that matches with the [id].
      */
-    suspend fun getCityStream(id: Int): Flow<City?>
+    suspend fun getCityStream(id: Long): Flow<City?>
 
     /**
      * Insert city in the data source

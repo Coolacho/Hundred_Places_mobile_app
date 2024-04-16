@@ -9,7 +9,7 @@ class UsersRemoteRepository(
 ) : UsersRepository{
     override suspend fun getAllUsersStream(): Flow<List<User>> = userRestApiService.getAllUsers()
 
-    override suspend fun getUserStream(id: Int): Flow<User?> = userRestApiService.getUser(id)
+    override suspend fun getUserStream(id: Long): Flow<User?> = userRestApiService.getUser(id)
 
     override suspend fun insertUser(user: User) = userRestApiService.insertUser(user)
 

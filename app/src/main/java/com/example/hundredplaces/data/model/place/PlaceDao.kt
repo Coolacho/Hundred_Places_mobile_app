@@ -20,7 +20,7 @@ interface PlaceDao {
     suspend fun delete(place: Place)
 
     @Query("SELECT * FROM places WHERE id = :id")
-    fun getPlace(id: Int): Flow<Place>
+    fun getPlace(id: Long): Flow<Place>
 
     @Query("SELECT * FROM places ORDER BY id ASC")
     fun getAllPlaces(): Flow<List<Place>>

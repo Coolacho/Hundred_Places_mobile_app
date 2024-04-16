@@ -9,7 +9,7 @@ class VisitsRemoteRepository(
 ) : VisitsRepository{
     override suspend fun getAllVisitsStream(): Flow<List<Visit>> = visitRestApiService.getAllVisits()
 
-    override suspend fun getVisitStream(id: Int): Flow<Visit?> = visitRestApiService.getVisit(id)
+    override suspend fun getVisitStream(id: Long): Flow<Visit?> = visitRestApiService.getVisit(id)
 
     override suspend fun insertVisit(visit: Visit) = visitRestApiService.insertVisit(visit)
 

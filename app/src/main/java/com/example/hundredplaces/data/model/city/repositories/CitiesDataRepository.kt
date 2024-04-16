@@ -18,7 +18,7 @@ class CitiesDataRepository(
         }
     }
 
-    override suspend fun getCityStream(id: Int): Flow<City?> {
+    override suspend fun getCityStream(id: Long): Flow<City?> {
         return if (networkConnection.isNetworkConnected) {
             citiesRemoteRepository.getCityStream(id)
         } else {

@@ -9,7 +9,7 @@ class VisitsLocalRepository(
 ) : VisitsRepository{
     override suspend fun getAllVisitsStream(): Flow<List<Visit>> = visitDao.getAllVisits()
 
-    override suspend fun getVisitStream(id: Int): Flow<Visit?> = visitDao.getVisit(id)
+    override suspend fun getVisitStream(id: Long): Flow<Visit?> = visitDao.getVisit(id)
 
     override suspend fun insertVisit(visit: Visit) = visitDao.insert(visit)
 

@@ -9,7 +9,7 @@ class UsersLocalRepository(
 ) : UsersRepository{
     override suspend fun getAllUsersStream(): Flow<List<User>> = userDao.getAllUsers()
 
-    override suspend fun getUserStream(id: Int): Flow<User?> = userDao.getUser(id)
+    override suspend fun getUserStream(id: Long): Flow<User?> = userDao.getUser(id)
 
     override suspend fun insertUser(user: User) = userDao.insert(user)
 
