@@ -7,4 +7,12 @@
     <string name="back_button">Back</string>
     <string name="grid_layout_toggle">Grid layout</string>
     <string name="linear_layout_toggle">Linear layout</string>
+    <string name="credits">Made by Katelina and Angel</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="log_out">Log out</string>
+    <string name="save">Save</string>
+    <string name="settings">Settings</string>
+    <string name="notifications">Notifications</string>
 </resources>
