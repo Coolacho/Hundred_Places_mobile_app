@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hundredplaces.HundredPlacesApplication
+import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.components.AppContentViewModel
 import com.example.hundredplaces.ui.places.PlacesViewModel
 
@@ -24,6 +25,13 @@ object AppViewModelProvider {
         initializer {
             PlacesViewModel(
                 hundredPlacesApplication().container.placesRepository
+            )
+        }
+        // Initializer for AccountViewModel
+        initializer {
+            AccountViewModel(
+                hundredPlacesApplication().container.usersRepository,
+                hundredPlacesApplication().container.userPreferencesRepository
             )
         }
     }
