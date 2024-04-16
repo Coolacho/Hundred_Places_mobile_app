@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">100-те обекта</string>
+    <string name="places">Обекти</string>
+    <string name="map">Карта</string>
+    <string name="achievements">Постижения</string>
+    <string name="account">Профил</string>
+    <string name="back_button">Назад</string>
+    <string name="credits">Направено от Кателина и Ангел</string>
+    <string name="grid_layout_toggle">Мрежово оформление</string>
+    <string name="linear_layout_toggle">Линейно оформление</string>
+    <string name="password">Парола</string>
+    <string name="email">Имейл</string>
+    <string name="name">Име</string>
+    <string name="log_out">Излез</string>
+    <string name="save">Запази</string>
+    <string name="settings">Настройки</string>
+    <string name="notifications">Известия</string>
+</resources>
