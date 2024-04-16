@@ -22,6 +22,9 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE id = :id")
     fun getUser(id: Long): Flow<User>
 
+    @Query("SELECT * FROM users WHERE id = :id")
+    fun getUserWithVisits(id: Long): Flow<UserWithVisits>
+
     @Query("SELECT * FROM users ORDER BY name ASC")
     fun getAllUsers(): Flow<List<User>>
 }

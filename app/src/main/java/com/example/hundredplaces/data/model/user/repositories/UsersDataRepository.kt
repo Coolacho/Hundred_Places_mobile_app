@@ -1,6 +1,7 @@
 package com.example.hundredplaces.data.model.user.repositories
 
 import com.example.hundredplaces.data.model.user.User
+import com.example.hundredplaces.data.model.user.UserWithVisits
 import com.example.hundredplaces.util.NetworkConnection
 import kotlinx.coroutines.flow.Flow
 
@@ -17,11 +18,19 @@ class UsersDataRepository(
         }
     }
 
-    override suspend fun getUserStream(id: Long): Flow<User?> {
+    override suspend fun getUserStream(id: Long): Flow<User> {
         return if (networkConnection.isNetworkConnected) {
             usersRemoteRepository.getUserStream(id)
         } else {
             usersLocalRepository.getUserStream(id)
+        }
+    }
+
+    override suspend fun getUserWithVisitsStream(id: Long): Flow<UserWithVisits> {
+        return if (networkConnection.isNetworkConnected) {
+            usersRemoteRepository.getUserWithVisitsStream(id)
+        } else {
+            usersLocalRepository.getUserWithVisitsStream(id)
         }
     }
 
