@@ -11,14 +11,19 @@ import kotlinx.coroutines.flow.Flow
  */
 interface PlacesRepository {
     /**
-     * Retrieve all the places from the given data source.
+     * Retrieve all the places with city and images from the given data source.
      */
-    suspend fun getAllPlacesStream(): Flow<List<PlaceWithCityAndImages>>
+    suspend fun getAllPlacesWithCityAndImagesStream(): Flow<List<PlaceWithCityAndImages>>
 
     /**
-     * Retrieve an place from the given data source that matches with the [id].
+     * Retrieve all the places from the given data source.
      */
-    suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?>
+    suspend fun getAllPlacesStream(): Flow<List<Place>>
+
+    /**
+     * Retrieve a place from the given data source
+     */
+    suspend fun getPlaceStream(id: Int): Flow<Place>
 
     /**
      * Insert place in the data source

@@ -87,7 +87,7 @@ class PlaceDaoTest {
     fun daoInsert_insertsPlaceIntoDb() = runBlocking {
         addOneCityToDb()
         addOnePlaceToDb()
-        val allPlaces = placeDao.getAllPlaces().first()
+        val allPlaces = placeDao.getAllPlacesWithCityAndImages().first()
         Assert.assertEquals(allPlaces[0], place1)
     }
 
@@ -96,7 +96,7 @@ class PlaceDaoTest {
     fun daoGetAllPlaces_returnsAllPlacesFromDB() = runBlocking {
         addTwoCitiesToDb()
         addTwoPlacesToDb()
-        val allPlaces = placeDao.getAllPlaces().first()
+        val allPlaces = placeDao.getAllPlacesWithCityAndImages().first()
         Assert.assertEquals(allPlaces[0], place1)
         Assert.assertEquals(allPlaces[1], place2)
     }
@@ -109,7 +109,7 @@ class PlaceDaoTest {
         placeDao.update(place1.copy(rating = 3.0))
         placeDao.update(place2.copy(rating = 2.0))
 
-        val allPlaces = placeDao.getAllPlaces().first()
+        val allPlaces = placeDao.getAllPlacesWithCityAndImages().first()
         Assert.assertEquals(allPlaces[0], place1.copy(rating = 3.0))
         Assert.assertEquals(allPlaces[1], place2.copy(rating = 2.0))
     }
@@ -121,7 +121,7 @@ class PlaceDaoTest {
         addTwoPlacesToDb()
         placeDao.delete(place1)
         placeDao.delete(place2)
-        val allPlaces = placeDao.getAllPlaces().first()
+        val allPlaces = placeDao.getAllPlacesWithCityAndImages().first()
         Assert.assertTrue(allPlaces.isEmpty())
     }
 

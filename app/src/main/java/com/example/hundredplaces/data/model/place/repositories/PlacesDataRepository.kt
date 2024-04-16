@@ -10,15 +10,23 @@ class PlacesDataRepository (
     private val placesRemoteRepository: PlacesRemoteRepository,
     private val networkConnection: NetworkConnection
 ) : PlacesRepository {
-    override suspend fun getAllPlacesStream(): Flow<List<PlaceWithCityAndImages>> {
+    override suspend fun getAllPlacesWithCityAndImagesStream(): Flow<List<PlaceWithCityAndImages>> {
         return if (networkConnection.isNetworkConnected) {
-           placesRemoteRepository. getAllPlacesStream()
+           placesRemoteRepository. getAllPlacesWithCityAndImagesStream()
+        } else {
+            placesLocalRepository.getAllPlacesWithCityAndImagesStream()
+        }
+    }
+
+    override suspend fun getAllPlacesStream(): Flow<List<Place>> {
+        return if (networkConnection.isNetworkConnected) {
+            placesRemoteRepository. getAllPlacesStream()
         } else {
             placesLocalRepository.getAllPlacesStream()
         }
     }
 
-    override suspend fun getPlaceStream(id: Int): Flow<PlaceWithCityAndImages?> {
+    override suspend fun getPlaceStream(id: Int): Flow<Place> {
         return if (networkConnection.isNetworkConnected) {
             placesRemoteRepository.getPlaceStream(id)
         } else {

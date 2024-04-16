@@ -30,7 +30,7 @@ class PlacesViewModel (
 
     private fun getPlaces() {
         viewModelScope.launch {
-            placesDataRepository.getAllPlacesStream().collect { places ->
+            placesDataRepository.getAllPlacesWithCityAndImagesStream().collect { places ->
                 _uiState.update {
                     it.copy(
                         places = places

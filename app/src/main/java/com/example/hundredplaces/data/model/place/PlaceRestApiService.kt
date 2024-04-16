@@ -8,19 +8,23 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+const val baseUrl = "/api/v1/places"
 interface PlaceRestApiService {
-    @GET("places")
-    suspend fun getAllPlaces(): Flow<List<PlaceWithCityAndImages>>
+    @GET("$baseUrl/all/filled")
+    suspend fun getAllPlacesWithCityAndImages(): Flow<List<PlaceWithCityAndImages>>
 
-    @GET("places/{placeId}")
-    suspend fun getPlace(@Path("placeId") id: Int): Flow<PlaceWithCityAndImages>
+    @GET("$baseUrl/all/plain")
+    suspend fun getAllPlaces(): Flow<List<Place>>
 
-    @POST("places/new")
+    @GET("$baseUrl/place/{placeId}")
+    suspend fun getPlace(@Path("placeId") id: Int): Flow<Place>
+
+    @POST("$baseUrl/new")
     suspend fun insertPlace(@Body place: Place)
 
-    @PUT("place/edit")
+    @PUT("$baseUrl/update")
     suspend fun updatePlace(@Body place: Place)
 
-    @DELETE("place/delete")
+    @DELETE("$baseUrl/delete")
     suspend fun deletePlace(@Body place: Place)
 }
