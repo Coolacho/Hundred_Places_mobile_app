@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -16,6 +17,7 @@ class UserPreferencesRepository(
 ) {
     private companion object {
         val IS_LINEAR_LAYOUT = booleanPreferencesKey("is_linear_layout")
+        val PREF_USERNAME = stringPreferencesKey("pref_username")
         const val TAG = "UserPreferencesRepo"
     }
 
@@ -33,9 +35,29 @@ class UserPreferencesRepository(
             preferences[IS_LINEAR_LAYOUT] ?: true
         }
 
+    val prefUsername: Flow<String> = dataStore.data
+        .catch {
+            if (it is IOException) {
+                Log.e(TAG, "Error reading preferences", it)
+                emit(emptyPreferences())
+            }
+            else {
+                throw it
+            }
+        }
+        .map { preferences ->
+            preferences[PREF_USERNAME] ?: ""
+        }
+
     suspend fun saveLayoutPreference(isLinearLayout: Boolean) {
         dataStore.edit { preferences ->
             preferences[IS_LINEAR_LAYOUT] = isLinearLayout
+        }
+    }
+
+    suspend fun saveUsernamePreference(prefUsername: String) {
+        dataStore.edit { preferences ->
+            preferences[PREF_USERNAME] = prefUsername
         }
     }
 }
