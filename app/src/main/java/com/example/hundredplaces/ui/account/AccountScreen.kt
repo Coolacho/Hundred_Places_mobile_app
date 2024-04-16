@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.R
+import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.navigation.NavigationDestination
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
@@ -43,8 +46,13 @@ object AccountDestination : NavigationDestination {
  */
 @Composable
 fun AccountScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AccountViewModel = viewModel(
+        factory = AppViewModelProvider.Factory
+    )
 ){
+    val uiState = viewModel.uiState.collectAsState()
+
     LazyColumn(
         //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -84,8 +92,8 @@ fun AccountScreen(
                             .fillMaxWidth()
                     ) {
                         OutlinedTextField(
-                            value = "Example",
-                            onValueChange = {},
+                            value = uiState.value.userDetails.name,
+                            onValueChange = {viewModel.updateUiState(uiState.value.userDetails.copy(name = it))},
                             readOnly = true,
                             label = { Text(
                                 text = stringResource(R.string.name),
@@ -96,8 +104,8 @@ fun AccountScreen(
                                 .fillMaxWidth()
                         )
                         OutlinedTextField(
-                            value = "Example",
-                            onValueChange = {},
+                            value = uiState.value.userDetails.email,
+                            onValueChange = {viewModel.updateUiState(uiState.value.userDetails.copy(email = it))},
                             readOnly = true,
                             label = { Text(
                                 text = stringResource(R.string.email),
@@ -108,8 +116,8 @@ fun AccountScreen(
                                 .fillMaxWidth()
                         )
                         OutlinedTextField(
-                            value = "Example",
-                            onValueChange = {},
+                            value = uiState.value.userDetails.password,
+                            onValueChange = {viewModel.updateUiState(uiState.value.userDetails.copy(password = it))},
                             readOnly = true,
                             label = { Text(
                                 text = stringResource(R.string.password),
@@ -128,7 +136,7 @@ fun AccountScreen(
                             Button(
                                 shape = MaterialTheme.shapes.small,
                                 enabled = true,
-                                onClick = { /*TODO*/ }
+                                onClick = { viewModel.saveUser() }
                             ) {
                                 Text(
                                     text = stringResource(R.string.save),
@@ -141,56 +149,13 @@ fun AccountScreen(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Red
                                 ),
-                                onClick = { /*TODO*/ }
+                                onClick = { viewModel.logOut() }
                             ) {
                                 Text(
                                     text = stringResource(R.string.log_out),
                                     fontSize = 16.sp
                                 )
                             }
-                        }
-                    }
-                }
-            }
-        }
-        item {
-            OutlinedCard(
-                modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.padding_medium))
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_medium))
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(bottom = dimensionResource(id = R.dimen.padding_small))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.surfaceTint,
-                            modifier = Modifier
-                                .padding(end = dimensionResource(id = R.dimen.padding_small))
-                        )
-                        Text(
-                            text = stringResource(R.string.settings),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                    Column {
-                        Row (
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Text(
-                                text = stringResource(R.string.notifications),
-                                fontSize = 20.sp
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Switch(
-                                checked = true,
-                                onCheckedChange = {},
-                            )
                         }
                     }
                 }
