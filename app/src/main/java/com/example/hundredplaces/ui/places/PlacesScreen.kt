@@ -42,6 +42,7 @@ import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
 object PlacesDestination : NavigationDestination {
     override val route = "Places"
+    override val title = R.string.places
     override val iconRes = R.drawable.rounded_museum_24
 }
 
@@ -50,7 +51,7 @@ object PlacesDestination : NavigationDestination {
  */
 @Composable
 fun PlacesScreen(
-    navigateToPlaceEntry: (Int) -> Unit,
+    navigateToPlaceEntry: (Long) -> Unit,
     contentType: AppContentType,
     modifier: Modifier = Modifier,
     viewModel: PlacesViewModel = viewModel(
@@ -77,7 +78,7 @@ fun PlacesScreen(
 @Composable
 private fun PlacesListOnlyContent(
     uiState: PlacesUiState,
-    cardOnClick: (Int) -> Unit,
+    cardOnClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(

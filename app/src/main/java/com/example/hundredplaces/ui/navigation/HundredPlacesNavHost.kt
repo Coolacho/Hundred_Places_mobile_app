@@ -46,7 +46,7 @@ fun HundredPlacesNavHost(
         composable(
             route = PlaceDetailsDestination.routeWithArgs,
             arguments = listOf(navArgument(PlaceDetailsDestination.PLACE_ID_ARG) {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
             PlaceDetailsScreen(
