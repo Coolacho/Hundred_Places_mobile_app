@@ -2,26 +2,25 @@ package com.example.hundredplaces.data.model.image.repositories
 
 import com.example.hundredplaces.data.model.image.Image
 import com.example.hundredplaces.util.NetworkConnection
-import kotlinx.coroutines.flow.Flow
 
 class ImagesDataRepository(
     private val imagesLocalRepository: ImagesLocalRepository,
     private val imagesRemoteRepository: ImagesRemoteRepository,
     private val networkConnection: NetworkConnection
 ) : ImagesRepository{
-    override suspend fun getAllImagesStream(): Flow<List<Image>> {
+    override suspend fun getAllImages(): List<Image> {
         return if (networkConnection.isNetworkConnected) {
-            imagesRemoteRepository.getAllImagesStream()
+            imagesRemoteRepository.getAllImages()
         } else {
-            imagesLocalRepository.getAllImagesStream()
+            imagesLocalRepository.getAllImages()
         }
     }
 
-    override suspend fun getImageStream(id: Long): Flow<Image?> {
+    override suspend fun getImage(id: Long): Image {
         return if (networkConnection.isNetworkConnected) {
-            imagesRemoteRepository.getImageStream(id)
+            imagesRemoteRepository.getImage(id)
         } else {
-            imagesLocalRepository.getImageStream(id)
+            imagesLocalRepository.getImage(id)
         }
     }
 

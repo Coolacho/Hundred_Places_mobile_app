@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CityDao {
@@ -20,8 +19,8 @@ interface CityDao {
     suspend fun delete(city: City)
 
     @Query("SELECT * FROM cities WHERE id = :id")
-    fun getCity(id: Long): Flow<City>
+    fun getCity(id: Long): City
 
     @Query("SELECT * FROM cities ORDER BY name ASC")
-    fun getAllCities(): Flow<List<City>>
+    fun getAllCities(): List<City>
 }

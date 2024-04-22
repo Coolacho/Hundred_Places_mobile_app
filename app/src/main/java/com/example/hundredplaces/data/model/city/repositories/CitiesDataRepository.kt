@@ -2,7 +2,6 @@ package com.example.hundredplaces.data.model.city.repositories
 
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.util.NetworkConnection
-import kotlinx.coroutines.flow.Flow
 
 class CitiesDataRepository(
     private val citiesLocalRepository: CitiesLocalRepository,
@@ -10,19 +9,19 @@ class CitiesDataRepository(
     private val networkConnection: NetworkConnection
 ) : CitiesRepository{
 
-    override suspend fun getAllCitiesStream(): Flow<List<City>> {
+    override suspend fun getAllCities(): List<City> {
         return if (networkConnection.isNetworkConnected) {
-            citiesRemoteRepository.getAllCitiesStream()
+            citiesRemoteRepository.getAllCities()
         } else {
-            citiesLocalRepository.getAllCitiesStream()
+            citiesLocalRepository.getAllCities()
         }
     }
 
-    override suspend fun getCityStream(id: Long): Flow<City?> {
+    override suspend fun getCity(id: Long): City {
         return if (networkConnection.isNetworkConnected) {
-            citiesRemoteRepository.getCityStream(id)
+            citiesRemoteRepository.getCity(id)
         } else {
-            citiesLocalRepository.getCityStream(id)
+            citiesLocalRepository.getCity(id)
         }
     }
 

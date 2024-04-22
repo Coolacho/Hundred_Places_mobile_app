@@ -7,7 +7,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.hundredplaces.data.HundredPlacesLocalDatabase
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.city.CityDao
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okio.IOException
 import org.junit.After
@@ -53,7 +52,7 @@ class CityDaoTest {
     @Throws(Exception::class)
     fun daoInsert_insertsCityIntoDb() = runBlocking {
         addOneCityToDb()
-        val allCities = cityDao.getAllCities().first()
+        val allCities = cityDao.getAllCities()
         assertEquals(allCities[0], city1)
     }
 
@@ -61,7 +60,7 @@ class CityDaoTest {
     @Throws(Exception::class)
     fun daoGetAllCities_returnsAllCitiesFromDB() = runBlocking {
         addTwoCitiesToDb()
-        val allCities = cityDao.getAllCities().first()
+        val allCities = cityDao.getAllCities()
         assertEquals(allCities[0], city1)
         assertEquals(allCities[1], city2)
     }
@@ -73,7 +72,7 @@ class CityDaoTest {
         cityDao.update(City(1, "Burgas"))
         cityDao.update(City(2, "Stara Zagora"))
 
-        val allCities = cityDao.getAllCities().first()
+        val allCities = cityDao.getAllCities()
         assertEquals(allCities[0], City(1, "Burgas"))
         assertEquals(allCities[1], City(2, "Stara Zagora"))
     }
@@ -84,7 +83,7 @@ class CityDaoTest {
         addTwoCitiesToDb()
         cityDao.delete(city1)
         cityDao.delete(city2)
-        val allCities = cityDao.getAllCities().first()
+        val allCities = cityDao.getAllCities()
         Assert.assertTrue(allCities.isEmpty())
     }
 
@@ -93,6 +92,6 @@ class CityDaoTest {
     fun daoGetCity_returnsCityFromDB() = runBlocking {
         addOneCityToDb()
         val city = cityDao.getCity(1)
-        assertEquals(city.first(), city1)
+        assertEquals(city, city1)
     }
 }

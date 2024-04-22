@@ -2,14 +2,13 @@ package com.example.hundredplaces.data.model.image.repositories
 
 import com.example.hundredplaces.data.model.image.Image
 import com.example.hundredplaces.data.model.image.ImageRestApiService
-import kotlinx.coroutines.flow.Flow
 
 class ImagesRemoteRepository(
     private val imageRestApiService: ImageRestApiService
 ) : ImagesRepository{
-    override suspend fun getAllImagesStream(): Flow<List<Image>> = imageRestApiService.getAllImages()
+    override suspend fun getAllImages(): List<Image> = imageRestApiService.getAllImages()
 
-    override suspend fun getImageStream(id: Long): Flow<Image?> = imageRestApiService.getImage(id)
+    override suspend fun getImage(id: Long): Image = imageRestApiService.getImage(id)
 
     override suspend fun insertImage(image: Image) = imageRestApiService.insertImage(image)
 

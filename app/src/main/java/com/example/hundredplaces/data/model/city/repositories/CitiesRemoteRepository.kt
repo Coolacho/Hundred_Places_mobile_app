@@ -2,15 +2,14 @@ package com.example.hundredplaces.data.model.city.repositories
 
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.city.CityRestApiService
-import kotlinx.coroutines.flow.Flow
 
 class CitiesRemoteRepository(
     private val cityRestApiService: CityRestApiService
 ) : CitiesRepository {
 
-    override suspend fun getAllCitiesStream(): Flow<List<City>> = cityRestApiService.getAllCities()
+    override suspend fun getAllCities(): List<City> = cityRestApiService.getAllCities()
 
-    override suspend fun getCityStream(id: Long): Flow<City?> = cityRestApiService.getCity(id)
+    override suspend fun getCity(id: Long): City = cityRestApiService.getCity(id)
 
     override suspend fun insertCity(city: City) = cityRestApiService.insertCity(city)
 

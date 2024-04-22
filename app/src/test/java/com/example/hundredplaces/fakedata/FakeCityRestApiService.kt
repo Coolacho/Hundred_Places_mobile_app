@@ -2,20 +2,18 @@ package com.example.hundredplaces.fakedata
 
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.city.CityRestApiService
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 class FakeCityRestApiService : CityRestApiService {
-    override suspend fun getAllCities(): Flow<List<City>> {
-        return flowOf(FakeCityDataSource.citiesList)
+    override suspend fun getAllCities(): List<City> {
+        return FakeCityDataSource.citiesList
     }
 
-    override suspend fun getCity(id: Int): Flow<City> {
-        return flowOf(FakeCityDataSource.citiesList[0])
+    override suspend fun getCity(id: Long): City {
+        return FakeCityDataSource.citiesList[0]
     }
 
     override suspend fun insertCity(city: City) {
-        FakeCityDataSource.citiesList.forEach { it ->
+        FakeCityDataSource.citiesList.forEach {
             if ((it.id == city.id) or (it.name == city.name)) {
                 throw IllegalArgumentException("City's id and name should be unique!")
             }
