@@ -24,7 +24,8 @@ object AppViewModelProvider {
         // Initializer for PlacesViewModel
         initializer {
             PlacesViewModel(
-                hundredPlacesApplication().container.placesRepository
+                hundredPlacesApplication().container.placesRepository,
+                hundredPlacesApplication().container.visitsRepository
             )
         }
         // Initializer for AccountViewModel
