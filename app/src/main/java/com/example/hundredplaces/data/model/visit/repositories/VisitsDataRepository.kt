@@ -2,26 +2,18 @@ package com.example.hundredplaces.data.model.visit.repositories
 
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.util.NetworkConnection
-import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 class VisitsDataRepository(
     private val visitsLocalRepository: VisitsLocalRepository,
     private val visitsRemoteRepository: VisitsRemoteRepository,
     private val networkConnection: NetworkConnection
 ) : VisitsRepository{
-    override suspend fun getAllVisitsStream(): Flow<List<Visit>> {
+    override suspend fun getAllVisitDatesByUserIdAndPlaceId(userId: Long, placeId: Long): List<LocalDateTime> {
         return if (networkConnection.isNetworkConnected) {
-            visitsRemoteRepository.getAllVisitsStream()
+            visitsRemoteRepository.getAllVisitDatesByUserIdAndPlaceId(userId, placeId)
         } else {
-            visitsLocalRepository.getAllVisitsStream()
-        }
-    }
-
-    override suspend fun getVisitStream(id: Long): Flow<Visit?> {
-        return if (networkConnection.isNetworkConnected) {
-            visitsRemoteRepository.getVisitStream(id)
-        } else {
-            visitsLocalRepository.getVisitStream(id)
+            visitsLocalRepository.getAllVisitDatesByUserIdAndPlaceId(userId, placeId)
         }
     }
 
@@ -33,19 +25,4 @@ class VisitsDataRepository(
         }
     }
 
-    override suspend fun deleteVisit(visit: Visit) {
-        return if (networkConnection.isNetworkConnected) {
-            visitsRemoteRepository.deleteVisit(visit)
-        } else {
-            visitsLocalRepository.deleteVisit(visit)
-        }
-    }
-
-    override suspend fun updateVisit(visit: Visit) {
-        return if (networkConnection.isNetworkConnected) {
-            visitsRemoteRepository.updateVisit(visit)
-        } else {
-            visitsLocalRepository.updateVisit(visit)
-        }
-    }
 }
