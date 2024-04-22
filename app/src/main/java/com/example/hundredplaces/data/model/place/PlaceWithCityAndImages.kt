@@ -4,7 +4,9 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.image.Image
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PlaceWithCityAndImages(
     @Embedded
     val place: Place,
