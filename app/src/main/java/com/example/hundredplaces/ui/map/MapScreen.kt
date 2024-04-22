@@ -8,7 +8,6 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,10 +33,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.hundredplaces.R
 import com.example.hundredplaces.data.FakePlaceDataSource
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.places.PlacesUiState
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.Geofence
@@ -64,11 +66,9 @@ object MapDestination : NavigationDestination {
 @Composable
 fun MapScreen(
     navigateToPlaceEntry: (Long) -> Unit,
-    modifier: Modifier = Modifier,
-    placesWithCityAndImages: List<PlaceWithCityAndImages> = FakePlaceDataSource.PlacesList
+    uiState: PlacesUiState,
+    modifier: Modifier = Modifier
 ) {
-
-
 
     var currentLocation by remember { mutableStateOf("Your location") }
     val context = LocalContext.current
@@ -129,7 +129,7 @@ fun MapScreen(
 
     val geofencingClient = LocationServices.getGeofencingClient(context)
     val geofenceList = mutableListOf<Geofence>()
-    for (place in placesWithCityAndImages) {
+    for (place in uiState.places) {
         geofenceList.add(Geofence.Builder()
             .setRequestId(place.place.id.toString())
             .setCircularRegion(
@@ -145,15 +145,19 @@ fun MapScreen(
         )
     }
     val geofencingRequest = GeofencingRequest.Builder()
-        //.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
         .addGeofences(geofenceList)
         .build()
 
     // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
     // addGeofences() and removeGeofences().
-    val geofencingPendingIntent = PendingIntent.getBroadcast(context, 0, Intent(context, GeofenceBroadcastReceiver::class.java), PendingIntent.FLAG_IMMUTABLE)
+    val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        // addGeofences() and removeGeofences().
+        PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_MUTABLE)
+    }
 
-    geofencingClient.addGeofences(geofencingRequest, geofencingPendingIntent).run {
+    geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
         addOnSuccessListener {
             // Geofences added
             Log.d("Geofences", "Geofences added")
@@ -189,7 +193,7 @@ fun MapScreen(
         cameraPositionState = cameraPositionState,
         properties = MapProperties(isMyLocationEnabled = ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     ) {
-        for (place in placesWithCityAndImages) {
+        for (place in uiState.places) {
             MarkerInfoWindow(
                 state = MarkerState(position = LatLng(place.place.latitude, place.place.longitude)),
                 onInfoWindowClick = { navigateToPlaceEntry(place.place.id) }
@@ -213,10 +217,16 @@ fun PlaceMapMarker(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.nim),
+            AsyncImage(
+                model = ImageRequest.Builder(context = LocalContext.current)
+                    .allowHardware(false)
+                    .data(placeWithCityAndImages.images[0])
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                error = painterResource(id = R.drawable.ic_broken_image),
+                placeholder = painterResource(id = R.drawable.loading_img),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
