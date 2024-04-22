@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,14 +29,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.R
 import com.example.hundredplaces.data.FakePlaceDataSource
+import com.example.hundredplaces.data.model.place.PlaceTypeEnum
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.AppContentType
-import com.example.hundredplaces.ui.AppViewModelProvider
+import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.navigation.NavigationDestination
-import com.example.hundredplaces.ui.places.details.PlaceDetailsScreen
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
 object PlacesDestination : NavigationDestination {
@@ -53,22 +51,24 @@ object PlacesDestination : NavigationDestination {
 fun PlacesScreen(
     navigateToPlaceEntry: (Long) -> Unit,
     contentType: AppContentType,
-    modifier: Modifier = Modifier,
-    viewModel: PlacesViewModel = viewModel(
-        factory = AppViewModelProvider.Factory
-    )
+    accountUiState: AccountUiState,
+    viewModel: PlacesViewModel,
+    placesUiState: PlacesUiState,
+    modifier: Modifier = Modifier
 ) {
-    val uiState = viewModel.uiState.collectAsState().value
     if (contentType == AppContentType.LIST_ONLY) {
         PlacesListOnlyContent(
-            uiState = uiState,
-            cardOnClick = navigateToPlaceEntry,
+            uiState = placesUiState,
+            cardOnClick = viewModel::selectPlaceCard,
+            navigateToPlaceEntry = navigateToPlaceEntry,
             modifier = modifier
         )
     }
     else {
         PlacesListAndDetailsContent(
-            uiState = uiState,
+            accountUiState = accountUiState,
+            viewModel = viewModel,
+            placesUiState = placesUiState,
             cardOnClick = viewModel::selectPlaceCard,
             modifier = modifier
         )
@@ -78,18 +78,21 @@ fun PlacesScreen(
 @Composable
 private fun PlacesListOnlyContent(
     uiState: PlacesUiState,
-    cardOnClick: (Long) -> Unit,
+    cardOnClick: (PlaceWithCityAndImages) -> Unit,
+    navigateToPlaceEntry: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier
-            .padding(dimensionResource(id = R.dimen.padding_medium))
+            .padding(dimensionResource(id = R.dimen.padding_small))
     ) {
-        items(FakePlaceDataSource.PlacesList /*uistate.places*/, key = { it.place.id}) {//TODO swap fake data source with ui state places
+        items(uiState.places, key = { it.place.id}) {
             PlaceItem(
                 placeWithCityAndImages = it,
                 selected = false,
-                onClick = { cardOnClick(it.place.id) },
+                onClick = { cardOnClick(it)
+                            navigateToPlaceEntry(it.place.id)
+                          },
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .fillMaxWidth()
@@ -100,7 +103,9 @@ private fun PlacesListOnlyContent(
 
 @Composable
 private fun PlacesListAndDetailsContent(
-    uiState: PlacesUiState,
+    viewModel: PlacesViewModel,
+    accountUiState: AccountUiState,
+    placesUiState: PlacesUiState,
     cardOnClick: (PlaceWithCityAndImages) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -117,11 +122,11 @@ private fun PlacesListAndDetailsContent(
                 )
         ) {
             items(
-                FakePlaceDataSource.PlacesList /*uistate.places*/,
-                key = { it.place.id }) {//TODO swap fake data source with ui state places
+                placesUiState.places,
+                key = { it.place.id }) {
                 PlaceItem(
                     placeWithCityAndImages = it,
-                    selected = uiState.currentSelectedPlace?.place?.id == it.place.id,
+                    selected = placesUiState.currentSelectedPlace.place.id == it.place.id,
                     onClick = { cardOnClick(it) },
                     modifier = Modifier
                         .padding(dimensionResource(id = R.dimen.padding_small))
@@ -129,15 +134,16 @@ private fun PlacesListAndDetailsContent(
                 )
             }
         }
-        if (uiState.currentSelectedPlace != null) {
-            val activity = LocalContext.current as Activity
-            PlaceDetailsScreen(
-                navigateBack = { activity.finish() },
-                isFullScreen = true,
-                modifier = Modifier
-                    .weight(1f)
-            )
-        }
+        val activity = LocalContext.current as Activity
+        PlaceDetailsScreen(
+            navigateBack = { activity.finish() },
+            isFullScreen = true,
+            accountUiState = accountUiState,
+            viewModel = viewModel,
+            placesUiState = placesUiState,
+            modifier = Modifier
+                .weight(1f)
+        )
     }
 }
 
@@ -172,7 +178,19 @@ fun PlaceItem(
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .clip(MaterialTheme.shapes.small),
                 contentScale = ContentScale.Crop,
-                painter = painterResource(id = R.drawable.rounded_museum_24),
+                painter = painterResource(id = when(placeWithCityAndImages.place.type) {
+                    PlaceTypeEnum.MUSEUM -> R.drawable.rounded_museum_24
+                    PlaceTypeEnum.PEAK -> R.drawable.rounded_landscape_24
+                    PlaceTypeEnum.GALLERY -> R.drawable.rounded_wall_art_24
+                    PlaceTypeEnum.CAVE -> R.drawable.icons8_cave_96
+                    PlaceTypeEnum.CHURCH -> R.drawable.rounded_church_24
+                    PlaceTypeEnum.SANCTUARY -> R.drawable.icons8_synagogue_96
+                    PlaceTypeEnum.FORTRESS -> R.drawable.rounded_fort_24
+                    PlaceTypeEnum.TOMB -> R.drawable.icons8_tomb_100
+                    PlaceTypeEnum.MONUMENT -> R.drawable.icons8_obelisk_100
+                    PlaceTypeEnum.WATERFALL -> R.drawable.rounded_waves_24
+                    PlaceTypeEnum.OTHER -> R.drawable.icons8_other_100
+                }),
                 contentDescription = null
             )
             PlaceInformation(
