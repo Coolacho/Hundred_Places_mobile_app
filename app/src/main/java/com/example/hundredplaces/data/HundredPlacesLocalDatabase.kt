@@ -25,7 +25,7 @@ import com.example.hundredplaces.util.LocalDateTimeConverter
         User::class,
         Visit::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(
