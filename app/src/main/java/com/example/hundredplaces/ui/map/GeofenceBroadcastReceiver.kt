@@ -14,19 +14,20 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.hundredplaces.MainActivity
 import com.example.hundredplaces.R
+import com.example.hundredplaces.ui.places.PlacesUiState
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 
 const val TAG = "Geofence intent"
 
-class GeofenceBroadcastReceiver: BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent?) {
-        val geofencingEvent = intent?.let { GeofencingEvent.fromIntent(it) }
-        geofencingEvent?.let {
-            if (it.hasError()) {
+class GeofenceBroadcastReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val geofencingEvent = GeofencingEvent.fromIntent(intent)
+        if (geofencingEvent != null) {
+            if (geofencingEvent.hasError()) {
                 val errorMessage = GeofenceStatusCodes
-                    .getStatusCodeString(it.errorCode)
+                    .getStatusCodeString(geofencingEvent.errorCode)
                 Log.e(TAG, errorMessage)
                 return
             }
@@ -36,19 +37,20 @@ class GeofenceBroadcastReceiver: BroadcastReceiver() {
         val geofenceTransition = geofencingEvent?.geofenceTransition
 
         // Test that the reported transition was of interest.
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
+        if ((geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) or
+        (geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL)) {
 
             // Get the geofences that were triggered. A single event can trigger
             // multiple geofences.
-            val triggeringGeofences = geofencingEvent.triggeringGeofences
+            val triggeringGeofences = geofencingEvent?.triggeringGeofences
 
 
             // Send notification and log the transition details.
             sendNotification(context)
-            Log.i(TAG, "One or more places nearby")
+            Log.i(TAG, "Successful transition: $geofenceTransition")
         } else {
             // Log the error.
-            Log.e(TAG, "Invalid geofence transition.")
+            Log.e(TAG, "Unsuccessful transition: $geofenceTransition")
         }
     }
 
