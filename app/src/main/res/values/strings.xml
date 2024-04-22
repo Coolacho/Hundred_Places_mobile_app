@@ -13,4 +13,22 @@
     <string name="name">Name</string>
     <string name="log_out">Log out</string>
     <string name="save">Save</string>
+    <string name="information">Information</string>
+    <string name="visits">Visits</string>
+    <string name="museums_visited">Museums visited</string>
+    <string name="peaks_visited">Peaks visited</string>
+    <string name="galleries_visited">Galleries visited</string>
+    <string name="caves_visited">Caves visited</string>
+    <string name="churches_visited">Churches visited</string>
+    <string name="sanctuaries_visited">Sanctuaries visited</string>
+    <string name="fortresses_visited">Fortresses visited</string>
+    <string name="toms_visited">Toms visited</string>
+    <string name="monuments_visited">Monuments visited</string>
+    <string name="waterfalls_visited">Waterfalls visited</string>
+    <string name="others_visited">Others visited</string>
+    <string name="hundred_places_visited">Hundred places visited</string>
+    <string name="total_visited_places">Total visited places</string>
+    <string name="log_in">Log In</string>
+    <string name="create_an_account">Create an account</string>
+    <string name="take_your_badge">Take your badge</string>
 </resources>

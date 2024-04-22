@@ -14,4 +14,22 @@
     <string name="name">Име</string>
     <string name="log_out">Излез</string>
     <string name="save">Запази</string>
+    <string name="information">Информация</string>
+    <string name="visits">Посещения</string>
+    <string name="museums_visited">Посетени музеи</string>
+    <string name="peaks_visited">Посетени върхове</string>
+    <string name="galleries_visited">Посетени галерии</string>
+    <string name="caves_visited">Посетени пещери</string>
+    <string name="churches_visited">Посетени църкви</string>
+    <string name="sanctuaries_visited">Посетени светилища</string>
+    <string name="fortresses_visited">Посетени крепости</string>
+    <string name="toms_visited">Посетени гробници</string>
+    <string name="monuments_visited">Посетени паметници</string>
+    <string name="waterfalls_visited">Посетени водопади</string>
+    <string name="others_visited">Други посетени обекти</string>
+    <string name="hundred_places_visited">Посетени обекти от 100те обекта</string>
+    <string name="total_visited_places">Общо посетени обекти</string>
+    <string name="log_in">Влез</string>
+    <string name="create_an_account">Създай профил</string>
+    <string name="take_your_badge">Вземи значката си</string>
 </resources>
