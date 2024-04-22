@@ -1,23 +1,26 @@
 package com.example.hundredplaces.data.model.place
 
-import kotlinx.coroutines.flow.Flow
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
-const val baseUrl = "/api/v1/places"
+const val baseUrl = "places"
 interface PlaceRestApiService {
     @GET("$baseUrl/all/filled")
-    suspend fun getAllPlacesWithCityAndImages(): Flow<List<PlaceWithCityAndImages>>
+    suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
+
+    @GET("$baseUrl/place/filled")
+    suspend fun getPlaceWithCityAndImages(@Query("id") id: Long): PlaceWithCityAndImages
 
     @GET("$baseUrl/all/plain")
-    suspend fun getAllPlaces(): Flow<List<Place>>
+    suspend fun getAllPlaces(): List<Place>
 
-    @GET("$baseUrl/place/{placeId}")
-    suspend fun getPlace(@Path("placeId") id: Long): Flow<Place>
+    @GET("$baseUrl/place/plain")
+    suspend fun getPlace(@Query("id") id: Long): Place
 
     @POST("$baseUrl/new")
     suspend fun insertPlace(@Body place: Place)

@@ -3,34 +3,41 @@ package com.example.hundredplaces.data.model.place.repositories
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.util.NetworkConnection
-import kotlinx.coroutines.flow.Flow
 
 class PlacesDataRepository (
     private val placesLocalRepository: PlacesLocalRepository,
     private val placesRemoteRepository: PlacesRemoteRepository,
     private val networkConnection: NetworkConnection
 ) : PlacesRepository {
-    override suspend fun getAllPlacesWithCityAndImagesStream(): Flow<List<PlaceWithCityAndImages>> {
+    override suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages> {
         return if (networkConnection.isNetworkConnected) {
-           placesRemoteRepository. getAllPlacesWithCityAndImagesStream()
+           placesRemoteRepository. getAllPlacesWithCityAndImages()
         } else {
-            placesLocalRepository.getAllPlacesWithCityAndImagesStream()
+            placesLocalRepository.getAllPlacesWithCityAndImages()
         }
     }
 
-    override suspend fun getAllPlacesStream(): Flow<List<Place>> {
+    override suspend fun getAllPlaces(): List<Place> {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository. getAllPlacesStream()
+            placesRemoteRepository. getAllPlaces()
         } else {
-            placesLocalRepository.getAllPlacesStream()
+            placesLocalRepository.getAllPlaces()
         }
     }
 
-    override suspend fun getPlaceStream(id: Long): Flow<Place> {
+    override suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository.getPlaceStream(id)
+            placesRemoteRepository.getPlaceWithCityAndImages(id)
         } else {
-            placesLocalRepository.getPlaceStream(id)
+            placesLocalRepository.getPlaceWithCityAndImages(id)
+        }
+    }
+
+    override suspend fun getPlace(id: Long): Place {
+        return if (networkConnection.isNetworkConnected) {
+            placesRemoteRepository.getPlace(id)
+        } else {
+            placesLocalRepository.getPlace(id)
         }
     }
 

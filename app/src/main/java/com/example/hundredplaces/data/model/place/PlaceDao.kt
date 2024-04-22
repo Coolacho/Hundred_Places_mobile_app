@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaceDao {
@@ -21,13 +20,16 @@ interface PlaceDao {
     suspend fun delete(place: Place)
 
     @Query("SELECT * FROM places WHERE id = :id")
-    fun getPlace(id: Long): Flow<Place>
+    fun getPlace(id: Long): Place
 
     @Query("SELECT * FROM places ORDER BY id ASC")
-    fun getAllPlaces(): Flow<List<Place>>
+    fun getAllPlaces(): List<Place>
 
     @Transaction
+    @Query("SELECT * FROM places WHERE id = :id")
+    fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages
+    @Transaction
     @Query("SELECT * FROM places ORDER BY id ASC")
-    fun getAllPlacesWithCityAndImages(): Flow<List<PlaceWithCityAndImages>>
+    fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
 
 }

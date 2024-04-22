@@ -3,7 +3,6 @@ package com.example.hundredplaces.data.model.place.repositories
 
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
-import kotlinx.coroutines.flow.Flow
 
 
 /**
@@ -13,17 +12,22 @@ interface PlacesRepository {
     /**
      * Retrieve all the places with city and images from the given data source.
      */
-    suspend fun getAllPlacesWithCityAndImagesStream(): Flow<List<PlaceWithCityAndImages>>
+    suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
 
     /**
      * Retrieve all the places from the given data source.
      */
-    suspend fun getAllPlacesStream(): Flow<List<Place>>
+    suspend fun getAllPlaces(): List<Place>
+
+    /**
+     * Retrieve a place with city and images from the given data source
+     */
+    suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages
 
     /**
      * Retrieve a place from the given data source
      */
-    suspend fun getPlaceStream(id: Long): Flow<Place>
+    suspend fun getPlace(id: Long): Place
 
     /**
      * Insert place in the data source
