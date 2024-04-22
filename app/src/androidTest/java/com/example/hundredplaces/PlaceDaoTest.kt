@@ -10,7 +10,6 @@ import com.example.hundredplaces.data.model.city.CityDao
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceDao
 import com.example.hundredplaces.data.model.place.PlaceTypeEnum
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
