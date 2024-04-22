@@ -96,6 +96,8 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.compose.widgets)
+    //Coil for Async image
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     //Coroutines test

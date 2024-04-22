@@ -1,5 +1,6 @@
 [versions]
 agp = "8.3.2"
+coilCompose = "2.6.0"
 kotlin = "1.9.23"
 kotlinPluginSerialization = "1.9.10"
 ksp = "1.9.23-1.0.20"
@@ -25,6 +26,7 @@ kotlinCoroutinesTest = "1.7.3"
 playServicesLocation = "21.2.0"
 
 [libraries]
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
