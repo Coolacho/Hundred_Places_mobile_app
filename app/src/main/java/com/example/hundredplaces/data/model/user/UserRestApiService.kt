@@ -1,30 +1,32 @@
 package com.example.hundredplaces.data.model.user
 
-import kotlinx.coroutines.flow.Flow
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.Query
 
-const val baseUrl = "/api/v1/users"
+const val baseUrl = "users"
 interface UserRestApiService {
-    @GET("$baseUrl/all")
-    suspend fun getAllUsers(): Flow<List<User>>
 
-    @GET("$baseUrl/user/plain/{userId}")
-    suspend fun getUser(@Path("userId") id: Long): Flow<User>
+    @GET("$baseUrl/user/login")
+    suspend fun getUserByEmailAndPassword(
+        @Query("email") email: String,
+        @Query("password") password: String
+    ): User
 
-    @GET("$baseUrl/user/filled/{userId}")
-    suspend fun getUserWithVisits(@Path("userId") id: Long): Flow<UserWithVisits>
+    @GET("$baseUrl/user/existing")
+    suspend fun getUserByEmail(
+        @Query("email") email: String
+    ): User
 
-    @POST("users/new")
+    @POST("$baseUrl/new")
     suspend fun insertUser(@Body user: User)
 
-    @PUT("user/edit")
+    @PUT("$baseUrl/update")
     suspend fun updateUser(@Body user: User)
 
-    @DELETE("user/delete")
+    @DELETE("$baseUrl/delete")
     suspend fun deleteUser(@Body user: User)
 }

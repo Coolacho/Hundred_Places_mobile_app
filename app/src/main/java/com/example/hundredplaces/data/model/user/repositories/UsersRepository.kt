@@ -1,27 +1,15 @@
 package com.example.hundredplaces.data.model.user.repositories
 
 import com.example.hundredplaces.data.model.user.User
-import com.example.hundredplaces.data.model.user.UserWithVisits
-import kotlinx.coroutines.flow.Flow
 
 /**
  * Repository that provides insert, update, delete, and retrieve of [User] from a given data source.
  */
 interface UsersRepository {
-    /**
-     * Retrieve all the users from the given data source.
-     */
-    suspend fun getAllUsersStream(): Flow<List<User>>
 
-    /**
-     * Retrieve an user from the given data source that matches with the [id].
-     */
-    suspend fun getUserStream(id: Long): Flow<User>
+    suspend fun getUserByEmailAndPassword(email: String, password: String): User
 
-    /**
-     * Retrieve an user with visits from the given data source that matches with the [id].
-     */
-    suspend fun getUserWithVisitsStream(id: Long): Flow<UserWithVisits>
+    suspend fun getUserByEmail(email: String): User
 
     /**
      * Insert user in the data source

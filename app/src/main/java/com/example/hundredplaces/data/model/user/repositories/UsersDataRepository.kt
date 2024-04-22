@@ -1,36 +1,34 @@
 package com.example.hundredplaces.data.model.user.repositories
 
+import android.util.Log
 import com.example.hundredplaces.data.model.user.User
-import com.example.hundredplaces.data.model.user.UserWithVisits
 import com.example.hundredplaces.util.NetworkConnection
-import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.SerializationException
 
 class UsersDataRepository(
     private val usersLocalRepository: UsersLocalRepository,
     private val usersRemoteRepository: UsersRemoteRepository,
     private val networkConnection: NetworkConnection
 ) : UsersRepository{
-    override suspend fun getAllUsersStream(): Flow<List<User>> {
-        return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.getAllUsersStream()
-        } else {
-            usersLocalRepository.getAllUsersStream()
+
+    override suspend fun getUserByEmailAndPassword(email: String, password: String): User {
+        var user: User
+        try {
+            user = usersRemoteRepository.getUserByEmailAndPassword(email, password)
+            usersLocalRepository.insertUser(user)
         }
+        catch (e: SerializationException) {
+            user = User(name ="", email = "", password = "")
+            Log.d("UserRepository", "User is null")
+        }
+        return user
     }
 
-    override suspend fun getUserStream(id: Long): Flow<User> {
+    override suspend fun getUserByEmail(email: String): User {
         return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.getUserStream(id)
+            usersRemoteRepository.getUserByEmail(email)
         } else {
-            usersLocalRepository.getUserStream(id)
-        }
-    }
-
-    override suspend fun getUserWithVisitsStream(id: Long): Flow<UserWithVisits> {
-        return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.getUserWithVisitsStream(id)
-        } else {
-            usersLocalRepository.getUserWithVisitsStream(id)
+            usersLocalRepository.getUserByEmail(email)
         }
     }
 

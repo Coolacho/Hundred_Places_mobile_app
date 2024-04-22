@@ -50,4 +50,6 @@ data class User(
     val waterfallsVisited: Int = 0,
     @ColumnInfo(name = "others_visited")
     val othersVisited: Int = 0,
+    @ColumnInfo(name = "total_visited")
+    val totalVisited: Int = 0
 )

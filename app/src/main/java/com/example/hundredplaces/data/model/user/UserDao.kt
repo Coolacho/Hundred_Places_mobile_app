@@ -6,25 +6,22 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User)
 
-    @Update(onConflict = OnConflictStrategy.ABORT)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(user: User)
 
     @Delete
     suspend fun delete(user: User)
 
-    @Query("SELECT * FROM users WHERE id = :id")
-    fun getUser(id: Long): Flow<User>
+    @Query("SELECT * FROM users WHERE email = :email AND password = :password")
+    fun getUserByEmailAndPassword(email: String, password: String): User
 
-    @Query("SELECT * FROM users WHERE id = :id")
-    fun getUserWithVisits(id: Long): Flow<UserWithVisits>
+    @Query("SELECT * FROM users WHERE email = :email")
+    fun getUserByEmail(email: String): User
 
-    @Query("SELECT * FROM users ORDER BY name ASC")
-    fun getAllUsers(): Flow<List<User>>
 }

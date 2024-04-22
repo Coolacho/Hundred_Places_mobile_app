@@ -2,17 +2,13 @@ package com.example.hundredplaces.data.model.user.repositories
 
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.UserRestApiService
-import com.example.hundredplaces.data.model.user.UserWithVisits
-import kotlinx.coroutines.flow.Flow
 
 class UsersRemoteRepository(
     private val userRestApiService: UserRestApiService
 ) : UsersRepository{
-    override suspend fun getAllUsersStream(): Flow<List<User>> = userRestApiService.getAllUsers()
 
-    override suspend fun getUserStream(id: Long): Flow<User> = userRestApiService.getUser(id)
-
-    override suspend fun getUserWithVisitsStream(id: Long): Flow<UserWithVisits> = userRestApiService.getUserWithVisits(id)
+    override suspend fun getUserByEmailAndPassword(email: String, password: String): User = userRestApiService.getUserByEmailAndPassword(email, password)
+    override suspend fun getUserByEmail(email: String): User = userRestApiService.getUserByEmail(email)
 
     override suspend fun insertUser(user: User) = userRestApiService.insertUser(user)
 
