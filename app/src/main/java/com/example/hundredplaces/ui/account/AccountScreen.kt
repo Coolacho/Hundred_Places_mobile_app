@@ -24,9 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.hundredplaces.R
-import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 
-object AccountDestination : NavigationDestination {
+object AccountDestination : MenuNavigationDestination {
     override val route = "Account"
     override val title = R.string.account
     override val iconRes = R.drawable.baseline_account_circle_24

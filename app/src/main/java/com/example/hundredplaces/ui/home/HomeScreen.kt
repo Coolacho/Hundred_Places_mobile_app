@@ -39,7 +39,7 @@ import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.navigation.AppBottomNavigationBar
 import com.example.hundredplaces.ui.navigation.AppNavigationRail
 import com.example.hundredplaces.ui.navigation.HundredPlacesNavHost
-import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
 import com.example.hundredplaces.ui.places.PlacesDestination
 
@@ -106,7 +106,7 @@ private fun HomeScreenContent(
     navController: NavHostController,
     contentType: AppContentType,
     navigationType: AppNavigationType,
-    navigationItemContentList: List<NavigationDestination>,
+    navigationItemContentList: List<MenuNavigationDestination>,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(

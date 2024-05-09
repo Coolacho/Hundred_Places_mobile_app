@@ -25,9 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.account.AccountUiState
-import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 
-object AchievementsDestination : NavigationDestination {
+object AchievementsDestination : MenuNavigationDestination {
     override val route = "Achievements"
     override val title = R.string.achievements
     override val iconRes = R.drawable.rounded_trophy_24

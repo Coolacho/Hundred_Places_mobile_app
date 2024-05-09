@@ -25,10 +25,6 @@ import com.example.hundredplaces.ui.navigation.NavigationDestination
 
 object LoginDestination : NavigationDestination {
     override val route = "Login"
-    override val title: Int
-    get() = TODO("Not yet implemented")
-    override val iconRes: Int
-    get() = TODO("Not yet implemented")
 }
 
 @Composable

@@ -35,10 +35,10 @@ import com.example.hundredplaces.data.model.place.PlaceTypeEnum
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.AppContentType
 import com.example.hundredplaces.ui.account.AccountUiState
-import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
-object PlacesDestination : NavigationDestination {
+object PlacesDestination : MenuNavigationDestination {
     override val route = "Places"
     override val title = R.string.places
     override val iconRes = R.drawable.rounded_museum_24

@@ -38,7 +38,7 @@ import coil.request.ImageRequest
 import com.example.hundredplaces.R
 import com.example.hundredplaces.data.FakePlaceDataSource
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
-import com.example.hundredplaces.ui.navigation.NavigationDestination
+import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.places.PlacesUiState
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 import com.google.android.gms.common.api.ApiException
@@ -54,7 +54,7 @@ import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
-object MapDestination : NavigationDestination {
+object MapDestination : MenuNavigationDestination {
     override val route = "Map"
     override val title = R.string.map
     override val iconRes = R.drawable.rounded_map_24

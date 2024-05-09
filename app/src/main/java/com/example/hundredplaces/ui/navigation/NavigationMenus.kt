@@ -29,7 +29,7 @@ import com.example.hundredplaces.R
 
 @Composable
 fun AppBottomNavigationBar(
-    navigationItemContentList: List<NavigationDestination>,
+    navigationItemContentList: List<MenuNavigationDestination>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -70,7 +70,7 @@ fun AppBottomNavigationBar(
 
 @Composable
 fun AppNavigationRail(
-    navigationItemContentList: List<NavigationDestination>,
+    navigationItemContentList: List<MenuNavigationDestination>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -112,7 +112,7 @@ fun AppNavigationRail(
 
 @Composable
 fun NavigationDrawerContent(
-    navigationItemContentList: List<NavigationDestination>,
+    navigationItemContentList: List<MenuNavigationDestination>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {

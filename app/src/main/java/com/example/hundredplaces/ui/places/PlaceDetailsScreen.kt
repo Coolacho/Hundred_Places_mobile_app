@@ -51,10 +51,6 @@ import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
 object PlaceDetailsDestination : NavigationDestination {
     override val route = "Place Details"
-    override val title: Int
-        get() = TODO("Not yet implemented")
-    override val iconRes: Int
-        get() = TODO("Not yet implemented")
     const val PLACE_ID_ARG = "placeId"
     val routeWithArgs = "$route/{$PLACE_ID_ARG}"
 }

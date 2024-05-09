@@ -29,10 +29,6 @@ import com.example.hundredplaces.ui.navigation.NavigationDestination
 
 object CreateAccountDestination : NavigationDestination {
     override val route = "Create account"
-    override val title: Int
-        get() = TODO("Not yet implemented")
-    override val iconRes: Int
-        get() = TODO("Not yet implemented")
 }
 @Composable
 fun CreateAccountScreen(

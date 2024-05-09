@@ -12,15 +12,4 @@ interface NavigationDestination {
      */
     val route: String
 
-    /**
-     * String resource for navigation menu labels
-     */
-    @get:StringRes
-    val title: Int
-
-    /**
-     * Icon for menu
-     */
-    @get:DrawableRes
-    val iconRes: Int
 }
