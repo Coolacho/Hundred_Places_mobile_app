@@ -30,7 +30,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val windowSize = calculateWindowSizeClass(activity = this)
                     val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
-                    val startDestination = if (navigateToPlaceDetails) PlaceDetailsDestination.routeWithArgs else PlacesDestination.route
+                    val placeId = intent.getLongExtra("placeId", 0L)
+                    val startDestination = if (navigateToPlaceDetails && placeId != 0L) "${PlaceDetailsDestination.route}/${placeId}" else PlacesDestination.route
                     HundredPlacesApp(
                         windowSize = windowSize.widthSizeClass,
                         startDestination = startDestination
