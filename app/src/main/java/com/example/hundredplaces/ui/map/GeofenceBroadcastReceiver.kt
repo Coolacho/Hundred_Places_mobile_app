@@ -43,9 +43,10 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             // multiple geofences.
             val triggeringGeofences = geofencingEvent?.triggeringGeofences
 
-
-            // Send notification and log the transition details.
-            sendNotification(context)
+            if (triggeringGeofences!= null) {
+                // Send notification and log the transition details.
+                sendNotification(context, triggeringGeofences[0].requestId.toLong())
+            }
             Log.i(TAG, "Successful transition: $geofenceTransition")
         } else {
             // Log the error.
@@ -53,7 +54,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun sendNotification(context: Context) {
+    private fun sendNotification(context: Context, placeId: Long) {
 
         // Make a channel if necessary
         // Create the NotificationChannel, but only on API 26+ because
@@ -74,13 +75,14 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         val intent = Intent(context, MainActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .putExtra("navigateToPlacesDetails", true)
+            .putExtra("placeId", placeId)
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
         // Create the notification
         val builder = NotificationCompat.Builder(context, "GEOFENCE_NOTIFICATION")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Places nearby")
-            .setContentText("One or more places nearby")
+            .setContentTitle(context.getString(R.string.app_name))
+            .setContentText(context.getString(R.string.one_or_more_places_nearby))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVibrate(LongArray(0))
             .setContentIntent(pendingIntent)
