@@ -98,6 +98,8 @@ dependencies {
     implementation(libs.maps.compose.widgets)
     //Coil for Async image
     implementation(libs.coil.compose)
+    //WorkManager dependency
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     //Coroutines test
