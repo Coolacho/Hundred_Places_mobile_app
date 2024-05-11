@@ -2,6 +2,7 @@ package com.example.hundredplaces.ui.places
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hundredplaces.data.WorkManagerRepository
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.data.model.place.repositories.PlacesDataRepository
 import com.example.hundredplaces.data.model.user.User
@@ -15,7 +16,8 @@ import java.time.LocalDateTime
 
 class PlacesViewModel (
     private val placesDataRepository: PlacesDataRepository,
-    private val visitsDataRepository: VisitsDataRepository
+    private val visitsDataRepository: VisitsDataRepository,
+    private val workManagerRepository: WorkManagerRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlacesUiState())
@@ -40,6 +42,7 @@ class PlacesViewModel (
                     places = placesDataRepository.getAllPlacesWithCityAndImages()
                 )
             }
+            workManagerRepository.addGeofences(uiState.value.places)
         }
     }
 
