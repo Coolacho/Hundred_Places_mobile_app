@@ -25,12 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.AppContentType
 import com.example.hundredplaces.ui.AppNavigationType
-import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.account.AccountViewModel
@@ -42,6 +40,7 @@ import com.example.hundredplaces.ui.navigation.HundredPlacesNavHost
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
 import com.example.hundredplaces.ui.places.PlacesDestination
+import com.example.hundredplaces.ui.places.PlacesViewModel
 
 @Composable
 fun HomeScreen(
@@ -49,15 +48,14 @@ fun HomeScreen(
     navController: NavHostController,
     navigationType: AppNavigationType,
     contentType: AppContentType,
-    modifier: Modifier = Modifier,
-    sharedAccountViewModel: AccountViewModel = viewModel(
-        factory = AppViewModelProvider.Factory
-    )
+    placesViewModel: PlacesViewModel,
+    accountViewModel: AccountViewModel,
+    modifier: Modifier = Modifier
 ) {
     val navigationItemContentList = listOf(PlacesDestination, MapDestination, AchievementsDestination, AccountDestination)
-    val sharedAccountUiState = sharedAccountViewModel.uiState.collectAsState()
+    val accountUiState = accountViewModel.uiState.collectAsState()
 
-    if (navigationType == AppNavigationType.PERMANENT_NAVIGATION_DRAWER && sharedAccountUiState.value.isLoggedIn) {
+    if (navigationType == AppNavigationType.PERMANENT_NAVIGATION_DRAWER && accountUiState.value.isLoggedIn) {
         PermanentNavigationDrawer(
             drawerContent = {
                 PermanentDrawerSheet(
@@ -74,8 +72,9 @@ fun HomeScreen(
                 }
             }) {
             HomeScreenContent(
-                sharedAccountUiState = sharedAccountUiState.value,
-                sharedAccountViewModel = sharedAccountViewModel,
+                accountUiState = accountUiState.value,
+                accountViewModel = accountViewModel,
+                placesViewModel = placesViewModel,
                 startDestination = startDestination,
                 navController = navController,
                 contentType = contentType,
@@ -85,8 +84,9 @@ fun HomeScreen(
     }
     else {
         HomeScreenContent(
-            sharedAccountUiState = sharedAccountUiState.value,
-            sharedAccountViewModel = sharedAccountViewModel,
+            accountUiState = accountUiState.value,
+            accountViewModel = accountViewModel,
+            placesViewModel = placesViewModel,
             startDestination = startDestination,
             navController = navController,
             contentType = contentType,
@@ -100,8 +100,9 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenContent(
-    sharedAccountUiState: AccountUiState,
-    sharedAccountViewModel: AccountViewModel,
+    accountUiState: AccountUiState,
+    accountViewModel: AccountViewModel,
+    placesViewModel: PlacesViewModel,
     startDestination: String,
     navController: NavHostController,
     contentType: AppContentType,
@@ -130,7 +131,7 @@ private fun HomeScreenContent(
             .padding(paddingValues)
         ) {
             Row(modifier = Modifier.fillMaxSize()) {
-                AnimatedVisibility(visible = navigationType == AppNavigationType.NAVIGATION_RAIL && sharedAccountUiState.isLoggedIn) {
+                AnimatedVisibility(visible = navigationType == AppNavigationType.NAVIGATION_RAIL && accountUiState.isLoggedIn) {
                     AppNavigationRail(
                         navigationItemContentList = navigationItemContentList,
                         navController = navController,
@@ -145,11 +146,12 @@ private fun HomeScreenContent(
                         startDestination = startDestination,
                         navController = navController,
                         contentType = contentType,
-                        sharedAccountViewModel = sharedAccountViewModel,
-                        sharedAccountUiState = sharedAccountUiState,
+                        accountViewModel = accountViewModel,
+                        accountUiState = accountUiState,
+                        placesViewModel = placesViewModel,
                         modifier = Modifier.weight(1f)
                     )
-                    AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION && sharedAccountUiState.isLoggedIn) {
+                    AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION && accountUiState.isLoggedIn) {
                         AppBottomNavigationBar(
                             navigationItemContentList = navigationItemContentList,
                             navController = navController,

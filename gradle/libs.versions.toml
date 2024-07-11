@@ -1,17 +1,17 @@
 [versions]
-agp = "8.4.0"
+agp = "8.5.0"
 coilCompose = "2.6.0"
-kotlin = "1.9.23"
+kotlin = "2.0.0"
 kotlinPluginSerialization = "1.9.10"
-ksp = "1.9.23-1.0.20"
+ksp = "2.0.0-1.0.22"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.7.0"
+lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
-composeBom = "2024.05.00"
-mapsCompose = "4.3.3"
+composeBom = "2024.06.00"
+mapsCompose = "5.0.3"
 playServicesMaps = "18.2.0"
 secretsGradlePlugin = "2.0.1"
 windowSizeClass = "1.2.1"
@@ -19,11 +19,9 @@ navigationCompose = "2.7.7"
 datastorePreferences = "1.1.1"
 room = "2.6.1"
 retrofit = "2.11.0"
-okhttp3 = "4.12.0"
-kotlinSerializationJson = "1.6.0"
-retrofitKotlinSerializationJson = "1.0.0"
-kotlinCoroutinesTest = "1.7.3"
-playServicesLocation = "21.2.0"
+kotlinSerializationJson = "1.7.0"
+kotlinCoroutinesTest = "1.8.1"
+playServicesLocation = "21.3.0"
 workRuntimeKtx = "2.9.0"
 
 [libraries]
@@ -56,9 +54,8 @@ maps-compose-widgets = { group = "com.google.maps.android", name = "maps-compose
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit"}
-squareup-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp3"}
+squareup-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit"}
 jetbrains-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerializationJson"}
-jakewharton-retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerializationJson"}
 jetbrains-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutinesTest"}
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 androidx-work-runtime-ktx = {group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx"}
@@ -67,5 +64,6 @@ androidx-work-runtime-ktx = {group = "androidx.work", name = "work-runtime-ktx",
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrainsKotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinPluginSerialization"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 googleDevtoolsKsp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 

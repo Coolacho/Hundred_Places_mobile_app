@@ -4,14 +4,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.hundredplaces.ui.AppContentType
-import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountScreen
 import com.example.hundredplaces.ui.account.AccountUiState
@@ -38,17 +36,15 @@ fun HundredPlacesNavHost(
     startDestination: String,
     navController: NavHostController,
     contentType: AppContentType,
-    sharedAccountViewModel: AccountViewModel,
-    sharedAccountUiState: AccountUiState,
-    modifier: Modifier = Modifier,
-    sharedPlacesViewModel: PlacesViewModel = viewModel(
-        factory = AppViewModelProvider.Factory
-    ),
+    accountViewModel: AccountViewModel,
+    accountUiState: AccountUiState,
+    placesViewModel: PlacesViewModel,
+    modifier: Modifier = Modifier
 ) {
-    val sharedPlacesUiState = sharedPlacesViewModel.uiState.collectAsState()
+    val placesUiState = placesViewModel.uiState.collectAsState()
     NavHost(
         navController = navController,
-        startDestination = if (sharedAccountUiState.isLoggedIn) startDestination else LoginDestination.route,
+        startDestination = if (accountUiState.isLoggedIn) startDestination else LoginDestination.route,
         modifier = modifier
         ) {
         composable(
@@ -56,9 +52,9 @@ fun HundredPlacesNavHost(
         ) {
             PlacesScreen(
                 contentType = contentType,
-                accountUiState = sharedAccountUiState,
-                viewModel = sharedPlacesViewModel,
-                placesUiState = sharedPlacesUiState.value,
+                accountUiState = accountUiState,
+                placesViewModel = placesViewModel,
+                placesUiState = placesUiState.value,
                 navigateToPlaceEntry = {
                     navController.navigate("${PlaceDetailsDestination.route}/${it}")}
             )
@@ -71,9 +67,9 @@ fun HundredPlacesNavHost(
         ) {
             PlaceDetailsScreen(
                 isFullScreen = false,
-                accountUiState = sharedAccountUiState,
-                viewModel = sharedPlacesViewModel,
-                placesUiState = sharedPlacesUiState.value,
+                accountUiState = accountUiState,
+                viewModel = placesViewModel,
+                placesUiState = placesUiState.value,
                 navigateBack = { navController.navigateUp() }
             )
         }
@@ -81,7 +77,7 @@ fun HundredPlacesNavHost(
             route = MapDestination.route
         ) {
             MapScreen(
-                uiState = sharedPlacesUiState.value,
+                placesUiState = placesUiState.value,
                 navigateToPlaceEntry = {
                     navController.navigate("${PlaceDetailsDestination.route}/${it}")}
             )
@@ -90,15 +86,15 @@ fun HundredPlacesNavHost(
             route = AchievementsDestination.route
         ) {
             AchievementsScreen(
-                uiState = sharedAccountUiState
+                uiState = accountUiState
             )
         }
         composable(
             route = AccountDestination.route
         ) {
             AccountScreen(
-                uiState = sharedAccountUiState,
-                viewModel = sharedAccountViewModel,
+                uiState = accountUiState,
+                viewModel = accountViewModel,
                 navigateToLogIn = {navController.navigate(LoginDestination.route)}
             )
         }
@@ -106,8 +102,8 @@ fun HundredPlacesNavHost(
             route = LoginDestination.route
         ) {
             LoginScreen(
-                uiState = sharedAccountUiState,
-                viewModel = sharedAccountViewModel,
+                uiState = accountUiState,
+                viewModel = accountViewModel,
                 navigateToHome = { navController.navigate(PlacesDestination.route) },
                 navigateToCreateAccount = { navController.navigate(CreateAccountDestination.route) },
                 modifier = Modifier
@@ -118,8 +114,8 @@ fun HundredPlacesNavHost(
             route = CreateAccountDestination.route
         ) {
             CreateAccountScreen(
-                uiState = sharedAccountUiState,
-                viewModel = sharedAccountViewModel,
+                uiState = accountUiState,
+                viewModel = accountViewModel,
                 navigateToHome = { navController.navigate(PlacesDestination.route) },
                 navigateToLogin = { navController.navigate(LoginDestination.route) })
         }

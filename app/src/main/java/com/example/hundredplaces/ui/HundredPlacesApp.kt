@@ -5,12 +5,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.home.HomeScreen
+import com.example.hundredplaces.ui.places.PlacesViewModel
 
 @Composable
 fun HundredPlacesApp(
     windowSize: WindowWidthSizeClass,
     startDestination: String,
+    placesViewModel: PlacesViewModel,
+    accountViewModel: AccountViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -42,6 +46,8 @@ fun HundredPlacesApp(
         navController = navController,
         navigationType = navigationType,
         contentType = contentType,
+        accountViewModel = accountViewModel,
+        placesViewModel = placesViewModel,
         modifier = modifier
     )
 }

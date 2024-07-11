@@ -27,11 +27,12 @@ import com.example.hundredplaces.data.model.visit.VisitRestApiService
 import com.example.hundredplaces.data.model.visit.repositories.VisitsDataRepository
 import com.example.hundredplaces.data.model.visit.repositories.VisitsLocalRepository
 import com.example.hundredplaces.data.model.visit.repositories.VisitsRemoteRepository
+import com.example.hundredplaces.util.LocalDateTimeConverter
 import com.example.hundredplaces.util.NetworkConnection
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
+import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDateTime
 
 //Datastore constants
 private const val USER_PREFERENCES_NAME = "user_preferences"
@@ -47,14 +48,23 @@ class DefaultAppContainer(
 
     //Retrofit Rest constants
     private val baseUrl =
-        "http://192.168.1.5:8080/api/v1/"
+        "http://192.168.2.150:8080/api/v1/"
     private val retrofit = Retrofit.Builder()
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .baseUrl(baseUrl)
+        .addConverterFactory(GsonConverterFactory.create(
+            GsonBuilder()
+                .registerTypeAdapter(
+                    LocalDateTime::class.java,
+                    LocalDateTimeConverter()
+                ).create()))
         .build()
 
     private val hundredPlacesLocalDatabase by lazy {
         HundredPlacesLocalDatabase.getDatabase(context)
+    }
+
+    override val networkConnection by lazy {
+        NetworkConnection(context)
     }
 
     override val userPreferencesRepository: UserPreferencesRepository by lazy {
@@ -63,10 +73,6 @@ class DefaultAppContainer(
 
     override val workManagerRepository: WorkManagerRepository by lazy {
         WorkManagerRepository(context)
-    }
-
-    override val networkConnection by lazy {
-        NetworkConnection(context)
     }
 
     override val citiesRepository: CitiesDataRepository by lazy {

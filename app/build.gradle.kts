@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.googleDevtoolsKsp)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
@@ -86,10 +87,8 @@ dependencies {
     implementation(libs.squareup.retrofit)
     //Kotlinx serialization fro JSON
     implementation(libs.jetbrains.kotlinx.serialization.json)
-    //Retrofit with kotlinx serialization converter
-    implementation(libs.jakewharton.retrofit2.kotlinx.serialization.converter)
-    //Okhttp for JSON media type
-    implementation(libs.squareup.okhttp)
+    //Retrofit with gson serialization converter
+    implementation(libs.squareup.retrofit.converter.gson)
     //Maps and location libs
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)

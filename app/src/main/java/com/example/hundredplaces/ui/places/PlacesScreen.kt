@@ -15,7 +15,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,16 +26,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hundredplaces.R
-import com.example.hundredplaces.data.FakePlaceDataSource
 import com.example.hundredplaces.data.model.place.PlaceTypeEnum
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.AppContentType
 import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
-import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
 object PlacesDestination : MenuNavigationDestination {
     override val route = "Places"
@@ -52,24 +48,23 @@ fun PlacesScreen(
     navigateToPlaceEntry: (Long) -> Unit,
     contentType: AppContentType,
     accountUiState: AccountUiState,
-    viewModel: PlacesViewModel,
+    placesViewModel: PlacesViewModel,
     placesUiState: PlacesUiState,
     modifier: Modifier = Modifier
 ) {
     if (contentType == AppContentType.LIST_ONLY) {
         PlacesListOnlyContent(
-            uiState = placesUiState,
-            cardOnClick = viewModel::selectPlaceCard,
+            placesUiState = placesUiState,
+            cardOnClick = placesViewModel::selectPlaceCard,
             navigateToPlaceEntry = navigateToPlaceEntry,
             modifier = modifier
         )
-    }
-    else {
+    } else {
         PlacesListAndDetailsContent(
             accountUiState = accountUiState,
-            viewModel = viewModel,
+            viewModel = placesViewModel,
             placesUiState = placesUiState,
-            cardOnClick = viewModel::selectPlaceCard,
+            cardOnClick = placesViewModel::selectPlaceCard,
             modifier = modifier
         )
     }
@@ -77,7 +72,7 @@ fun PlacesScreen(
 
 @Composable
 private fun PlacesListOnlyContent(
-    uiState: PlacesUiState,
+    placesUiState: PlacesUiState,
     cardOnClick: (PlaceWithCityAndImages) -> Unit,
     navigateToPlaceEntry: (Long) -> Unit,
     modifier: Modifier = Modifier
@@ -86,13 +81,15 @@ private fun PlacesListOnlyContent(
         modifier = modifier
             .padding(dimensionResource(id = R.dimen.padding_small))
     ) {
-        items(uiState.places, key = { it.place.id}) {
+        items(placesUiState.places, key = { it.place.id }) {
             PlaceItem(
                 placeWithCityAndImages = it,
                 selected = false,
-                onClick = { cardOnClick(it)
-                            navigateToPlaceEntry(it.place.id)
-                          },
+                distance = placesUiState.distances[it.place.id].toString(),
+                onClick = {
+                    cardOnClick(it)
+                    navigateToPlaceEntry(it.place.id)
+                },
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .fillMaxWidth()
@@ -112,7 +109,7 @@ private fun PlacesListAndDetailsContent(
     Row(
         modifier = modifier
     ) {
-        LazyColumn (
+        LazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .padding(
@@ -126,7 +123,8 @@ private fun PlacesListAndDetailsContent(
                 key = { it.place.id }) {
                 PlaceItem(
                     placeWithCityAndImages = it,
-                    selected = placesUiState.currentSelectedPlace.place.id == it.place.id,
+                    selected = placesUiState.selectedPlace.place.id == it.place.id,
+                    distance = placesUiState.distances[it.place.id].toString(),
                     onClick = { cardOnClick(it) },
                     modifier = Modifier
                         .padding(dimensionResource(id = R.dimen.padding_small))
@@ -153,6 +151,7 @@ private fun PlacesListAndDetailsContent(
 @Composable
 fun PlaceItem(
     selected: Boolean,
+    distance: String,
     onClick: () -> Unit,
     placeWithCityAndImages: PlaceWithCityAndImages,
     modifier: Modifier = Modifier
@@ -167,30 +166,32 @@ fun PlaceItem(
         onClick = onClick,
         modifier = modifier
     ) {
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .background(color)
-        ){
+        ) {
             Image(
                 modifier = Modifier
                     .size(64.dp)
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .clip(MaterialTheme.shapes.small),
                 contentScale = ContentScale.Crop,
-                painter = painterResource(id = when(placeWithCityAndImages.place.type) {
-                    PlaceTypeEnum.MUSEUM -> R.drawable.rounded_museum_24
-                    PlaceTypeEnum.PEAK -> R.drawable.rounded_landscape_24
-                    PlaceTypeEnum.GALLERY -> R.drawable.rounded_wall_art_24
-                    PlaceTypeEnum.CAVE -> R.drawable.icons8_cave_96
-                    PlaceTypeEnum.CHURCH -> R.drawable.rounded_church_24
-                    PlaceTypeEnum.SANCTUARY -> R.drawable.icons8_synagogue_96
-                    PlaceTypeEnum.FORTRESS -> R.drawable.rounded_fort_24
-                    PlaceTypeEnum.TOMB -> R.drawable.icons8_tomb_100
-                    PlaceTypeEnum.MONUMENT -> R.drawable.icons8_obelisk_100
-                    PlaceTypeEnum.WATERFALL -> R.drawable.rounded_waves_24
-                    PlaceTypeEnum.OTHER -> R.drawable.icons8_other_100
-                }),
+                painter = painterResource(
+                    id = when (placeWithCityAndImages.place.type) {
+                        PlaceTypeEnum.MUSEUM -> R.drawable.rounded_museum_24
+                        PlaceTypeEnum.PEAK -> R.drawable.rounded_landscape_24
+                        PlaceTypeEnum.GALLERY -> R.drawable.rounded_wall_art_24
+                        PlaceTypeEnum.CAVE -> R.drawable.icons8_cave_96
+                        PlaceTypeEnum.CHURCH -> R.drawable.rounded_church_24
+                        PlaceTypeEnum.SANCTUARY -> R.drawable.icons8_synagogue_96
+                        PlaceTypeEnum.FORTRESS -> R.drawable.rounded_fort_24
+                        PlaceTypeEnum.TOMB -> R.drawable.icons8_tomb_100
+                        PlaceTypeEnum.MONUMENT -> R.drawable.icons8_obelisk_100
+                        PlaceTypeEnum.WATERFALL -> R.drawable.rounded_waves_24
+                        PlaceTypeEnum.OTHER -> R.drawable.icons8_other_100
+                    }
+                ),
                 contentDescription = null
             )
             PlaceInformation(
@@ -198,11 +199,14 @@ fun PlaceItem(
                 placeCity = placeWithCityAndImages.city,
                 modifier = Modifier.weight(1f)
             )
-            PlaceRating(
-                placeRating = placeWithCityAndImages.place.rating,
-                modifier = Modifier
-                    .padding(end = dimensionResource(id = R.dimen.padding_small))
-            )
+            Column {
+                PlaceRating(
+                    placeRating = placeWithCityAndImages.place.rating,
+                    modifier = Modifier
+                        .padding(end = dimensionResource(id = R.dimen.padding_small))
+                )
+                Text(text = "${distance}m")
+            }
         }
     }
 }
@@ -212,7 +216,7 @@ fun PlaceInformation(
     placeName: String,
     placeCity: String,
     modifier: Modifier = Modifier
-){
+) {
     Column(
         modifier = modifier
     ) {
@@ -243,22 +247,5 @@ fun PlaceRating(
         Text(
             text = placeRating.toString()
         )
-    }
-}
-
-/**
- * Preview for place card
- */
-@Preview(showBackground = true)
-@Composable
-private fun PlaceCardPreview() {
-    HundredPlacesTheme {
-        Surface {
-            PlaceItem(
-                selected = true,
-                placeWithCityAndImages = FakePlaceDataSource.PlacesList[0],
-                onClick = {}
-            )
-        }
     }
 }
