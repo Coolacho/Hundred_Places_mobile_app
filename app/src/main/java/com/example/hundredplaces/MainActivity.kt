@@ -53,7 +53,11 @@ class MainActivity : ComponentActivity() {
                     val windowSize = calculateWindowSizeClass(activity = this)
                     val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
                     val placeId = intent.getLongExtra("placeId", 0L)
-                    val startDestination = if (navigateToPlaceDetails && placeId != 0L) "${PlaceDetailsDestination.route}/${placeId}" else PlacesDestination.route
+                    val startDestination: String
+                    if (navigateToPlaceDetails && placeId != 0L) {
+                        startDestination = "${PlaceDetailsDestination.route}/${placeId}"
+                        placesViewModel.selectPlace(placeId)
+                    } else startDestination = PlacesDestination.route
 
                     val locationPermissionLauncher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.RequestMultiplePermissions()
