@@ -1,4 +1,4 @@
-package com.example.hundredplaces.data
+package com.example.hundredplaces.fakedata
 
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceTypeEnum
@@ -15,7 +15,7 @@ object FakePlaceDataSource {
                 4.7,
                 "",
                 false,
-                PlaceTypeEnum.OTHER,
+                PlaceTypeEnum.MUSEUM,
                 1
             ),
             "гр. София",
@@ -29,7 +29,7 @@ object FakePlaceDataSource {
                 4.6,
                 "",
                 true,
-                PlaceTypeEnum.MUSEUM,
+                PlaceTypeEnum.OTHER,
                 2
             ),
             "гр. Пловдив",

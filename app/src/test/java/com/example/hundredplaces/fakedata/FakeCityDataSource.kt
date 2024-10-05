@@ -5,9 +5,9 @@ import com.example.hundredplaces.data.model.city.City
 object FakeCityDataSource {
 
     //Cities' ids
-    private const val ID_ONE = 1
-    private const val ID_TWO = 2
-    private const val ID_THREE = 3
+    private const val ID_ONE = 1L
+    private const val ID_TWO = 2L
+    private const val ID_THREE = 3L
 
     //Cities' names
     private const val CITY_ONE = "Sofia"
