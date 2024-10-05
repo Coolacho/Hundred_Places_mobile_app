@@ -10,26 +10,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hundredplaces.R
-import com.example.hundredplaces.data.FakePlaceDataSource
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.places.PlacesUiState
-import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -66,7 +63,10 @@ fun MapScreen(
         for (place in placesUiState.places) {
             MarkerInfoWindow(
                 state = MarkerState(position = LatLng(place.place.latitude, place.place.longitude)),
-                onInfoWindowClick = { navigateToPlaceEntry(place.place.id) }
+                infoWindowAnchor = Offset(0.5f, 0.65f),
+                onInfoWindowClick = {
+                    navigateToPlaceEntry(place.place.id)
+                }
             ) {
                 PlaceMapMarker(place)
             }
@@ -117,19 +117,6 @@ fun PlaceMapMarker(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-        }
-    }
-}
-
-/**
- * Preview for place marker card
- */
-@Preview
-@Composable
-private fun PlaceMapMarkerPreview() {
-    HundredPlacesTheme {
-        Surface {
-            PlaceMapMarker(FakePlaceDataSource.PlacesList[0])
         }
     }
 }
