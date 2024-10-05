@@ -3,6 +3,7 @@ package com.example.hundredplaces.data.model.place.repositories
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.util.NetworkConnection
+import java.net.SocketTimeoutException
 
 class PlacesDataRepository (
     private val placesLocalRepository: PlacesLocalRepository,
@@ -11,7 +12,11 @@ class PlacesDataRepository (
 ) : PlacesRepository {
     override suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages> {
         return if (networkConnection.isNetworkConnected) {
-           placesRemoteRepository. getAllPlacesWithCityAndImages()
+            try {
+                placesRemoteRepository.getAllPlacesWithCityAndImages()
+            } catch (e: SocketTimeoutException) {
+                placesLocalRepository.getAllPlacesWithCityAndImages()
+            }
         } else {
             placesLocalRepository.getAllPlacesWithCityAndImages()
         }
@@ -19,7 +24,11 @@ class PlacesDataRepository (
 
     override suspend fun getAllPlaces(): List<Place> {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository. getAllPlaces()
+            try {
+                placesRemoteRepository. getAllPlaces()
+            } catch (e: SocketTimeoutException) {
+                placesLocalRepository.getAllPlaces()
+            }
         } else {
             placesLocalRepository.getAllPlaces()
         }
@@ -27,7 +36,11 @@ class PlacesDataRepository (
 
     override suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository.getPlaceWithCityAndImages(id)
+            try {
+                placesRemoteRepository.getPlaceWithCityAndImages(id)
+            } catch (e: SocketTimeoutException) {
+                placesLocalRepository.getPlaceWithCityAndImages(id)
+            }
         } else {
             placesLocalRepository.getPlaceWithCityAndImages(id)
         }
@@ -35,7 +48,11 @@ class PlacesDataRepository (
 
     override suspend fun getPlace(id: Long): Place {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository.getPlace(id)
+            try {
+                placesRemoteRepository.getPlace(id)
+            } catch (e: SocketTimeoutException) {
+                placesLocalRepository.getPlace(id)
+            }
         } else {
             placesLocalRepository.getPlace(id)
         }
@@ -43,7 +60,11 @@ class PlacesDataRepository (
 
     override suspend fun insertPlace(place: Place) {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository.insertPlace(place)
+            try {
+                placesRemoteRepository.insertPlace(place)
+            } catch (e: SocketTimeoutException) {
+                placesLocalRepository.insertPlace(place)
+            }
         } else {
             placesLocalRepository.insertPlace(place)
         }
@@ -51,7 +72,11 @@ class PlacesDataRepository (
 
     override suspend fun deletePlace(place: Place) {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository.deletePlace(place)
+            try {
+                placesRemoteRepository.deletePlace(place)
+            } catch (e: SocketTimeoutException) {
+                placesLocalRepository.deletePlace(place)
+            }
         } else {
             placesLocalRepository.deletePlace(place)
         }
@@ -59,7 +84,11 @@ class PlacesDataRepository (
 
     override suspend fun updatePlace(place: Place) {
         return if (networkConnection.isNetworkConnected) {
-            placesRemoteRepository.updatePlace(place)
+            try {
+                placesRemoteRepository.updatePlace(place)
+            } catch (e: Exception) {
+                placesLocalRepository.updatePlace(place)
+            }
         } else {
             placesLocalRepository.updatePlace(place)
         }

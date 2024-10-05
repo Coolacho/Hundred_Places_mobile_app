@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.util.NetworkConnection
 import kotlinx.serialization.SerializationException
+import java.net.SocketTimeoutException
 
 class UsersDataRepository(
     private val usersLocalRepository: UsersLocalRepository,
@@ -13,46 +14,75 @@ class UsersDataRepository(
 
     override suspend fun getUserByEmailAndPassword(email: String, password: String): User {
         var user: User
-        try {
-            user = usersRemoteRepository.getUserByEmailAndPassword(email, password)
-            usersLocalRepository.insertUser(user)
+        if (networkConnection.isNetworkConnected) {
+            try {
+                user = usersRemoteRepository.getUserByEmailAndPassword(email, password)
+                usersLocalRepository.insertUser(user)
+            }
+            catch (e: SerializationException) {
+                user = User(name ="", email = "", password = "")
+                Log.d("UserRepository", "User is null")
+            }
+            catch (e: SocketTimeoutException) {
+                user = usersLocalRepository.getUserByEmailAndPassword(email, password)
+            }
         }
-        catch (e: SerializationException) {
-            user = User(name ="", email = "", password = "")
-            Log.d("UserRepository", "User is null")
+        else {
+            user = usersLocalRepository.getUserByEmailAndPassword(email, password)
         }
         return user
     }
 
     override suspend fun getUserByEmail(email: String): User {
-        return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.getUserByEmail(email)
+        var user: User
+        if (networkConnection.isNetworkConnected) {
+            try {
+                user = usersRemoteRepository.getUserByEmail(email)
+                usersLocalRepository.insertUser(user)
+            }
+            catch (e: SerializationException) {
+                user = User(name ="", email = "", password = "")
+                Log.d("UserRepository", "User is null")
+            }
+            catch (e: SocketTimeoutException) {
+                user = usersLocalRepository.getUserByEmail(email)
+            }
         } else {
-            usersLocalRepository.getUserByEmail(email)
+            user = usersLocalRepository.getUserByEmail(email)
         }
+        return user
     }
 
     override suspend fun insertUser(user: User) {
-        return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.insertUser(user)
-        } else {
-            usersLocalRepository.insertUser(user)
+        if (networkConnection.isNetworkConnected) {
+            try {
+                usersRemoteRepository.insertUser(user)
+            } catch (e: SocketTimeoutException) {
+                Log.e("Retrofit", "Server is not accessible. Insert in remote failed.")
+            }
         }
+        usersLocalRepository.insertUser(user)
     }
 
     override suspend fun deleteUser(user: User) {
-        return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.deleteUser(user)
-        } else {
-            usersLocalRepository.deleteUser(user)
+        if (networkConnection.isNetworkConnected) {
+            try {
+                usersRemoteRepository.deleteUser(user)
+            } catch (e: SocketTimeoutException) {
+                Log.e("Retrofit", "Server is not accessible. Delete in remote failed.")
+            }
         }
+        usersLocalRepository.deleteUser(user)
     }
 
     override suspend fun updateUser(user: User) {
-        return if (networkConnection.isNetworkConnected) {
-            usersRemoteRepository.updateUser(user)
-        } else {
-            usersLocalRepository.updateUser(user)
+        if (networkConnection.isNetworkConnected) {
+            try {
+                usersRemoteRepository.updateUser(user)
+            } catch (e: SocketTimeoutException) {
+                Log.e("Retrofit", "Server is not accessible. Update in remote failed.")
+            }
         }
+        usersLocalRepository.updateUser(user)
     }
 }

@@ -1,7 +1,9 @@
 package com.example.hundredplaces.data.model.visit.repositories
 
+import android.util.Log
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.util.NetworkConnection
+import java.net.SocketTimeoutException
 import java.time.LocalDateTime
 
 class VisitsDataRepository(
@@ -18,11 +20,14 @@ class VisitsDataRepository(
     }
 
     override suspend fun insertVisit(visit: Visit) {
-        return if (networkConnection.isNetworkConnected) {
-            visitsRemoteRepository.insertVisit(visit)
-        } else {
-            visitsLocalRepository.insertVisit(visit)
+        if (networkConnection.isNetworkConnected) {
+            try {
+                visitsRemoteRepository.insertVisit(visit)
+            } catch (e: SocketTimeoutException) {
+                Log.e("Retrofit", "Server is not accessible. Insert in remote failed.")
+            }
         }
+        visitsLocalRepository.insertVisit(visit)
     }
 
 }
