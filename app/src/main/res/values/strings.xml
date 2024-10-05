@@ -32,4 +32,23 @@
     <string name="create_an_account">Create an account</string>
     <string name="take_your_badge">Take your badge</string>
     <string name="one_or_more_places_nearby">One or more places nearby</string>
+    <string name="kilometres">km</string>
+    <string name="metres">m</string>
+    <string name="select_place_see_details">Select a place to see details about it.</string>
+    <string name="place_not_visited">You haven\'t visited this place yet!</string>
+    <string name="filter">Filter</string>
+    <string name="favorites_category_name">Favorites</string>
+    <string name="museums_category_name">Museums</string>
+    <string name="peaks_category_name">Peaks</string>
+    <string name="galleries_category_name">Galleries</string>
+    <string name="caves_category_name">Caves</string>
+    <string name="churches_category_name">Churches</string>
+    <string name="sanctuaries_category_name">Sanctuaries</string>
+    <string name="fortresses_category_name">Fortresses</string>
+    <string name="tombs_category_name">Tombs</string>
+    <string name="monuments_category_name">Monuments</string>
+    <string name="waterfalls_category_name">Waterfalls</string>
+    <string name="others_category_name">Others</string>
+    <string name="rating_category_name">Rating:</string>
+    <string name="range_format">From %.2f to %.2f</string>
 </resources>
