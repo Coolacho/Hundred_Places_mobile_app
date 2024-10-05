@@ -43,11 +43,10 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
 ){
     LazyColumn(
-        //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(dimensionResource(id = R.dimen.padding_medium))
+            .padding(dimensionResource(id = R.dimen.padding_small))
     ) {
         item {
             OutlinedCard(
