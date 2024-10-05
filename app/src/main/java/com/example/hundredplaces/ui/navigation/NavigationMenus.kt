@@ -1,11 +1,14 @@
 package com.example.hundredplaces.ui.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
@@ -21,21 +24,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.hundredplaces.R
+import com.example.hundredplaces.ui.account.AccountDestination
+import com.example.hundredplaces.ui.achievements.AchievementsDestination
+import com.example.hundredplaces.ui.map.MapDestination
+import com.example.hundredplaces.ui.places.PlacesDestination
+
+val navigationItemContentList = listOf(PlacesDestination, MapDestination, AchievementsDestination, AccountDestination)
 
 @Composable
 fun AppBottomNavigationBar(
-    navigationItemContentList: List<MenuNavigationDestination>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    NavigationBar(modifier = modifier) {
+    NavigationBar(
+        modifier = modifier
+    ) {
         for (navItem in navigationItemContentList) {
             NavigationBarItem(
                 selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
@@ -70,14 +81,15 @@ fun AppBottomNavigationBar(
 
 @Composable
 fun AppNavigationRail(
-    navigationItemContentList: List<MenuNavigationDestination>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    NavigationRail(modifier = modifier
-        .padding(dimensionResource(id = R.dimen.padding_small))) {
+    NavigationRail(
+        modifier = modifier
+            .padding(dimensionResource(id = R.dimen.padding_small))
+    ) {
         for (navItem in navigationItemContentList) {
             NavigationRailItem(
                 selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
@@ -97,12 +109,12 @@ fun AppNavigationRail(
                 icon = {
                     Icon(
                         painter = painterResource(navItem.iconRes),
-                        contentDescription = navItem.route
+                        contentDescription = stringResource(navItem.title)
                     )
                 },
                 label = {
                     Text(
-                        text = navItem.route
+                        text = stringResource(navItem.title)
                     )
                 }
             )
@@ -112,21 +124,31 @@ fun AppNavigationRail(
 
 @Composable
 fun NavigationDrawerContent(
-    navigationItemContentList: List<MenuNavigationDestination>,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+    ) {
         Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.padding_medium)),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(bottom = dimensionResource(id = R.dimen.padding_small))
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                )
         ) {
-            Text(text = stringResource(id = R.string.app_name))
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_small))
+            )
         }
         for (navItem in navigationItemContentList) {
             NavigationDrawerItem(
@@ -146,19 +168,21 @@ fun NavigationDrawerContent(
                 }},
                 label = {
                     Text(
-                        text = navItem.route,
+                        text = stringResource(navItem.title),
                         modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     )
                 },
                 icon = {
                     Icon(
                         painter = painterResource(navItem.iconRes),
-                        contentDescription = navItem.route
+                        contentDescription = stringResource(navItem.title)
                     )
                 },
                 colors = NavigationDrawerItemDefaults.colors(
                     unselectedContainerColor = Color.Transparent
-                )
+                ),
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_small))
             )
         }
     }

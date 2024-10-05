@@ -9,7 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.hundredplaces.ui.AppContentType
+import com.example.hundredplaces.ui.places.PlacesScreenContentType
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountScreen
 import com.example.hundredplaces.ui.account.AccountUiState
@@ -35,7 +35,7 @@ import com.example.hundredplaces.ui.places.PlaceDetailsScreen
 fun HundredPlacesNavHost(
     startDestination: String,
     navController: NavHostController,
-    contentType: AppContentType,
+    contentType: PlacesScreenContentType,
     accountViewModel: AccountViewModel,
     accountUiState: AccountUiState,
     placesViewModel: PlacesViewModel,
@@ -79,6 +79,7 @@ fun HundredPlacesNavHost(
             MapScreen(
                 placesUiState = placesUiState.value,
                 navigateToPlaceEntry = {
+                    placesViewModel.selectPlace(it)
                     navController.navigate("${PlaceDetailsDestination.route}/${it}")}
             )
         }
