@@ -20,16 +20,16 @@ interface PlaceDao {
     suspend fun delete(place: Place)
 
     @Query("SELECT * FROM places WHERE id = :id")
-    fun getPlace(id: Long): Place
+    suspend fun getPlace(id: Long): Place
 
     @Query("SELECT * FROM places ORDER BY id ASC")
-    fun getAllPlaces(): List<Place>
+    suspend fun getAllPlaces(): List<Place>
 
     @Transaction
     @Query("SELECT * FROM places WHERE id = :id")
-    fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages
+    suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages
     @Transaction
     @Query("SELECT * FROM places ORDER BY id ASC")
-    fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
+    suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
 
 }

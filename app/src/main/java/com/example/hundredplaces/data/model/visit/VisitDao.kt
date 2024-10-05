@@ -12,5 +12,5 @@ interface VisitDao {
     suspend fun insert(visit: Visit)
 
     @Query("SELECT date_visited FROM visits WHERE user_id = :userId AND place_id = :placeId")
-    fun getAllVisitsByUserIdAndPlaceId(userId: Long, placeId: Long): List<LocalDateTime>
+    suspend fun getAllVisitsByUserIdAndPlaceId(userId: Long, placeId: Long): List<LocalDateTime>
 }

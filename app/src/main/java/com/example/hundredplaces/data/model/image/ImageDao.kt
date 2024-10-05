@@ -19,8 +19,8 @@ interface ImageDao {
     suspend fun delete(image: Image)
 
     @Query("SELECT * FROM images WHERE id = :id")
-    fun getImage(id: Long): Image
+    suspend fun getImage(id: Long): Image
 
     @Query("SELECT * FROM images ORDER BY id ASC")
-    fun getAllImages(): List<Image>
+    suspend fun getAllImages(): List<Image>
 }
