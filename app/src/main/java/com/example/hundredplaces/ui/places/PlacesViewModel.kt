@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 class PlacesViewModel(

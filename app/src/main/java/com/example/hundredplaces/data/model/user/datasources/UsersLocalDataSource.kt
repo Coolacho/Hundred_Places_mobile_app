@@ -2,7 +2,6 @@ package com.example.hundredplaces.data.model.user.datasources
 
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.UserDao
-import com.example.hundredplaces.data.model.user.repositories.UsersRepository
 
 class UsersLocalDataSource(
     private val userDao: UserDao

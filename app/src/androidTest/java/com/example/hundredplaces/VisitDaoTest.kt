@@ -22,7 +22,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
@@ -33,8 +33,8 @@ class VisitDaoTest {
     private lateinit var userDao: UserDao
     private lateinit var hundredPlacesLocalDatabase: HundredPlacesLocalDatabase
 
-    private val visit1 = Visit(id= UUID.fromString("11efea33-dbf6-d03f-b9ef-2cf05d72c5a3"), userId=1, placeId=1, dateVisited= LocalDateTime.parse("2024-01-03T10:15:30"))
-    private val visit2 = Visit(userId=1, placeId=1, dateVisited= LocalDateTime.parse("2024-01-03T10:16:30"))
+    private val visit1 = Visit(id= UUID.fromString("11efea33-dbf6-d03f-b9ef-2cf05d72c5a3"), userId=1, placeId=1, dateVisited= Instant.parse("2024-01-03T10:15:30"))
+    private val visit2 = Visit(userId=1, placeId=1, dateVisited= Instant.parse("2024-01-03T10:16:30"))
 
     private val city1 = City(1, "Plovdiv")
 
