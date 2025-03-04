@@ -23,8 +23,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.hundredplaces.R
-import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 
 object AchievementsDestination : MenuNavigationDestination {
@@ -38,14 +38,21 @@ object AchievementsDestination : MenuNavigationDestination {
  */
 @Composable
 fun AchievementsScreen(
-    uiState: AccountUiState,
+    achievementsViewModel: AchievementsViewModel,
     modifier: Modifier = Modifier
 ) {
+    val uiState = achievementsViewModel.uiState.collectAsStateWithLifecycle().value
+
     LazyColumn(
         modifier = modifier
-            .padding(dimensionResource(id = R.dimen.padding_small))
+            .padding(
+                bottom = 0.dp,
+                top = dimensionResource(id = R.dimen.padding_small),
+                start = dimensionResource(id = R.dimen.padding_small),
+                end = dimensionResource(id = R.dimen.padding_small))
     ) {
-        items(AchievementTypeEnum.entries.toTypedArray()) {
+        items(uiState.achievements.entries.toList()) {
+            val upperBound = getUpperBound(it.key, it.value)
             Card(
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
@@ -62,7 +69,7 @@ fun AchievementsScreen(
                             .padding(dimensionResource(id = R.dimen.padding_small))
                             .clip(MaterialTheme.shapes.small),
                         contentScale = ContentScale.Crop,
-                        painter = painterResource(id = it.icon),
+                        painter = painterResource(id = it.key.icon),
                         contentDescription = null
                     )
                     Column(
@@ -71,38 +78,23 @@ fun AchievementsScreen(
                             .padding(end = dimensionResource(id = R.dimen.padding_medium))
                             .fillMaxWidth()
                     ) {
-                        Text(text = stringResource(it.title))
+                        Text(text = stringResource(it.key.title))
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            when(it) {
-                                AchievementTypeEnum.MUSEUM -> uiState.currentUser.museumsVisited to getUpperBound(it, uiState.currentUser.museumsVisited)
-                                AchievementTypeEnum.PEAK -> uiState.currentUser.peaksVisited to getUpperBound(it, uiState.currentUser.peaksVisited)
-                                AchievementTypeEnum.GALLERY -> uiState.currentUser.galleriesVisited to getUpperBound(it, uiState.currentUser.galleriesVisited)
-                                AchievementTypeEnum.CAVE -> uiState.currentUser.cavesVisited to getUpperBound(it, uiState.currentUser.cavesVisited)
-                                AchievementTypeEnum.CHURCH -> uiState.currentUser.churchesVisited to getUpperBound(it, uiState.currentUser.churchesVisited)
-                                AchievementTypeEnum.SANCTUARY -> uiState.currentUser.sanctuariesVisited to getUpperBound(it, uiState.currentUser.sanctuariesVisited)
-                                AchievementTypeEnum.FORTRESS -> uiState.currentUser.fortressesVisited to getUpperBound(it, uiState.currentUser.fortressesVisited)
-                                AchievementTypeEnum.TOMB -> uiState.currentUser.tombsVisited to getUpperBound(it, uiState.currentUser.tombsVisited)
-                                AchievementTypeEnum.MONUMENT -> uiState.currentUser.monumentsVisited to getUpperBound(it, uiState.currentUser.monumentsVisited)
-                                AchievementTypeEnum.WATERFALL -> uiState.currentUser.waterfallsVisited to getUpperBound(it, uiState.currentUser.waterfallsVisited)
-                                AchievementTypeEnum.OTHER -> uiState.currentUser.othersVisited to getUpperBound(it, uiState.currentUser.othersVisited)
-                                AchievementTypeEnum.HUNDRED_PLACES -> uiState.currentUser.hundredPlacesVisited to getUpperBound(it, uiState.currentUser.hundredPlacesVisited)
-                                AchievementTypeEnum.TOTAL -> uiState.currentUser.totalVisited to getUpperBound(it, uiState.currentUser.totalVisited)
-                            }.let { (visited, upperBound) ->
-                                LinearProgressIndicator(
-                                    progress = { (visited.toFloat() / upperBound.toFloat()) },
-                                    trackColor = Color.LightGray,
-                                    strokeCap = StrokeCap.Round,
-                                    gapSize = 0.dp,
-                                    modifier = Modifier
-                                        .padding(end = dimensionResource(R.dimen.padding_small))
-                                        .weight(1f)
-                                )
-                                Text(
-                                    text = "$visited/$upperBound".padStart(4)
-                                )
-                            }
+                            LinearProgressIndicator(
+                                progress = { (it.value.toFloat() / upperBound.toFloat()) },
+                                trackColor = Color.LightGray,
+                                strokeCap = StrokeCap.Round,
+                                gapSize = 0.dp,
+                                drawStopIndicator = {}, //Removes the dots at the start and the end of the track
+                                modifier = Modifier
+                                    .padding(end = dimensionResource(R.dimen.padding_small))
+                                    .weight(1f)
+                            )
+                            Text(
+                                text = "${it.value}/$upperBound".padStart(4)
+                            )
                         }
                     }
                 }

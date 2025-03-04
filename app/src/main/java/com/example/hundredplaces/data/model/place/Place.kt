@@ -1,14 +1,15 @@
 package com.example.hundredplaces.data.model.place
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.hundredplaces.data.model.city.City
-import kotlinx.serialization.Serializable
+import kotlinx.parcelize.Parcelize
 
-@Serializable
+@Parcelize
 @Entity(
     tableName = "places",
     indices = [
@@ -26,7 +27,8 @@ import kotlinx.serialization.Serializable
             parentColumns = ["id"],
             childColumns = ["city_id"],
             onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.SET_NULL
+            onDelete = ForeignKey.CASCADE,
+            deferred = true
         )
     ]
 )
@@ -50,4 +52,4 @@ data class Place(
     val type: PlaceTypeEnum,
     @ColumnInfo(name = "city_id")
     val cityId: Long
-)
+) : Parcelable

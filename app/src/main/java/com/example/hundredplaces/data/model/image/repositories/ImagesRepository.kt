@@ -2,33 +2,19 @@ package com.example.hundredplaces.data.model.image.repositories
 
 
 import com.example.hundredplaces.data.model.image.Image
+import kotlinx.coroutines.flow.Flow
 
 /**
- * Repository that provides insert, update, delete, and retrieve of [Image] from a given data source.
+ * Repository that provides a [Flow] to retrieve all records of [Image] from a given data source.
  */
 interface ImagesRepository {
     /**
-     * Retrieve all the images from the given data source.
+     * [Flow] to retrieve all images from the given data source.
      */
-    suspend fun getAllImages(): List<Image>
+    val allImages: Flow<List<Image>>
 
     /**
-     * Retrieve an image from the given data source that matches with the [id].
+     * Function to retrieve images from the remote data source and save them to the local one
      */
-    suspend fun getImage(id: Long): Image
-
-    /**
-     * Insert image in the data source
-     */
-    suspend fun insertImage(image: Image)
-
-    /**
-     * Delete image from the data source
-     */
-    suspend fun deleteImage(image: Image)
-
-    /**
-     * Update image in the data source
-     */
-    suspend fun updateImage(image: Image)
+    suspend fun pullImages()
 }

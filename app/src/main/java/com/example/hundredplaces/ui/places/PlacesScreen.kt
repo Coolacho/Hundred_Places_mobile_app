@@ -1,6 +1,7 @@
 package com.example.hundredplaces.ui.places
 
-import android.app.Activity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -9,7 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,23 +37,29 @@ import androidx.compose.material3.RangeSliderState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.hundredplaces.R
-import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsScreen
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 
 object PlacesDestination : MenuNavigationDestination {
     override val route = "Places"
@@ -56,67 +67,297 @@ object PlacesDestination : MenuNavigationDestination {
     override val iconRes = R.drawable.rounded_museum_24
 }
 
-/**
- * Entry route for Places screen
- */
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun PlacesScreenV2(
+    placesDetailsViewModel: PlaceDetailsViewModel,
+    placesViewModel: PlacesViewModel,
+    modifier: Modifier = Modifier
+) {
+    val uiState = placesViewModel.uiState.collectAsStateWithLifecycle().value
+    val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+
+    BackHandler(navigator.canNavigateBack()) {
+        navigator.navigateBack()
+    }
+
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        listPane = {
+            AnimatedPane {
+                Scaffold(
+                    floatingActionButton = {
+                        Box(
+                            contentAlignment = if (navigator.isDetailExpanded()) Alignment.BottomStart else Alignment.BottomEnd
+                        ) {
+                            AnimatedVisibility(
+                                visible = uiState.isFilterScreenOpen
+                            ) {
+                                PlacesFilterCategories(
+                                    filterOnClick = { filter ->
+                                        placesViewModel.toggleFilter(filter)
+                                                    },
+                                    rangeSliderState = uiState.rangeSliderState,
+                                    filtersSet = uiState.filtersSet,
+                                    modifier = Modifier
+                                        .padding(48.dp)
+                                )
+                            }
+                            BadgedBox(
+                                badge = {
+                                    if (uiState.filtersSet.isNotEmpty()) {
+                                        Badge {
+                                            Text("${uiState.filtersSet.size}")
+                                        }
+                                    }
+                                }
+                            ) {
+                                IconButton(
+                                    onClick = placesViewModel::openFilterScreen,
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                                    ),
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.rounded_filter_alt_24),
+                                        contentDescription = stringResource(R.string.filter),
+                                        modifier = Modifier
+                                            .size(42.dp)
+                                            .padding(top = 5.dp)
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    floatingActionButtonPosition = if (navigator.isDetailExpanded()) FabPosition.Start else FabPosition.End,
+                    contentWindowInsets = WindowInsets(0,0,0,0),
+                    modifier = modifier
+                ) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_small)),
+                        modifier = Modifier
+                            .padding(it)
+                            .fillMaxHeight()
+                    ) {
+                        items(uiState.filteredPlaces, key = { it.place.id }) {
+                            PlaceItem(
+                                placeWithCityAndImages = it,
+                                rating = 0.0,
+                                isFavorite = uiState.favorites.contains(it.place.id),
+                                isSelected = navigator.currentDestination?.content == it.place.id && navigator.isDetailExpanded(),
+                                distance = uiState.distances[it.place.id],
+                                onClick = {
+                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it.place.id)
+                                    placesDetailsViewModel.setPlaceId(it.place.id)
+                                },
+                                toggleFavorite = placesViewModel::toggleFavorite,
+                                modifier = Modifier
+                                    .padding(dimensionResource(id = R.dimen.padding_small))
+                                    .fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        detailPane = {
+            AnimatedPane {
+                navigator.currentDestination?.content?.let {
+                    PlaceDetailsScreen(
+                        navigateBack = { navigator.navigateBack() },
+                        isFullScreen = navigator.isListExpanded(),
+                        placesDetailsViewModel = placesDetailsViewModel,
+                        modifier = modifier
+                    )
+                }
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun PlacesFilterCategories(
+    filterOnClick: (PlaceFiltersEnum) -> Unit,
+    rangeSliderState: RangeSliderState,
+    filtersSet: Set<PlaceFiltersEnum>,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
+        modifier = modifier
+            .width(325.dp)
+            .height(500.dp)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_medium))
+        ){
+            item {
+                Column {
+                    val startInteractionSource = remember { MutableInteractionSource() }
+                    val endInteractionSource = remember { MutableInteractionSource() }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val color by animateColorAsState(
+                            targetValue = if (filtersSet.contains(PlaceFiltersEnum.RATING)) Color(
+                                3,
+                                100,
+                                252
+                            ) else Color.LightGray,
+                            label = "Category color Animation"
+                        )
+                        OutlinedCard(
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, color),
+                            modifier = Modifier
+                                .padding(end = dimensionResource(R.dimen.padding_small))
+                        ) {
+                            Text(
+                                text = stringResource(R.string.rating_category_name),
+                                color = color,
+                                modifier = Modifier
+                                    .padding(dimensionResource(R.dimen.padding_small))
+                            )
+                        }
+                        RangeSlider(
+                            state = rangeSliderState,
+                            startThumb = {
+                                SliderDefaults.Thumb(
+                                    interactionSource = startInteractionSource,
+                                    thumbSize = DpSize(4.dp, 32.dp)
+                                )
+                            },
+                            endThumb = {
+                                SliderDefaults.Thumb(
+                                    interactionSource = endInteractionSource,
+                                    thumbSize = DpSize(4.dp, 32.dp),
+                                )
+                            },
+                            track = {
+                                SliderDefaults.Track(
+                                    rangeSliderState = it,
+                                    thumbTrackGapSize = 4.dp,
+                                    trackInsideCornerSize = 6.dp,
+                                    colors = SliderDefaults.colors(
+                                        activeTickColor = Color.Transparent,
+                                        inactiveTickColor = Color.Transparent
+                                    ),
+                                    drawStopIndicator = {} //Removes the dots at the start and the end of the track
+                                )
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.range_format).format(
+                            rangeSliderState.activeRangeStart,
+                            rangeSliderState.activeRangeEnd
+                        )
+                    )
+                }
+            }
+            item {
+                HorizontalDivider(
+                    thickness = 2.dp,
+                    modifier = Modifier
+                        .padding(vertical = dimensionResource(R.dimen.padding_small))
+                )
+            }
+            item {
+                FlowRow {
+                    for (filter in PlaceFiltersEnum.entries.filterNot { filter -> filter == PlaceFiltersEnum.RATING }) {
+                        val color by animateColorAsState(
+                            targetValue = if (filtersSet.contains(filter)) Color(
+                                3,
+                                100,
+                                252
+                            ) else Color.LightGray,
+                            label = "Category color Animation"
+                        )
+                        OutlinedCard(
+                            shape = RoundedCornerShape(8.dp),
+                            onClick = { filterOnClick(filter) },
+                            border = BorderStroke(1.dp, color),
+                            modifier = Modifier
+                                .padding(end = dimensionResource(R.dimen.padding_small))
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                AnimatedVisibility(
+                                    filtersSet.contains(filter)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.round_done_24),
+                                        contentDescription = null,
+                                        tint = Color(3, 100, 252),
+                                        modifier = Modifier
+                                            .padding(start = dimensionResource(R.dimen.padding_small))
+                                    )
+                                }
+                                Text(
+                                    text = stringResource(filter.categoryName),
+                                    color = color,
+                                    modifier = Modifier
+                                        .padding(dimensionResource(R.dimen.padding_small))
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlacesScreen(
-    navigateToPlaceEntry: (Long) -> Unit,
+    selectAndNavigateToPlace: (Long) -> Unit,
+    selectPlace: (Long) -> Unit,
     contentType: PlacesScreenContentType,
-    accountUiState: AccountUiState,
+    placesDetailsViewModel: PlaceDetailsViewModel,
     placesViewModel: PlacesViewModel,
-    placesUiState: PlacesUiState,
     modifier: Modifier = Modifier
 ) {
-    var isCategoryScreenOpened by remember { mutableStateOf(false) }
-    val filterList = remember { mutableStateListOf<PlaceFilterCategoriesEnum>() }
-    val rangeSliderState = remember {
-        RangeSliderState(
-            activeRangeStart = 0f,
-            activeRangeEnd = 5f,
-            steps = 49,
-            valueRange = 0f..5f
-        )
-    }
-    rangeSliderState.onValueChangeFinished = {
-        if (rangeSliderState.activeRangeStart > 0f || rangeSliderState.activeRangeEnd < 5f)
-        {
-            if (!filterList.contains(PlaceFilterCategoriesEnum.RATING))
-                filterList.add(PlaceFilterCategoriesEnum.RATING)
-        }
-        else filterList.remove(PlaceFilterCategoriesEnum.RATING)
-        placesViewModel.filterPlaces(filterList, rangeSliderState.activeRangeStart, rangeSliderState.activeRangeEnd)
-    }
+    val uiState = placesViewModel.uiState.collectAsStateWithLifecycle().value
+
     Scaffold(
         floatingActionButton = {
             Box(
-                contentAlignment = Alignment.BottomEnd
+                contentAlignment = if (contentType == PlacesScreenContentType.LIST_ONLY) Alignment.BottomEnd else Alignment.BottomStart
             ) {
                 AnimatedVisibility(
-                    visible = isCategoryScreenOpened
+                    visible = uiState.isFilterScreenOpen
                 ) {
                     PlacesFilterCategories(
-                        placesViewModel = placesViewModel,
-                        rangeSliderState = rangeSliderState,
-                        filterList = filterList,
+                        filterOnClick = { filter ->
+                            placesViewModel.toggleFilter(filter)
+                                        },
+                        rangeSliderState = uiState.rangeSliderState,
+                        filtersSet = uiState.filtersSet,
                         modifier = Modifier
                             .padding(48.dp)
                     )
                 }
                 BadgedBox(
                     badge = {
-                        if (filterList.isNotEmpty()) {
+                        if (uiState.filtersSet.isNotEmpty()) {
                             Badge {
-                                Text("${filterList.size}")
+                                Text("${uiState.filtersSet.size}")
                             }
                         }
                     }
                 ) {
                     IconButton(
-                        onClick = { isCategoryScreenOpened = !isCategoryScreenOpened },
+                        onClick = placesViewModel::openFilterScreen,
                         colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
                         ),
                         modifier = Modifier
                             .size(48.dp)
@@ -132,49 +373,54 @@ fun PlacesScreen(
                 }
             }
         },
+        floatingActionButtonPosition = if (contentType == PlacesScreenContentType.LIST_ONLY) FabPosition.End else FabPosition.Start,
+        contentWindowInsets = WindowInsets(0,0,0,0),
         modifier = modifier
     ) {
         if (contentType == PlacesScreenContentType.LIST_ONLY) {
             PlacesListOnlyContent(
-                placesUiState = placesUiState,
-                cardOnClick = placesViewModel::selectPlace,
-                navigateToPlaceEntry = navigateToPlaceEntry,
+                placesUiState = uiState,
+                cardOnClick = selectAndNavigateToPlace,
+                toggleFavorite = placesViewModel::toggleFavorite,
                 modifier = Modifier
                     .padding(it)
+                    .fillMaxHeight()
             )
         } else {
             PlacesListAndDetailsContent(
-                accountUiState = accountUiState,
-                viewModel = placesViewModel,
-                placesUiState = placesUiState,
-                cardOnClick = placesViewModel::selectPlace,
+                placesDetailsViewModel = placesDetailsViewModel,
+                placesUiState = uiState,
+                cardOnClick = selectPlace,
+                toggleFavorite = placesViewModel::toggleFavorite,
                 modifier = Modifier
                     .padding(it)
+                    .fillMaxHeight()
             )
         }
     }
 }
 
+
 @Composable
 private fun PlacesListOnlyContent(
     placesUiState: PlacesUiState,
     cardOnClick: (Long) -> Unit,
-    navigateToPlaceEntry: (Long) -> Unit,
+    toggleFavorite: (placeId: Long, rating: Double, isFavorite: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
+        contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_small)),
         modifier = modifier
-            .padding(dimensionResource(id = R.dimen.padding_small))
     ) {
         items(placesUiState.filteredPlaces, key = { it.place.id }) {
             PlaceItem(
                 placeWithCityAndImages = it,
+                rating = 0.0,
+                isFavorite = placesUiState.favorites.contains(it.place.id),
                 isSelected = false,
                 distance = placesUiState.distances[it.place.id],
-                onClick = {
-                    cardOnClick(it.place.id)
-                    navigateToPlaceEntry(it.place.id)
-                },
+                onClick = { cardOnClick(it.place.id) },
+                toggleFavorite = toggleFavorite,
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
                     .fillMaxWidth()
@@ -185,10 +431,10 @@ private fun PlacesListOnlyContent(
 
 @Composable
 private fun PlacesListAndDetailsContent(
-    viewModel: PlacesViewModel,
-    accountUiState: AccountUiState,
+    placesDetailsViewModel: PlaceDetailsViewModel,
     placesUiState: PlacesUiState,
     cardOnClick: (Long) -> Unit,
+    toggleFavorite: (placeId: Long, rating: Double, isFavorite: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -208,143 +454,30 @@ private fun PlacesListAndDetailsContent(
                 key = { it.place.id }) {
                 PlaceItem(
                     placeWithCityAndImages = it,
-                    isSelected = placesUiState.selectedPlaceId == it.place.id,
+                    rating = 0.0,
+                    isFavorite = placesUiState.favorites.contains(it.place.id),
+                    isSelected = placesDetailsViewModel.getPlaceId() == it.place.id,
                     distance = placesUiState.distances[it.place.id],
                     onClick = { cardOnClick(it.place.id) },
+                    toggleFavorite = toggleFavorite,
                     modifier = Modifier
                         .padding(dimensionResource(id = R.dimen.padding_small))
                         .fillMaxWidth()
                 )
             }
         }
-        val activity = LocalContext.current as Activity
+        val activity = LocalActivity.current
         PlaceDetailsScreen(
-            navigateBack = { activity.finish() },
+            navigateBack = { activity?.finish() },
             isFullScreen = true,
-            accountUiState = accountUiState,
-            viewModel = viewModel,
-            placesUiState = placesUiState,
+            placesDetailsViewModel = placesDetailsViewModel,
             modifier = Modifier
                 .weight(1f)
         )
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable
-fun PlacesFilterCategories(
-    placesViewModel: PlacesViewModel,
-    rangeSliderState: RangeSliderState,
-    filterList: MutableList<PlaceFilterCategoriesEnum>,
-    modifier: Modifier = Modifier
-) {
-    OutlinedCard(
-        modifier = modifier
-            .width(325.dp)
-            .height(500.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_medium))
-        ) {
-            val startInteractionSource = remember { MutableInteractionSource() }
-            val endInteractionSource = remember { MutableInteractionSource() }
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedCard(
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .padding(end = dimensionResource(R.dimen.padding_small))
-                ) {
-                    Text(
-                        text = stringResource(R.string.rating_category_name),
-                        modifier = Modifier
-                            .padding(dimensionResource(R.dimen.padding_small))
-                    )
-                }
-                RangeSlider(
-                    state = rangeSliderState,
-                    startThumb = {
-                        SliderDefaults.Thumb(
-                            interactionSource = startInteractionSource,
-                            thumbSize = _root_ide_package_.androidx.compose.ui.unit.DpSize(4.dp, 32.dp)
-                        )
-                    },
-                    endThumb = {
-                        SliderDefaults.Thumb(
-                            interactionSource = endInteractionSource,
-                            thumbSize = _root_ide_package_.androidx.compose.ui.unit.DpSize(4.dp, 32.dp),
-                        )
-                    },
-                    track = {
-                        SliderDefaults.Track(
-                            rangeSliderState = it,
-                            thumbTrackGapSize = 4.dp,
-                            trackInsideCornerSize = 6.dp,
-                            colors = SliderDefaults.colors(
-                                activeTickColor = Color.Transparent,
-                                inactiveTickColor = Color.Transparent
-                            ),
-                            drawStopIndicator  = {} //Removes the dots at the start and the end of the track
-                        )
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                )
-            }
-            Text(text = stringResource(R.string.range_format).format(rangeSliderState.activeRangeStart, rangeSliderState.activeRangeEnd))
-        }
-        HorizontalDivider(
-            thickness = 2.dp,
-            modifier = Modifier
-                .padding(horizontal = dimensionResource(R.dimen.padding_small))
-        )
-        FlowRow(
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.padding_medium))
-        ) {
-            for (category in PlaceFilterCategoriesEnum.entries.filterNot { category -> category == PlaceFilterCategoriesEnum.RATING }) {
-                val color by animateColorAsState(
-                    targetValue = if (filterList.contains(category)) Color(3, 100, 252) else Color.LightGray,
-                    label = "Category color Animation"
-                )
-                OutlinedCard(
-                    shape = RoundedCornerShape(8.dp),
-                    onClick = {
-                        if (filterList.contains(category))
-                            filterList.remove(category)
-                        else filterList.add(category)
-                        placesViewModel.filterPlaces(filterList, rangeSliderState.activeRangeStart, rangeSliderState.activeRangeEnd)
-                    },
-                    border = BorderStroke(1.dp, color),
-                    modifier = Modifier
-                        .padding(end = dimensionResource(R.dimen.padding_small))
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AnimatedVisibility(
-                            filterList.contains(category)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_done_24),
-                                contentDescription = null,
-                                tint = Color(3, 100, 252),
-                                modifier = Modifier
-                                    .padding(start = dimensionResource(R.dimen.padding_small))
-                            )
-                        }
-                        Text(
-                            text = stringResource(category.categoryName),
-                            color = color,
-                            modifier = Modifier
-                                .padding(dimensionResource(R.dimen.padding_small))
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+fun ThreePaneScaffoldNavigator<*>.isListExpanded() = scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Expanded
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+fun ThreePaneScaffoldNavigator<*>.isDetailExpanded() = scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded

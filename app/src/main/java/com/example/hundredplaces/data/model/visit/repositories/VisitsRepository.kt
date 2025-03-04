@@ -1,7 +1,9 @@
 package com.example.hundredplaces.data.model.visit.repositories
 
+import com.example.hundredplaces.data.model.place.PlaceTypeEnum
 import com.example.hundredplaces.data.model.visit.Visit
-import java.time.LocalDateTime
+import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 
 /**
@@ -9,13 +11,33 @@ import java.time.LocalDateTime
  */
 interface VisitsRepository {
     /**
-     * Retrieve all the visits from the given data source.
+     * Retrieve all the visits for a given place by userId from the given data source.
      */
-    suspend fun getAllVisitDatesByUserIdAndPlaceId(userId: Long, placeId: Long): List<LocalDateTime>
+    fun getAllVisitDatesByUserIdAndPlaceId(userId: Long, placeId: Long): Flow<List<Instant>>
+
+    /**
+     * Retrieve the number of all the visits for a given user from the given data source.
+     */
+    fun getAllVisitsCountByUserId(userId: Long): Flow<Int>
+
+    /**
+     * Retrieve the number of all the visits of places part of Hundred Places
+     * for a given user from the given data source.
+     */
+    fun getVisitsCountByIsHundredPlacesAndUserId(userId: Long): Flow<Int>
+
+    /**
+     * Retrieve the number of all the visits grouped by place type for a given user from the given data source.
+     */
+    fun getVisitsCountByPlaceTypeAndUserId(userId: Long): Flow<Map<PlaceTypeEnum, Int>>
 
     /**
      * Insert visit in the data source
      */
     suspend fun insertVisit(visit: Visit)
+
+    suspend fun pushVisits(userId: Long)
+
+    suspend fun pullVisits(userId: Long)
 
 }

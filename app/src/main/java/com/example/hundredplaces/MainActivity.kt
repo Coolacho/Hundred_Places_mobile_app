@@ -4,11 +4,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +22,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.HundredPlacesApp
 import com.example.hundredplaces.ui.account.AccountViewModel
-import com.example.hundredplaces.ui.places.PlaceDetailsDestination
+import com.example.hundredplaces.ui.map.MapViewModel
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
 import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.places.PlacesViewModel
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
@@ -31,11 +33,13 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             HundredPlacesTheme {
                 // A surface container using the 'background' color from the theme
@@ -49,6 +53,14 @@ class MainActivity : ComponentActivity() {
                     val accountViewModel: AccountViewModel = viewModel (
                         factory = AppViewModelProvider.Factory
                     )
+                    val placeDetailsViewModel: PlaceDetailsViewModel = viewModel (
+                        factory = AppViewModelProvider.Factory
+                    )
+                    val mapViewModel: MapViewModel = viewModel  (
+                        factory = AppViewModelProvider.Factory
+                    )
+
+
 
                     val windowSize = calculateWindowSizeClass(activity = this)
                     val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
@@ -56,7 +68,7 @@ class MainActivity : ComponentActivity() {
                     val startDestination: String
                     if (navigateToPlaceDetails && placeId != 0L) {
                         startDestination = "${PlaceDetailsDestination.route}/${placeId}"
-                        placesViewModel.selectPlace(placeId)
+                        placeDetailsViewModel.setPlaceId(placeId)
                     } else startDestination = PlacesDestination.route
 
                     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -88,15 +100,16 @@ class MainActivity : ComponentActivity() {
                         ) == PackageManager.PERMISSION_GRANTED) {
                         fusedLocationClient.requestLocationUpdates(
                             LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 10000).build(),
+                            Executors.newSingleThreadExecutor(),
                             object: LocationCallback() {
                                 override fun onLocationResult(locationResult: LocationResult) {
-                                    for (location in locationResult.locations){
+                                    val location = locationResult.lastLocation
+                                    if (location != null) {
                                         placesViewModel.getDistances(location)
-                                        placesViewModel.updateCameraPosition(location)
+                                        mapViewModel.updateCameraPositionState(location)
                                     }
                                 }
-                            },
-                            Looper.getMainLooper()
+                            }
                         )
                     }
                     else {
@@ -124,7 +137,9 @@ class MainActivity : ComponentActivity() {
                         windowSize = windowSize.widthSizeClass,
                         startDestination = startDestination,
                         accountViewModel = accountViewModel,
-                        placesViewModel = placesViewModel
+                        placesViewModel = placesViewModel,
+                        placeDetailsViewModel = placeDetailsViewModel,
+                        mapViewModel = mapViewModel
                     )
                 }
             }

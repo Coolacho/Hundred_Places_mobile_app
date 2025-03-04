@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -21,14 +22,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hundredplaces.R
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
-import com.example.hundredplaces.ui.places.PlacesUiState
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MarkerInfoWindow
@@ -46,13 +46,15 @@ object MapDestination : MenuNavigationDestination {
 @Composable
 fun MapScreen(
     navigateToPlaceEntry: (Long) -> Unit,
-    placesUiState: PlacesUiState,
+    mapViewModel: MapViewModel,
     modifier: Modifier = Modifier
 ) {
+    val uiState = mapViewModel.uiState.collectAsStateWithLifecycle().value
+
     GoogleMap(
         modifier = modifier
             .fillMaxSize(),
-        cameraPositionState = CameraPositionState(placesUiState.cameraPosition),
+        cameraPositionState = uiState.cameraPositionState ,
         properties = MapProperties(
             isMyLocationEnabled = ContextCompat.checkSelfPermission(
                 LocalContext.current,
@@ -60,9 +62,9 @@ fun MapScreen(
             ) == PackageManager.PERMISSION_GRANTED
         )
     ) {
-        for (place in placesUiState.places) {
+        for (place in uiState.places) {
             MarkerInfoWindow(
-                state = MarkerState(position = LatLng(place.place.latitude, place.place.longitude)),
+                state = remember { MarkerState(position = LatLng(place.place.latitude, place.place.longitude)) } ,
                 infoWindowAnchor = Offset(0.5f, 0.65f),
                 onInfoWindowClick = {
                     navigateToPlaceEntry(place.place.id)
@@ -90,7 +92,9 @@ fun PlaceMapMarker(
             AsyncImage(
                 model = ImageRequest.Builder(context = LocalContext.current)
                     .allowHardware(false)
-                    .data(placeWithCityAndImages.images[0])
+                    .data(
+                        if (placeWithCityAndImages.images.isNotEmpty()) placeWithCityAndImages.images[0] else ""
+                    )
                     .crossfade(true)
                     .build(),
                 contentDescription = null,

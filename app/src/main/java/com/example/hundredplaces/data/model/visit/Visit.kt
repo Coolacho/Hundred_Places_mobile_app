@@ -8,10 +8,9 @@ import androidx.room.PrimaryKey
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.user.User
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
+import java.time.Instant
+import java.util.UUID
 
-@Serializable
 @Entity(
     tableName = "visits",
     indices = [
@@ -39,15 +38,15 @@ import java.time.LocalDateTime
         )
     ]
 )
-data class Visit(
-    @PrimaryKey(autoGenerate = true)
+data class Visit (
+    @PrimaryKey()
     @ColumnInfo(name = "id")
-    val id: Long = 0,
+    val id: UUID = UUID.randomUUID(),
     @ColumnInfo(name = "user_id")
     val userId: Long,
     @ColumnInfo(name = "place_id")
     val placeId: Long,
-    @Contextual
+    @Contextual //TODO: Check if this is necessary or you can remove it
     @ColumnInfo(name = "date_visited")
-    val dateVisited: LocalDateTime
+    val dateVisited: Instant = Instant.now()
 )

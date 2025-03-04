@@ -2,13 +2,15 @@ package com.example.hundredplaces.data.model.user.repositories
 
 import android.util.Log
 import com.example.hundredplaces.data.model.user.User
+import com.example.hundredplaces.data.model.user.datasources.UsersLocalDataSource
+import com.example.hundredplaces.data.model.user.datasources.UsersRemoteDataSource
 import com.example.hundredplaces.util.NetworkConnection
 import kotlinx.serialization.SerializationException
 import java.net.SocketTimeoutException
 
 class UsersDataRepository(
-    private val usersLocalRepository: UsersLocalRepository,
-    private val usersRemoteRepository: UsersRemoteRepository,
+    private val usersLocalDataSource: UsersLocalDataSource,
+    private val usersRemoteDataSource: UsersRemoteDataSource,
     private val networkConnection: NetworkConnection
 ) : UsersRepository{
 
@@ -16,19 +18,19 @@ class UsersDataRepository(
         var user: User
         if (networkConnection.isNetworkConnected) {
             try {
-                user = usersRemoteRepository.getUserByEmailAndPassword(email, password)
-                usersLocalRepository.insertUser(user)
+                user = usersRemoteDataSource.getUserByEmailAndPassword(email, password)
+                usersLocalDataSource.insertUser(user)
             }
             catch (e: SerializationException) {
                 user = User(name ="", email = "", password = "")
                 Log.d("UserRepository", "User is null")
             }
             catch (e: SocketTimeoutException) {
-                user = usersLocalRepository.getUserByEmailAndPassword(email, password)
+                user = usersLocalDataSource.getUserByEmailAndPassword(email, password)
             }
         }
         else {
-            user = usersLocalRepository.getUserByEmailAndPassword(email, password)
+            user = usersLocalDataSource.getUserByEmailAndPassword(email, password)
         }
         return user
     }
@@ -37,18 +39,18 @@ class UsersDataRepository(
         var user: User
         if (networkConnection.isNetworkConnected) {
             try {
-                user = usersRemoteRepository.getUserByEmail(email)
-                usersLocalRepository.insertUser(user)
+                user = usersRemoteDataSource.getUserByEmail(email)
+                usersLocalDataSource.insertUser(user)
             }
             catch (e: SerializationException) {
                 user = User(name ="", email = "", password = "")
                 Log.d("UserRepository", "User is null")
             }
             catch (e: SocketTimeoutException) {
-                user = usersLocalRepository.getUserByEmail(email)
+                user = usersLocalDataSource.getUserByEmail(email)
             }
         } else {
-            user = usersLocalRepository.getUserByEmail(email)
+            user = usersLocalDataSource.getUserByEmail(email)
         }
         return user
     }
@@ -56,33 +58,33 @@ class UsersDataRepository(
     override suspend fun insertUser(user: User) {
         if (networkConnection.isNetworkConnected) {
             try {
-                usersRemoteRepository.insertUser(user)
+                usersRemoteDataSource.insertUser(user)
             } catch (e: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Insert in remote failed.")
             }
         }
-        usersLocalRepository.insertUser(user)
+        usersLocalDataSource.insertUser(user)
     }
 
     override suspend fun deleteUser(user: User) {
         if (networkConnection.isNetworkConnected) {
             try {
-                usersRemoteRepository.deleteUser(user)
+                usersRemoteDataSource.deleteUser(user)
             } catch (e: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Delete in remote failed.")
             }
         }
-        usersLocalRepository.deleteUser(user)
+        usersLocalDataSource.deleteUser(user)
     }
 
     override suspend fun updateUser(user: User) {
         if (networkConnection.isNetworkConnected) {
             try {
-                usersRemoteRepository.updateUser(user)
+                usersRemoteDataSource.updateUser(user)
             } catch (e: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Update in remote failed.")
             }
         }
-        usersLocalRepository.updateUser(user)
+        usersLocalDataSource.updateUser(user)
     }
 }

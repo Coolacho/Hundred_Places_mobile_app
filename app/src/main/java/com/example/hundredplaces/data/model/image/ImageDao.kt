@@ -1,26 +1,21 @@
 package com.example.hundredplaces.data.model.image
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Transaction
+import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ImageDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(image: Image)
 
-    @Update(onConflict = OnConflictStrategy.ABORT)
-    suspend fun update(image: Image)
+    @Upsert
+    suspend fun insertAll(images: List<Image>)
 
-    @Delete
-    suspend fun delete(image: Image)
+    @Query("DELETE FROM images WHERE id NOT IN (:ids)")
+    suspend fun deleteImagesNotIn(ids: List<Long>)
 
-    @Query("SELECT * FROM images WHERE id = :id")
-    suspend fun getImage(id: Long): Image
-
-    @Query("SELECT * FROM images ORDER BY id ASC")
-    suspend fun getAllImages(): List<Image>
+    @Transaction
+    @Query("SELECT * FROM images")
+    fun getAll(): Flow<List<Image>>
 }

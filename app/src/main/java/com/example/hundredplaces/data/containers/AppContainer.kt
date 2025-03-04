@@ -1,10 +1,11 @@
 package com.example.hundredplaces.data.containers
 
 import com.example.hundredplaces.data.UserPreferencesRepository
-import com.example.hundredplaces.data.WorkManagerRepository
+import com.example.hundredplaces.workers.WorkManagerRepository
 import com.example.hundredplaces.data.model.city.repositories.CitiesRepository
 import com.example.hundredplaces.data.model.image.repositories.ImagesRepository
 import com.example.hundredplaces.data.model.place.repositories.PlacesRepository
+import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.UsersPlacesPreferencesRepository
 import com.example.hundredplaces.data.model.user.repositories.UsersRepository
 import com.example.hundredplaces.data.model.visit.repositories.VisitsRepository
 import com.example.hundredplaces.util.NetworkConnection
@@ -21,4 +22,5 @@ interface AppContainer {
     val imagesRepository: ImagesRepository
     val usersRepository: UsersRepository
     val visitsRepository: VisitsRepository
+    val usersPlacesPreferencesDataRepository: UsersPlacesPreferencesRepository
 }

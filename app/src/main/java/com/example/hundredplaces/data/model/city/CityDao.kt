@@ -1,26 +1,22 @@
 package com.example.hundredplaces.data.model.city
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Transaction
+import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CityDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(city: City)
 
-    @Update(onConflict = OnConflictStrategy.ABORT)
-    suspend fun update(city: City)
+    @Upsert
+    suspend fun insertAll(cities: List<City>)
 
-    @Delete
-    suspend fun delete(city: City)
+    @Query("DELETE FROM cities WHERE id NOT IN (:ids)")
+    suspend fun deleteCitiesNotIn(ids: List<Long>)
 
-    @Query("SELECT * FROM cities WHERE id = :id")
-    suspend fun getCity(id: Long): City
+    @Transaction
+    @Query("SELECT * FROM cities")
+    fun getAll(): Flow<List<City>>
 
-    @Query("SELECT * FROM cities ORDER BY name ASC")
-    suspend fun getAllCities(): List<City>
 }

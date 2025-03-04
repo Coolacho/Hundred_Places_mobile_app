@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinSerialization)
     alias(libs.plugins.googleDevtoolsKsp)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("kotlin-parcelize")
 }
 
 secrets {
@@ -17,12 +18,12 @@ secrets {
 
 android {
     namespace = "com.example.hundredplaces"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.hundredplaces"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -99,6 +100,10 @@ dependencies {
     implementation(libs.coil.compose)
     //WorkManager dependency
     implementation(libs.androidx.work.runtime.ktx)
+    //Adaptive layout
+    implementation(libs.androidx.material3.adaptive)
+    implementation(libs.androidx.material3.adaptive.layout)
+    implementation(libs.androidx.material3.adaptive.navigation)
 
     testImplementation(libs.junit)
     //Coroutines test

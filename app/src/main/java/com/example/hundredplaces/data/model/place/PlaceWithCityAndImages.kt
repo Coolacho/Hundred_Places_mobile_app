@@ -1,12 +1,13 @@
 package com.example.hundredplaces.data.model.place
 
+import android.os.Parcelable
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.image.Image
-import kotlinx.serialization.Serializable
+import kotlinx.parcelize.Parcelize
 
-@Serializable
+@Parcelize
 data class PlaceWithCityAndImages(
     @Embedded
     val place: Place,
@@ -24,4 +25,4 @@ data class PlaceWithCityAndImages(
         entity = Image::class
     )
     val images: List<String>
-)
+) : Parcelable

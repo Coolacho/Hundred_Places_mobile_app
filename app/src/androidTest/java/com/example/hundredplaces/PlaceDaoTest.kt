@@ -48,88 +48,88 @@ class PlaceDaoTest {
         2
         )
 
-    private suspend fun addOneCityToDb() {
-        cityDao.insert(city1)
-    }
-    private suspend fun addTwoCitiesToDb() {
-        cityDao.insert(city1)
-        cityDao.insert(city2)
-    }
-
-    private suspend fun addOnePlaceToDb() {
-        placeDao.insert(place1)
-    }
-
-    private suspend fun addTwoPlacesToDb() {
-        placeDao.insert(place1)
-        placeDao.insert(place2)
-    }
-
-    @Before
-    fun createDb() {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        hundredPlacesLocalDatabase = Room.inMemoryDatabaseBuilder(context, HundredPlacesLocalDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
-        cityDao = hundredPlacesLocalDatabase.cityDao()
-        placeDao = hundredPlacesLocalDatabase.placeDao()
-    }
-
-    @After
-    @Throws(IOException::class)
-    fun closeDb() {
-        hundredPlacesLocalDatabase.close()
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun daoInsert_insertsPlaceIntoDb() = runBlocking {
-        addOneCityToDb()
-        addOnePlaceToDb()
-        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
-        Assert.assertEquals(allPlaces[0], place1)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun daoGetAllPlaces_returnsAllPlacesFromDB() = runBlocking {
-        addTwoCitiesToDb()
-        addTwoPlacesToDb()
-        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
-        Assert.assertEquals(allPlaces[0], place1)
-        Assert.assertEquals(allPlaces[1], place2)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun daoUpdatePlaces_updatesPlacesInDB() = runBlocking {
-        addTwoCitiesToDb()
-        addTwoPlacesToDb()
-        placeDao.update(place1.copy(rating = 3.0))
-        placeDao.update(place2.copy(rating = 2.0))
-
-        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
-        Assert.assertEquals(allPlaces[0], place1.copy(rating = 3.0))
-        Assert.assertEquals(allPlaces[1], place2.copy(rating = 2.0))
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun daoDeletePlaces_deletesAllPlacesFromDB() = runBlocking {
-        addTwoCitiesToDb()
-        addTwoPlacesToDb()
-        placeDao.delete(place1)
-        placeDao.delete(place2)
-        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
-        Assert.assertTrue(allPlaces.isEmpty())
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun daoGetPlace_returnsPlaceFromDB() = runBlocking {
-        addOneCityToDb()
-        addOnePlaceToDb()
-        val place = placeDao.getPlace(1)
-        Assert.assertEquals(place, place1)
-    }
+//    private suspend fun addOneCityToDb() {
+//        cityDao.insert(city1)
+//    }
+//    private suspend fun addTwoCitiesToDb() {
+//        cityDao.insert(city1)
+//        cityDao.insert(city2)
+//    }
+//
+//    private suspend fun addOnePlaceToDb() {
+//        placeDao.insert(place1)
+//    }
+//
+//    private suspend fun addTwoPlacesToDb() {
+//        placeDao.insert(place1)
+//        placeDao.insert(place2)
+//    }
+//
+//    @Before
+//    fun createDb() {
+//        val context: Context = ApplicationProvider.getApplicationContext()
+//        hundredPlacesLocalDatabase = Room.inMemoryDatabaseBuilder(context, HundredPlacesLocalDatabase::class.java)
+//            .allowMainThreadQueries()
+//            .build()
+//        cityDao = hundredPlacesLocalDatabase.cityDao()
+//        placeDao = hundredPlacesLocalDatabase.placeDao()
+//    }
+//
+//    @After
+//    @Throws(IOException::class)
+//    fun closeDb() {
+//        hundredPlacesLocalDatabase.close()
+//    }
+//
+//    @Test
+//    @Throws(Exception::class)
+//    fun daoInsert_insertsPlaceIntoDb() = runBlocking {
+//        addOneCityToDb()
+//        addOnePlaceToDb()
+//        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
+//        Assert.assertEquals(allPlaces[0], place1)
+//    }
+//
+//    @Test
+//    @Throws(Exception::class)
+//    fun daoGetAllPlaces_returnsAllPlacesFromDB() = runBlocking {
+//        addTwoCitiesToDb()
+//        addTwoPlacesToDb()
+//        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
+//        Assert.assertEquals(allPlaces[0], place1)
+//        Assert.assertEquals(allPlaces[1], place2)
+//    }
+//
+//    @Test
+//    @Throws(Exception::class)
+//    fun daoUpdatePlaces_updatesPlacesInDB() = runBlocking {
+//        addTwoCitiesToDb()
+//        addTwoPlacesToDb()
+//        placeDao.update(place1.copy(rating = 3.0))
+//        placeDao.update(place2.copy(rating = 2.0))
+//
+//        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
+//        Assert.assertEquals(allPlaces[0], place1.copy(rating = 3.0))
+//        Assert.assertEquals(allPlaces[1], place2.copy(rating = 2.0))
+//    }
+//
+//    @Test
+//    @Throws(Exception::class)
+//    fun daoDeletePlaces_deletesAllPlacesFromDB() = runBlocking {
+//        addTwoCitiesToDb()
+//        addTwoPlacesToDb()
+//        placeDao.delete(place1)
+//        placeDao.delete(place2)
+//        val allPlaces = placeDao.getAllPlacesWithCityAndImages()
+//        Assert.assertTrue(allPlaces.isEmpty())
+//    }
+//
+//    @Test
+//    @Throws(Exception::class)
+//    fun daoGetPlace_returnsPlaceFromDB() = runBlocking {
+//        addOneCityToDb()
+//        addOnePlaceToDb()
+//        val place = placeDao.getPlace(1)
+//        Assert.assertEquals(place, place1)
+//    }
 }

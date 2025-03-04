@@ -6,7 +6,7 @@
     <string name="achievements">Постижения</string>
     <string name="account">Профил</string>
     <string name="back_button">Назад</string>
-    <string name="credits">Направено от Кателина и Ангел</string>
+    <string name="credits">Направено от Ангел Ангелов</string>
     <string name="grid_layout_toggle">Мрежово оформление</string>
     <string name="linear_layout_toggle">Линейно оформление</string>
     <string name="password">Парола</string>
@@ -36,7 +36,7 @@
     <string name="kilometres">км</string>
     <string name="metres">м</string>
     <string name="select_place_see_details">Избери място, за да видиш повече информация за него.</string>
-    <string name="place_not_visited">Все още не си посетил това място!</string>
+    <string name="place_not_visited">Все още не си посетил/а това място!</string>
     <string name="filter">Филтър</string>
     <string name="rating_category_name">Оценка:</string>
     <string name="range_format">От %.2f до %.2f</string>
@@ -52,4 +52,11 @@
     <string name="monuments_category_name">Паметници</string>
     <string name="waterfalls_category_name">Водопади</string>
     <string name="others_category_name">Други</string>
+    <string name="no_description_available">Няма налично описание за това място.</string>
+    <string name="load_description_exception">Неуспешно зареждане на описанието.</string>
+    <string name="rate">Оцени</string>
+    <string name="add_to_favorites">Добави в любими</string>
+    <string name="remove_from_favorites">Премахни от любими</string>
+    <string name="share">Сподели</string>
+    <string name="place_share_text">Виж това място: %s!</string>
 </resources>

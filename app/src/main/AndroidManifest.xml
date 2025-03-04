@@ -20,6 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HundredPlaces"
+        android:windowSoftInputMode="adjustResize"
         tools:targetApi="31">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -37,7 +38,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".ui.map.GeofenceBroadcastReceiver"/>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+        <receiver android:name=".util.GeofenceBroadcastReceiver"/>
     </application>
 
 </manifest>

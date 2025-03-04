@@ -3,44 +3,31 @@ package com.example.hundredplaces.data.model.place.repositories
 
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
+import kotlinx.coroutines.flow.Flow
 
 
 /**
- * Repository that provides insert, update, delete, and retrieve of [Place] from a given data source.
+ * Repository that provides a [Flow] to retrieve all records of [Place] from a given data source.
  */
 interface PlacesRepository {
-    /**
-     * Retrieve all the places with city and images from the given data source.
-     */
-    suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
 
     /**
      * Retrieve all the places from the given data source.
      */
-    suspend fun getAllPlaces(): List<Place>
+    val allPlaces: Flow<List<Place>>
 
     /**
-     * Retrieve a place with city and images from the given data source
+     * Retrieve all the places with city and images from the given data source.
      */
-    suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages
+    val allPlacesWithCityAndImages: Flow<List<PlaceWithCityAndImages>>
 
     /**
-     * Retrieve a place from the given data source
+     * Retrieve a place with city and images from the given data source.
      */
-    suspend fun getPlace(id: Long): Place
+    fun getPlaceWithCityAndImages(placeId: Long): Flow<PlaceWithCityAndImages?>
 
     /**
-     * Insert place in the data source
+     * Function to retrieve all places from the remote data source and save them in the local one
      */
-    suspend fun insertPlace(place: Place)
-
-    /**
-     * Delete place from the data source
-     */
-    suspend fun deletePlace(place: Place)
-
-    /**
-     * Update place in the data source
-     */
-    suspend fun updatePlace(place: Place)
+    suspend fun pullPlaces()
 }

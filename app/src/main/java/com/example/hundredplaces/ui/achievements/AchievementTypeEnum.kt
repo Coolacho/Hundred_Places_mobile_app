@@ -23,7 +23,7 @@ enum class AchievementTypeEnum(
     TOMB(R.drawable.icons8_tomb_100, R.string.toms_visited, 1, 3, 5),
     MONUMENT(R.drawable.icons8_obelisk_100, R.string.monuments_visited, 10, 30, 50),
     WATERFALL(R.drawable.rounded_waves_24, R.string.waterfalls_visited, 10, 20, 30),
-    OTHER(R.drawable.icons8_other_100, R.string.others_visited, 5, 10, 15),
+    OTHER(R.drawable.baseline_location_pin_24, R.string.others_visited, 5, 10, 15),
     HUNDRED_PLACES(R.drawable.rounded_money_24, R.string.hundred_places_visited, 25, 50, 100),
     TOTAL(R.drawable.icons8_check_all_96, R.string.total_visited_places, 100, 150, 200)
 }

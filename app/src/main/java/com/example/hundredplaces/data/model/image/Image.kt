@@ -6,9 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.hundredplaces.data.model.place.Place
-import kotlinx.serialization.Serializable
 
-@Serializable
 @Entity(
     tableName = "images",
     indices = [
@@ -26,7 +24,8 @@ import kotlinx.serialization.Serializable
             parentColumns = ["id"],
             childColumns = ["place_id"],
             onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
+            deferred = true
         )
     ]
 )

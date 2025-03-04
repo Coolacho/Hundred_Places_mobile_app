@@ -11,11 +11,13 @@ import com.example.hundredplaces.data.model.image.Image
 import com.example.hundredplaces.data.model.image.ImageDao
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.place.PlaceDao
+import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
+import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferencesDao
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.UserDao
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.data.model.visit.VisitDao
-import com.example.hundredplaces.util.LocalDateTimeConverter
+import com.example.hundredplaces.util.InstantConverter
 
 @Database(
     entities = [
@@ -23,14 +25,15 @@ import com.example.hundredplaces.util.LocalDateTimeConverter
         Place::class,
         Image::class,
         User::class,
-        Visit::class
+        Visit::class,
+        UsersPlacesPreferences::class
     ],
-    version = 2,
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(
     value = [
-        LocalDateTimeConverter::class
+        InstantConverter::class
     ]
 )
 abstract class HundredPlacesLocalDatabase : RoomDatabase() {
@@ -39,6 +42,7 @@ abstract class HundredPlacesLocalDatabase : RoomDatabase() {
     abstract fun imageDao(): ImageDao
     abstract fun userDao(): UserDao
     abstract fun visitDao(): VisitDao
+    abstract fun usersPlacesPreferencesDao(): UsersPlacesPreferencesDao
 
     companion object{
         @Volatile

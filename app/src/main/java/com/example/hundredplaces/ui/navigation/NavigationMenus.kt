@@ -147,7 +147,11 @@ fun NavigationDrawerContent(
                 text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.displayLarge,
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
+                    .padding(
+                        top = 40.dp,
+                        bottom = dimensionResource(R.dimen.padding_small),
+                        start = dimensionResource(R.dimen.padding_small),
+                        end = dimensionResource(R.dimen.padding_small))
             )
         }
         for (navItem in navigationItemContentList) {

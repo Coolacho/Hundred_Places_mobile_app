@@ -1,6 +1,6 @@
 package com.example.hundredplaces.data.model.place
 
-enum class PlaceTypeEnum {
+enum class PlaceTypeEnum() {
     MUSEUM,
     PEAK,
     GALLERY,

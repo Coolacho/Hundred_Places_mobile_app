@@ -2,14 +2,14 @@ package com.example.hundredplaces.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.hundredplaces.ui.places.PlacesScreenContentType
+import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountScreen
 import com.example.hundredplaces.ui.account.AccountUiState
@@ -22,11 +22,13 @@ import com.example.hundredplaces.ui.account.LoginDestination
 import com.example.hundredplaces.ui.account.LoginScreen
 import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.map.MapScreen
+import com.example.hundredplaces.ui.map.MapViewModel
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesDestination
-import com.example.hundredplaces.ui.places.PlacesScreen
 import com.example.hundredplaces.ui.places.PlacesViewModel
-import com.example.hundredplaces.ui.places.PlaceDetailsDestination
-import com.example.hundredplaces.ui.places.PlaceDetailsScreen
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsScreen
+import com.example.hundredplaces.ui.places.PlacesScreenV2
 
 /**
  * Provides Navigation graph for the application.
@@ -35,13 +37,13 @@ import com.example.hundredplaces.ui.places.PlaceDetailsScreen
 fun HundredPlacesNavHost(
     startDestination: String,
     navController: NavHostController,
-    contentType: PlacesScreenContentType,
     accountViewModel: AccountViewModel,
     accountUiState: AccountUiState,
     placesViewModel: PlacesViewModel,
+    placeDetailsViewModel: PlaceDetailsViewModel,
+    mapViewModel: MapViewModel,
     modifier: Modifier = Modifier
 ) {
-    val placesUiState = placesViewModel.uiState.collectAsState()
     NavHost(
         navController = navController,
         startDestination = if (accountUiState.isLoggedIn) startDestination else LoginDestination.route,
@@ -50,13 +52,9 @@ fun HundredPlacesNavHost(
         composable(
             route = PlacesDestination.route
         ) {
-            PlacesScreen(
-                contentType = contentType,
-                accountUiState = accountUiState,
-                placesViewModel = placesViewModel,
-                placesUiState = placesUiState.value,
-                navigateToPlaceEntry = {
-                    navController.navigate("${PlaceDetailsDestination.route}/${it}")}
+            PlacesScreenV2(
+                placesDetailsViewModel = placeDetailsViewModel,
+                placesViewModel = placesViewModel
             )
         }
         composable(
@@ -67,9 +65,7 @@ fun HundredPlacesNavHost(
         ) {
             PlaceDetailsScreen(
                 isFullScreen = false,
-                accountUiState = accountUiState,
-                viewModel = placesViewModel,
-                placesUiState = placesUiState.value,
+                placesDetailsViewModel = placeDetailsViewModel,
                 navigateBack = { navController.navigateUp() }
             )
         }
@@ -77,9 +73,9 @@ fun HundredPlacesNavHost(
             route = MapDestination.route
         ) {
             MapScreen(
-                placesUiState = placesUiState.value,
+                mapViewModel = mapViewModel,
                 navigateToPlaceEntry = {
-                    placesViewModel.selectPlace(it)
+                    placeDetailsViewModel.setPlaceId(it)
                     navController.navigate("${PlaceDetailsDestination.route}/${it}")}
             )
         }
@@ -87,7 +83,9 @@ fun HundredPlacesNavHost(
             route = AchievementsDestination.route
         ) {
             AchievementsScreen(
-                uiState = accountUiState
+                achievementsViewModel = viewModel (
+                    factory = AppViewModelProvider.Factory
+                )
             )
         }
         composable(

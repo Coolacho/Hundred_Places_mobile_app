@@ -1,12 +1,24 @@
 package com.example.hundredplaces.ui
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.PermanentDrawerSheet
+import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.home.HomeScreen
+import com.example.hundredplaces.ui.map.MapViewModel
 import com.example.hundredplaces.ui.navigation.AppNavigationType
-import com.example.hundredplaces.ui.places.PlacesScreenContentType
+import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesViewModel
 
 @Composable
@@ -14,38 +26,70 @@ fun HundredPlacesApp(
     windowSize: WindowWidthSizeClass,
     startDestination: String,
     placesViewModel: PlacesViewModel,
+    placeDetailsViewModel: PlaceDetailsViewModel,
+    mapViewModel: MapViewModel,
     accountViewModel: AccountViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
 ) {
 
-    val navigationType: AppNavigationType
-    val contentType: PlacesScreenContentType
-
-    when (windowSize) {
+    val accountUiState = accountViewModel.uiState.collectAsState()
+    val navigationType: AppNavigationType = when (windowSize) {
         WindowWidthSizeClass.Compact -> {
-            navigationType = AppNavigationType.BOTTOM_NAVIGATION
-            contentType = PlacesScreenContentType.LIST_ONLY
+            AppNavigationType.BOTTOM_NAVIGATION
         }
         WindowWidthSizeClass.Medium -> {
-            navigationType = AppNavigationType.NAVIGATION_RAIL
-            contentType = PlacesScreenContentType.LIST_ONLY
+            AppNavigationType.NAVIGATION_RAIL
         }
         WindowWidthSizeClass.Expanded -> {
-            navigationType = AppNavigationType.PERMANENT_NAVIGATION_DRAWER
-            contentType = PlacesScreenContentType.LIST_AND_DETAIL
+            AppNavigationType.PERMANENT_NAVIGATION_DRAWER
         }
         else -> {
-            navigationType = AppNavigationType.BOTTOM_NAVIGATION
-            contentType = PlacesScreenContentType.LIST_ONLY
+            AppNavigationType.BOTTOM_NAVIGATION
         }
     }
 
-    HomeScreen(
-        startDestination = startDestination,
-        navigationType = navigationType,
-        contentType = contentType,
-        accountViewModel = accountViewModel,
-        placesViewModel = placesViewModel,
-        modifier = modifier
-    )
+    if (navigationType == AppNavigationType.PERMANENT_NAVIGATION_DRAWER && accountUiState.value.isLoggedIn) {
+        PermanentNavigationDrawer(
+            drawerContent = {
+                PermanentDrawerSheet(
+                    windowInsets = WindowInsets(0, 0, 0, 0),
+                    modifier = Modifier.width(240.dp)
+                ) {
+                    NavigationDrawerContent(
+                        navController = navController,
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .fillMaxHeight()
+                    )
+                }
+            },
+            modifier = modifier
+        ) {
+            HomeScreen(
+                accountUiState = accountUiState.value,
+                accountViewModel = accountViewModel,
+                placesViewModel = placesViewModel,
+                placeDetailsViewModel = placeDetailsViewModel,
+                mapViewModel = mapViewModel,
+                startDestination = startDestination,
+                navController = navController,
+                navigationType = navigationType
+            )
+        }
+    }
+    else {
+        HomeScreen(
+            accountUiState = accountUiState.value,
+            accountViewModel = accountViewModel,
+            placesViewModel = placesViewModel,
+            placeDetailsViewModel = placeDetailsViewModel,
+            mapViewModel = mapViewModel,
+            startDestination = startDestination,
+            navController = navController,
+            navigationType = navigationType,
+            modifier = modifier
+        )
+    }
+
 }

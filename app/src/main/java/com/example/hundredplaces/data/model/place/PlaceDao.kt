@@ -1,35 +1,29 @@
 package com.example.hundredplaces.data.model.place
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
+import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaceDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(place: Place)
 
-    @Update(onConflict = OnConflictStrategy.ABORT)
-    suspend fun update(place: Place)
+    @Upsert
+    suspend fun insertAll(places: List<Place>)
 
-    @Delete
-    suspend fun delete(place: Place)
-
-    @Query("SELECT * FROM places WHERE id = :id")
-    suspend fun getPlace(id: Long): Place
-
-    @Query("SELECT * FROM places ORDER BY id ASC")
-    suspend fun getAllPlaces(): List<Place>
+    @Query("DELETE FROM places WHERE id NOT IN (:ids)")
+    suspend fun deletePlacesNotIn(ids: List<Long>)
 
     @Transaction
-    @Query("SELECT * FROM places WHERE id = :id")
-    suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages
-    @Transaction
-    @Query("SELECT * FROM places ORDER BY id ASC")
-    suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages>
+    @Query("SELECT * FROM places")
+    fun getAllPlaces(): Flow<List<Place>>
 
+    @Transaction
+    @Query("SELECT * FROM places WHERE id = :placeId")
+    fun getPlaceWithCityAndImages(placeId: Long): Flow<PlaceWithCityAndImages?>
+
+    @Transaction
+    @Query("SELECT * FROM places")
+    fun getAllPlacesWithCityAndImages(): Flow<List<PlaceWithCityAndImages>>
 }

@@ -1,18 +1,20 @@
 package com.example.hundredplaces.ui.places
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.RangeSliderState
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import java.time.LocalDateTime
 
-data class PlacesUiState(
-    val places: List<PlaceWithCityAndImages> = listOf(),
-    val filteredPlaces: List<PlaceWithCityAndImages> = listOf(),
-    val selectedPlaceId: Long = 0,
-    val distances: Map<Long, Float> = mapOf(),
-    val cameraPosition: CameraPosition = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 15f),
-    val visits: List<LocalDateTime> = listOf(),
-    val triggeredGeofences: List<Geofence> = listOf(),
-    //val selectedFilterCategoriesSet: MutableSet<PlaceFilterCategoriesEnum> = mutableSetOf()
+data class PlacesUiState @OptIn(ExperimentalMaterial3Api::class) constructor(
+    val filteredPlaces: List<PlaceWithCityAndImages> = emptyList(),
+    val distances: Map<Long, Float> = emptyMap(),
+    val ratings: Map<Long, Double> = emptyMap(),
+    val favorites: List<Long> = emptyList(),
+    val isFilterScreenOpen: Boolean = false,
+    val filtersSet: Set<PlaceFiltersEnum> = emptySet(),
+    val rangeSliderState: RangeSliderState = RangeSliderState(
+        activeRangeStart = 0f,
+        activeRangeEnd = 5f,
+        steps = 49,
+        valueRange = 0f..5f
+    )
 )

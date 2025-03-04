@@ -1,96 +1,28 @@
 package com.example.hundredplaces.data.model.place.repositories
 
-import com.example.hundredplaces.data.model.place.Place
-import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
-import com.example.hundredplaces.util.NetworkConnection
-import java.net.SocketTimeoutException
+import android.util.Log
+import com.example.hundredplaces.data.model.place.datasources.PlacesLocalDataSource
+import com.example.hundredplaces.data.model.place.datasources.PlacesRemoteDataSource
+import kotlinx.coroutines.flow.catch
 
 class PlacesDataRepository (
-    private val placesLocalRepository: PlacesLocalRepository,
-    private val placesRemoteRepository: PlacesRemoteRepository,
-    private val networkConnection: NetworkConnection
+    private val placesLocalDataSource: PlacesLocalDataSource,
+    private val placesRemoteDataSource: PlacesRemoteDataSource
 ) : PlacesRepository {
-    override suspend fun getAllPlacesWithCityAndImages(): List<PlaceWithCityAndImages> {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository.getAllPlacesWithCityAndImages()
-            } catch (e: SocketTimeoutException) {
-                placesLocalRepository.getAllPlacesWithCityAndImages()
-            }
-        } else {
-            placesLocalRepository.getAllPlacesWithCityAndImages()
-        }
-    }
 
-    override suspend fun getAllPlaces(): List<Place> {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository. getAllPlaces()
-            } catch (e: SocketTimeoutException) {
-                placesLocalRepository.getAllPlaces()
-            }
-        } else {
-            placesLocalRepository.getAllPlaces()
-        }
-    }
+    override val allPlaces = placesLocalDataSource.allPlaces
+    override val allPlacesWithCityAndImages = placesLocalDataSource.allPlacesWithCityAndImages
 
-    override suspend fun getPlaceWithCityAndImages(id: Long): PlaceWithCityAndImages {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository.getPlaceWithCityAndImages(id)
-            } catch (e: SocketTimeoutException) {
-                placesLocalRepository.getPlaceWithCityAndImages(id)
-            }
-        } else {
-            placesLocalRepository.getPlaceWithCityAndImages(id)
-        }
-    }
+    override fun getPlaceWithCityAndImages(placeId: Long) = placesLocalDataSource.getPlaceWithCityAndImages(placeId)
 
-    override suspend fun getPlace(id: Long): Place {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository.getPlace(id)
-            } catch (e: SocketTimeoutException) {
-                placesLocalRepository.getPlace(id)
+    override suspend fun pullPlaces() {
+        placesRemoteDataSource.allPlaces
+            .catch { Log.e("Place flows", "${it.message}") }
+            .collect { remotePlaces ->
+                val remoteIds = remotePlaces.map { it.id }
+                placesLocalDataSource.deletePlacesNotIn(remoteIds)
+                placesLocalDataSource.insertAll(remotePlaces)
+                Log.d("Flows test", "$remotePlaces")
             }
-        } else {
-            placesLocalRepository.getPlace(id)
-        }
-    }
-
-    override suspend fun insertPlace(place: Place) {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository.insertPlace(place)
-            } catch (e: SocketTimeoutException) {
-                placesLocalRepository.insertPlace(place)
-            }
-        } else {
-            placesLocalRepository.insertPlace(place)
-        }
-    }
-
-    override suspend fun deletePlace(place: Place) {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository.deletePlace(place)
-            } catch (e: SocketTimeoutException) {
-                placesLocalRepository.deletePlace(place)
-            }
-        } else {
-            placesLocalRepository.deletePlace(place)
-        }
-    }
-
-    override suspend fun updatePlace(place: Place) {
-        return if (networkConnection.isNetworkConnected) {
-            try {
-                placesRemoteRepository.updatePlace(place)
-            } catch (e: Exception) {
-                placesLocalRepository.updatePlace(place)
-            }
-        } else {
-            placesLocalRepository.updatePlace(place)
-        }
     }
 }
