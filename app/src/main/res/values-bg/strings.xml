@@ -59,4 +59,6 @@
     <string name="remove_from_favorites">Премахни от любими</string>
     <string name="share">Сподели</string>
     <string name="place_share_text">Виж това място: %s!</string>
+    <string name="search_for_a_place">Потърси обект</string>
+    <string name="open_camera_to_search">Отвори камерата, за да търсиш</string>
 </resources>

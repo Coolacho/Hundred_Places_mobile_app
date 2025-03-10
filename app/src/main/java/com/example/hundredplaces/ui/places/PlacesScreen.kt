@@ -35,8 +35,11 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.RangeSliderState
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -53,6 +56,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,6 +76,7 @@ object PlacesDestination : MenuNavigationDestination {
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlacesScreenV2(
+    onCameraButtonClick: () -> Unit,
     placesDetailsViewModel: PlaceDetailsViewModel,
     placesViewModel: PlacesViewModel,
     modifier: Modifier = Modifier
@@ -84,57 +91,37 @@ fun PlacesScreenV2(
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
+        modifier = modifier,
         listPane = {
             AnimatedPane {
                 Scaffold(
+                    topBar = {
+                        SearchBarWithCameraButton(
+                            searchText = uiState.searchText,
+                            onSearchTextChange = placesViewModel::onSearchTextChange,
+                            onCameraButtonClick = onCameraButtonClick
+                        )
+                    },
                     floatingActionButton = {
-                        Box(
-                            contentAlignment = if (navigator.isDetailExpanded()) Alignment.BottomStart else Alignment.BottomEnd
+                        FilterButton(
+                            filtersScreenAlignment = if (navigator.isDetailExpanded()) Alignment.BottomStart else Alignment.BottomEnd,
+                            isFiltersScreenOpen = uiState.isFilterScreenOpen,
+                            filtersSetSize = uiState.filtersSet.size,
+                            onClick = placesViewModel::openFilterScreen
                         ) {
-                            AnimatedVisibility(
-                                visible = uiState.isFilterScreenOpen
-                            ) {
-                                PlacesFilterCategories(
-                                    filterOnClick = { filter ->
-                                        placesViewModel.toggleFilter(filter)
-                                                    },
-                                    rangeSliderState = uiState.rangeSliderState,
-                                    filtersSet = uiState.filtersSet,
-                                    modifier = Modifier
-                                        .padding(48.dp)
-                                )
-                            }
-                            BadgedBox(
-                                badge = {
-                                    if (uiState.filtersSet.isNotEmpty()) {
-                                        Badge {
-                                            Text("${uiState.filtersSet.size}")
-                                        }
-                                    }
-                                }
-                            ) {
-                                IconButton(
-                                    onClick = placesViewModel::openFilterScreen,
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                                    ),
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.rounded_filter_alt_24),
-                                        contentDescription = stringResource(R.string.filter),
-                                        modifier = Modifier
-                                            .size(42.dp)
-                                            .padding(top = 5.dp)
-                                    )
-                                }
-                            }
+                            PlacesFilterCategories(
+                                filterOnClick = { filter ->
+                                    placesViewModel.toggleFilter(filter)
+                                },
+                                rangeSliderState = uiState.rangeSliderState,
+                                filtersSet = uiState.filtersSet,
+                                modifier = Modifier
+                                    .padding(48.dp)
+                            )
                         }
                     },
                     floatingActionButtonPosition = if (navigator.isDetailExpanded()) FabPosition.Start else FabPosition.End,
-                    contentWindowInsets = WindowInsets(0,0,0,0),
-                    modifier = modifier
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0)
                 ) {
                     LazyColumn(
                         contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_small)),
@@ -150,7 +137,10 @@ fun PlacesScreenV2(
                                 isSelected = navigator.currentDestination?.content == it.place.id && navigator.isDetailExpanded(),
                                 distance = uiState.distances[it.place.id],
                                 onClick = {
-                                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it.place.id)
+                                    navigator.navigateTo(
+                                        ListDetailPaneScaffoldRole.Detail,
+                                        it.place.id
+                                    )
                                     placesDetailsViewModel.setPlaceId(it.place.id)
                                 },
                                 toggleFavorite = placesViewModel::toggleFavorite,
@@ -169,13 +159,138 @@ fun PlacesScreenV2(
                     PlaceDetailsScreen(
                         navigateBack = { navigator.navigateBack() },
                         isFullScreen = navigator.isListExpanded(),
-                        placesDetailsViewModel = placesDetailsViewModel,
-                        modifier = modifier
+                        placesDetailsViewModel = placesDetailsViewModel
                     )
                 }
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBarWithCameraButton(
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
+    onCameraButtonClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics { isTraversalGroup = true }
+    ) {
+        SearchBar(
+            expanded = false,
+            onExpandedChange = {},
+            windowInsets = WindowInsets(0, 0, 0, 0),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .semantics { traversalIndex = 0f }
+                .fillMaxWidth()
+                .padding(
+                    vertical = dimensionResource(R.dimen.padding_small),
+                    horizontal = dimensionResource(R.dimen.padding_medium)
+                ),
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = searchText,
+                    onQueryChange = onSearchTextChange,
+                    onSearch = onSearchTextChange,
+                    expanded = false,
+                    onExpandedChange = {},
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.search_for_a_place)
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.round_search_24),
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            VerticalDivider(
+                                color = Color.Gray,
+                                thickness = 2.dp,
+                                modifier = Modifier
+                                    .height(32.dp)
+                            )
+                            IconButton(
+                                onClick = onCameraButtonClick
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.round_photo_camera_24),
+                                    contentDescription = stringResource(R.string.open_camera_to_search)
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+        ) { }
+    }
+}
+
+/**
+ * A button composable to be used as a floating action button in a [Scaffold].
+ *
+ * @param filtersScreenAlignment - the position of the [content] screen.
+ * @param isFiltersScreenOpen - defines whether the content should be visible.
+ * @param filtersSetSize - defines the number of filters that are selected and is shown in the [BadgedBox]'s [Badge]
+ * @param onClick - called when this button is clicked.
+ * @param modifier - the modifier to be applied to the layout.
+ * @param content - the filter screen to appear or disappear based on the value of [isFiltersScreenOpen].
+ */
+@Composable
+fun FilterButton(
+    filtersScreenAlignment: Alignment,
+    isFiltersScreenOpen: Boolean,
+    filtersSetSize: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (() -> Unit)
+) {
+    Box(
+        contentAlignment = filtersScreenAlignment,
+        modifier = modifier
+    ) {
+        AnimatedVisibility(
+            visible = isFiltersScreenOpen
+        ) {
+            content()
+        }
+        BadgedBox(
+            badge = {
+                if (filtersSetSize > 0) {
+                    Badge {
+                        Text("$filtersSetSize")
+                    }
+                }
+            }
+        ) {
+            IconButton(
+                onClick = onClick,
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                ),
+                modifier = Modifier
+                    .size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.rounded_filter_alt_24),
+                    contentDescription = stringResource(R.string.filter),
+                    modifier = Modifier
+                        .size(42.dp)
+                        .padding(top = 5.dp)
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -194,7 +309,7 @@ fun PlacesFilterCategories(
         LazyColumn(
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_medium))
-        ){
+        ) {
             item {
                 Column {
                     val startInteractionSource = remember { MutableInteractionSource() }
@@ -338,7 +453,7 @@ fun PlacesScreen(
                     PlacesFilterCategories(
                         filterOnClick = { filter ->
                             placesViewModel.toggleFilter(filter)
-                                        },
+                        },
                         rangeSliderState = uiState.rangeSliderState,
                         filtersSet = uiState.filtersSet,
                         modifier = Modifier
@@ -374,7 +489,7 @@ fun PlacesScreen(
             }
         },
         floatingActionButtonPosition = if (contentType == PlacesScreenContentType.LIST_ONLY) FabPosition.End else FabPosition.Start,
-        contentWindowInsets = WindowInsets(0,0,0,0),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         modifier = modifier
     ) {
         if (contentType == PlacesScreenContentType.LIST_ONLY) {
@@ -478,6 +593,9 @@ private fun PlacesListAndDetailsContent(
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun ThreePaneScaffoldNavigator<*>.isListExpanded() = scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Expanded
+fun ThreePaneScaffoldNavigator<*>.isListExpanded() =
+    scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Expanded
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-fun ThreePaneScaffoldNavigator<*>.isDetailExpanded() = scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
+fun ThreePaneScaffoldNavigator<*>.isDetailExpanded() =
+    scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded

@@ -5,6 +5,7 @@ import androidx.compose.material3.RangeSliderState
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 
 data class PlacesUiState @OptIn(ExperimentalMaterial3Api::class) constructor(
+    val searchText: String = "",
     val filteredPlaces: List<PlaceWithCityAndImages> = emptyList(),
     val distances: Map<Long, Float> = emptyMap(),
     val ratings: Map<Long, Double> = emptyMap(),

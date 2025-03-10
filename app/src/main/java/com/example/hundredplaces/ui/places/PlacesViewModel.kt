@@ -27,6 +27,7 @@ class PlacesViewModel(
 
     private val userId: Long = 1//savedStateHandle["CURRENT_USER"]!!
 
+    private val _searchText = MutableStateFlow("")
     private val _distances = MutableStateFlow(mapOf<Long, Float>())
     private val _favorites = usersPlacesPreferencesRepository.getFavoritePlacesByUserId(userId)
     private val _ratings = usersPlacesPreferencesRepository.getPlacesRatingsByUserId(userId)
@@ -43,8 +44,9 @@ class PlacesViewModel(
         placesRepository.allPlacesWithCityAndImages,
         _filtersSet,
         _favorites,
-        _rangeSliderState
-    ) { allPlaces, filtersSet, favorites, rangeSliderState ->
+        _rangeSliderState,
+        _searchText
+    ) { allPlaces, filtersSet, favorites, rangeSliderState, searchText ->
         allPlaces.filter { place ->
             // Start by assuming true (no filters apply if filtersSet is empty)
             var shouldInclude = true
@@ -76,29 +78,33 @@ class PlacesViewModel(
                 shouldInclude = shouldInclude && _filtersSet.value.contains(PlaceFiltersEnum.valueOf(place.place.type.name))
             }
 
+            shouldInclude = shouldInclude && place.place.name.contains(searchText, ignoreCase = true)
+
             shouldInclude
         }
     }
 
     val uiState = combine(
-        _filteredPlaces, _distances, _ratings, _favorites, _isFilterScreenOpen, _filtersSet, _rangeSliderState
+        _searchText, _filteredPlaces, _distances, _ratings, _favorites, _isFilterScreenOpen, _filtersSet, _rangeSliderState
     ) { result ->
-        val filteredPlaces = result[0] as List<PlaceWithCityAndImages>
-        val distances = result[1] as Map<Long, Float>
-        val ratings = result[2] as Map<Long, Double>
-        val favorites = result[3] as List<Long>
-        val isFilterScreenOpen = result[4] as Boolean
-        val filtersSet = result[5] as Set<PlaceFiltersEnum>
-        val rangeSliderState = result[6] as RangeSliderState
+        val searchText = result[0] as String
+        val filteredPlaces = result[1] as List<PlaceWithCityAndImages>
+        val distances = result[2] as Map<Long, Float>
+        val ratings = result[3] as Map<Long, Double>
+        val favorites = result[4] as List<Long>
+        val isFilterScreenOpen = result[5] as Boolean
+        val filtersSet = result[6] as Set<PlaceFiltersEnum>
+        val rangeSliderState = result[7] as RangeSliderState
         rangeSliderState.onValueChangeFinished = { updateSliderState() }
         PlacesUiState(
-            filteredPlaces,
-            distances,
-            ratings,
-            favorites,
-            isFilterScreenOpen,
-            filtersSet,
-            rangeSliderState
+            searchText = searchText,
+            filteredPlaces = filteredPlaces,
+            distances = distances,
+            ratings = ratings,
+            favorites = favorites,
+            isFilterScreenOpen = isFilterScreenOpen,
+            filtersSet = filtersSet,
+            rangeSliderState = rangeSliderState
         )
     }
         .stateIn(
@@ -106,6 +112,10 @@ class PlacesViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PlacesUiState()
         )
+
+    fun onSearchTextChange(text: String) {
+        _searchText.value = text
+    }
 
     fun toggleFilter(filter: PlaceFiltersEnum) {
         if (_filtersSet.value.contains(filter)) {
