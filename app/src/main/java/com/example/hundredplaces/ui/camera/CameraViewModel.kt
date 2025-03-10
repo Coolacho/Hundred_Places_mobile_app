@@ -72,13 +72,14 @@ class CameraViewModel : ViewModel() {
                     }
 
                     val barcode = barcodeResults[0]
-                    Log.d("QR code scan", "Display: ${barcode.displayValue}; Url: ${barcode.url!!.url!!}")
                     when(barcode.valueType) {
                         Barcode.URL -> {
-                            _uiState.update {
-                                it.copy(
-                                    qrContent = barcode.url!!.url!!.toUri()
-                                )
+                            if (barcode.url!!.url!!.contains("http://192.168.2.150:8080/places/")) {
+                                _uiState.update {
+                                    it.copy(
+                                        qrContent = barcode.url!!.url!!.toUri()
+                                    )
+                                }
                             }
                         }
                     }
