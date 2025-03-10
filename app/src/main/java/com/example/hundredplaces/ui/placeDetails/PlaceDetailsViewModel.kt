@@ -19,7 +19,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.net.ConnectException
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -46,8 +50,29 @@ class PlaceDetailsViewModel(
             if (path.isNotEmpty()) {
                 withContext(Dispatchers.IO) {
                     try {
-                        MutableStateFlow(URL(path).readText())
-                    } catch (_: ConnectException) {
+                        val stringBuilder = StringBuilder()
+                        val url = URL(path)
+                        val connection = url.openConnection() as HttpURLConnection
+                        connection.connectTimeout = 3000
+                        connection.readTimeout = 3000
+                        connection.requestMethod = "GET"
+
+                        connection.connect()
+
+                        if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                                reader.forEachLine { line ->
+                                    stringBuilder.append(line)
+                                } }
+                        }
+                        else MutableStateFlow(null)
+
+                        MutableStateFlow(stringBuilder.toString())
+                    }
+                    catch (_: ConnectException) {
+                        MutableStateFlow(null)
+                    }
+                    catch (_: SocketTimeoutException) {
                         MutableStateFlow(null)
                     }
                 }
