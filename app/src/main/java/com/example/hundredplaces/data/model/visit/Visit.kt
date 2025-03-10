@@ -7,7 +7,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.hundredplaces.data.model.place.Place
 import com.example.hundredplaces.data.model.user.User
-import kotlinx.serialization.Contextual
 import java.time.Instant
 import java.util.UUID
 
@@ -46,7 +45,6 @@ data class Visit (
     val userId: Long,
     @ColumnInfo(name = "place_id")
     val placeId: Long,
-    @Contextual //TODO: Check if this is necessary or you can remove it
     @ColumnInfo(name = "date_visited")
     val dateVisited: Instant = Instant.now()
 )
