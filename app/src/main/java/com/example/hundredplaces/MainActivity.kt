@@ -3,6 +3,7 @@ package com.example.hundredplaces
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -23,8 +24,8 @@ import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.HundredPlacesApp
 import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.map.MapViewModel
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.places.PlacesViewModel
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
@@ -71,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         placeDetailsViewModel.setPlaceId(placeId)
                     } else startDestination = PlacesDestination.route
 
-                    val locationPermissionLauncher = rememberLauncherForActivityResult(
+                    val permissionLauncher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.RequestMultiplePermissions()
                     )
                     { permissions ->
@@ -114,25 +115,56 @@ class MainActivity : ComponentActivity() {
                     }
                     else {
                         LaunchedEffect(Unit) {
-                            locationPermissionLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                                )
+                            permissionLauncher.launch(
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                                    )
+                                }
+                                else {
+                                    arrayOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                }
                             )
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            if (ContextCompat.checkSelfPermission(
-                                    this,
-                                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                                ) != PackageManager.PERMISSION_GRANTED
-                            ) {
-                                LaunchedEffect(Unit) {
-                                    locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-                                }
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        if (ContextCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            LaunchedEffect(Unit) {
+                                permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
                             }
                         }
                     }
+                    if (Build.VERSION.SDK_INT >= TIRAMISU) {
+                        if (ContextCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            LaunchedEffect(Unit) {
+                                permissionLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+                            }
+                        }
+                    }
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.CAMERA
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        LaunchedEffect(Unit) {
+                            permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA))
+                        }
+                    }
+
+
                     HundredPlacesApp(
                         windowSize = windowSize.widthSizeClass,
                         startDestination = startDestination,
