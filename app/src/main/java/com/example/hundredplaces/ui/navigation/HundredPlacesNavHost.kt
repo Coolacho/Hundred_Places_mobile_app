@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountScreen
@@ -20,6 +21,8 @@ import com.example.hundredplaces.ui.achievements.AchievementsDestination
 import com.example.hundredplaces.ui.achievements.AchievementsScreen
 import com.example.hundredplaces.ui.account.LoginDestination
 import com.example.hundredplaces.ui.account.LoginScreen
+import com.example.hundredplaces.ui.camera.CameraScreen
+import com.example.hundredplaces.ui.camera.CameraScreenDestination
 import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.map.MapScreen
 import com.example.hundredplaces.ui.map.MapViewModel
@@ -53,12 +56,14 @@ fun HundredPlacesNavHost(
             route = PlacesDestination.route
         ) {
             PlacesScreenV2(
+                onCameraButtonClick = {navController.navigate(CameraScreenDestination.route)},
                 placesDetailsViewModel = placeDetailsViewModel,
                 placesViewModel = placesViewModel
             )
         }
         composable(
             route = PlaceDetailsDestination.routeWithArgs,
+            deepLinks = listOf(navDeepLink<Long>(basePath = "http://192.168.2.150:8080/places/{placeId}")),
             arguments = listOf(navArgument(PlaceDetailsDestination.PLACE_ID_ARG) {
                 type = NavType.LongType
             })
@@ -117,6 +122,11 @@ fun HundredPlacesNavHost(
                 viewModel = accountViewModel,
                 navigateToHome = { navController.navigate(PlacesDestination.route) },
                 navigateToLogin = { navController.navigate(LoginDestination.route) })
+        }
+        composable(
+            route = CameraScreenDestination.route
+        ) {
+            CameraScreen()
         }
     }
 }

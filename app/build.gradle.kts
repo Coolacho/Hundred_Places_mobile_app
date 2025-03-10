@@ -57,7 +57,7 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{AL2.0,LGPL2.1,DEPENDENCIES,INDEX.LIST}"
         }
     }
 }
@@ -104,6 +104,17 @@ dependencies {
     implementation(libs.androidx.material3.adaptive)
     implementation(libs.androidx.material3.adaptive.layout)
     implementation(libs.androidx.material3.adaptive.navigation)
+    //Camera libraries
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.compose)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.camera2)
+    //MlKit for qr scanning
+    implementation(libs.androidx.camera.mlkit)
+    implementation(libs.google.mlkit.barcodeScanning)
+    //Google cloud vision api
+    implementation(libs.google.cloud.vision)
+    implementation(libs.play.services.vision)
 
     testImplementation(libs.junit)
     //Coroutines test
