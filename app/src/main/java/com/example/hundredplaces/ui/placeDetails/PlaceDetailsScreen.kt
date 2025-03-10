@@ -1,6 +1,5 @@
 package com.example.hundredplaces.ui.placeDetails
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -76,138 +75,136 @@ fun PlaceDetailsScreen(
 ) {
     val uiState = placesDetailsViewModel.uiState.collectAsStateWithLifecycle().value
 
-    Log.d("PlacesDetailsScreen", "${uiState.place}")
-
-    if (uiState.place == null)
-    {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = modifier
-                .fillMaxSize()
-        ) {
-            Text(
-                text = stringResource(R.string.select_place_see_details)
-            )
-        }
-    }
-    else
-    {
-        Scaffold(
-            floatingActionButton = {
-                Button(
-                    onClick = { placesDetailsViewModel.addVisit() }
-                ) {
-                    Text(text = stringResource(R.string.take_your_badge))
-                }
-            },
-            floatingActionButtonPosition = FabPosition.Center,
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            modifier = modifier
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(it)
-                    .padding(dimensionResource(id = R.dimen.padding_medium))
+    when(uiState.place) {
+        null -> {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier
+                    .fillMaxSize()
             ) {
-                if (!isFullScreen) {
-                    IconButton(
-                        onClick = navigateBack,
-                        modifier = Modifier
-                            .padding(dimensionResource(id = R.dimen.padding_small))
-                            .align(Alignment.TopStart)
-                            .zIndex(3f)
-                            .background(
-                                color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
-                                shape = CircleShape
-                            )
-                            .size(40.dp)
+                Text(
+                    text = stringResource(R.string.select_place_see_details)
+                )
+            }
+        }
+        else -> {
+            Scaffold(
+                floatingActionButton = {
+                    Button(
+                        onClick = { placesDetailsViewModel.addVisit() }
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button)
-                        )
+                        Text(text = stringResource(R.string.take_your_badge))
                     }
-                }
-                Column(
+                },
+                floatingActionButtonPosition = FabPosition.Center,
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                modifier = modifier
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .padding(it)
+                        .padding(dimensionResource(id = R.dimen.padding_medium))
                 ) {
-                    ImageCarousel(
-                        images = uiState.place.images,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(
-                                bottom = dimensionResource(id = R.dimen.padding_medium)
-                            )
-                    )
                     if (!isFullScreen) {
-                        Row {
-                            Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                            ) {
-                                Text(
-                                    text = uiState.place.place.name,
-                                    fontSize = 20.sp
+                        IconButton(
+                            onClick = navigateBack,
+                            modifier = Modifier
+                                .padding(dimensionResource(id = R.dimen.padding_small))
+                                .align(Alignment.TopStart)
+                                .zIndex(3f)
+                                .background(
+                                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
+                                    shape = CircleShape
                                 )
-                                Text(
-                                    text = uiState.place.city,
-                                    style = MaterialTheme.typography.bodyLarge
+                                .size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back_button)
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        ImageCarousel(
+                            images = uiState.place.images,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .padding(
+                                    bottom = dimensionResource(id = R.dimen.padding_medium)
+                                )
+                        )
+                        if (!isFullScreen) {
+                            Row {
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                ) {
+                                    Text(
+                                        text = uiState.place.place.name,
+                                        fontSize = 20.sp
+                                    )
+                                    Text(
+                                        text = uiState.place.city,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                                PlaceRating(rating = uiState.place.place.rating)
+                            }
+                        }
+
+                        val tabs = listOf(R.string.information, R.string.visits)
+                        val pagerState = rememberPagerState(
+                            initialPage = 0,
+                            pageCount = { tabs.size }
+                        )
+                        val coroutineScope = rememberCoroutineScope()
+
+                        TabRow(
+                            selectedTabIndex = pagerState.currentPage,
+                            modifier = Modifier
+                                .padding(dimensionResource(id = R.dimen.padding_small))
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                Tab(
+                                    text = {
+                                        Text(
+                                            text = stringResource(id = title),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            overflow = TextOverflow.Ellipsis,
+                                            maxLines = 1,
+                                        )
+                                    },
+                                    selected = pagerState.currentPage == index,
+                                    onClick = {
+                                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                                    }
                                 )
                             }
-                            PlaceRating(rating = uiState.place.place.rating)
                         }
-                    }
 
-                    val tabs = listOf(R.string.information, R.string.visits)
-                    val pagerState = rememberPagerState(
-                        initialPage = 0,
-                        pageCount = { tabs.size }
-                    )
-                    val coroutineScope = rememberCoroutineScope()
-
-                    TabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        modifier = Modifier
-                            .padding(dimensionResource(id = R.dimen.padding_small))
-                    ) {
-                        tabs.forEachIndexed { index, title ->
-                            Tab(
-                                text = {
-                                    Text(
-                                        text = stringResource(id = title),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        overflow = TextOverflow.Ellipsis,
-                                        maxLines = 1,
-                                    )
-                                },
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    coroutineScope.launch { pagerState.animateScrollToPage(index) }
-                                }
-                            )
-                        }
-                    }
-
-                    HorizontalPager(
-                        state = pagerState,
-                        pageSpacing = 48.dp,
-                        verticalAlignment = Alignment.Top,
-                        modifier = Modifier
-                            .height(340.dp)
-                            .fillMaxWidth()
-                            .padding(
-                                horizontal = 20.dp,
-                                vertical = dimensionResource(R.dimen.padding_small)
-                            )
-                    ) {
-                        page ->
-                        when(page){
-                            0 -> InformationTab(uiState.descriptionText)
-                            1 -> VisitsTab(uiState.visits)
+                        HorizontalPager(
+                            state = pagerState,
+                            pageSpacing = 48.dp,
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier
+                                .height(340.dp)
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = 20.dp,
+                                    vertical = dimensionResource(R.dimen.padding_small)
+                                )
+                        ) {
+                                page ->
+                            when(page){
+                                0 -> InformationTab(uiState.descriptionText)
+                                1 -> VisitsTab(uiState.visits)
+                            }
                         }
                     }
                 }

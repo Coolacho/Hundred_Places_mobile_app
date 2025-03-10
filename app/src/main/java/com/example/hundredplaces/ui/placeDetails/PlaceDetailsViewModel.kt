@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.data.model.place.repositories.PlacesRepository
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.data.model.visit.repositories.VisitsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,20 +35,34 @@ class PlaceDetailsViewModel(
     )
     private val userId: Long = 1//savedStateHandle["CURRENT_USER"]!!
 
-    private val _descriptionText: MutableStateFlow<String?> = MutableStateFlow(null)
     private val _visits = placeIdFlow.flatMapLatest { placeId ->
         visitsRepository.getAllVisitDatesByUserIdAndPlaceId(userId, placeId)
     }
-    private val _place = placeIdFlow.flatMapLatest { placeId ->
+    private val _place: Flow<PlaceWithCityAndImages?> = placeIdFlow.flatMapLatest { placeId ->
         placesRepository.getPlaceWithCityAndImages(placeId)
     }
+    private val _descriptionText = _place.flatMapLatest { place ->
+        place?.place?.descriptionPath?.let { path ->
+            if (path.isNotEmpty()) {
+                withContext(Dispatchers.IO) {
+                    try {
+                        MutableStateFlow(URL(path).readText())
+                    } catch (_: ConnectException) {
+                        MutableStateFlow(null)
+                    }
+                }
+            }
+            else MutableStateFlow(null)
+        } ?: MutableStateFlow(null)
+    }
+
 
     val uiState = combine(
         _descriptionText, _visits, _place
     ) { descriptionText, visits, place ->
         PlaceDetailsUiState(
             place = place,
-            descriptionText = getDescription(place?.place?.descriptionPath ?: ""),
+            descriptionText = descriptionText,
             visits = visits
         )
     }
@@ -55,22 +71,6 @@ class PlaceDetailsViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = PlaceDetailsUiState()
         )
-
-
-    suspend fun getDescription(descriptionPath: String): String? {
-        var descriptionText: String? = null
-        if (descriptionPath.isNotEmpty()) {
-            // Move the network operation to the IO thread
-            descriptionText = withContext(Dispatchers.IO) {
-                try {
-                    URL(descriptionPath).readText()
-                } catch (_: ConnectException) {
-                    null
-                }
-            }
-        }
-        return descriptionText
-    }
 
     fun addVisit() {
         viewModelScope.launch {
