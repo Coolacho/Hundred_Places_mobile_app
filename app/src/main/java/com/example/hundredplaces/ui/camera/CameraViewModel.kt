@@ -34,7 +34,6 @@ class CameraViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CameraUiState())
     val uiState: StateFlow<CameraUiState> = _uiState.asStateFlow()
 
-
     private val executor = Executors.newSingleThreadExecutor()
 
     private val cameraPreview = Preview.Builder().build().apply {
@@ -96,16 +95,6 @@ class CameraViewModel : ViewModel() {
             )
         }
 
-    suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {
-        val processCameraProvider = ProcessCameraProvider.awaitInstance(appContext)
-        processCameraProvider.bindToLifecycle(
-            lifecycleOwner, DEFAULT_BACK_CAMERA, cameraPreview, imageAnalysis
-        )
-
-        // Cancellation signals we're done with the camera
-        try { awaitCancellation() } finally { processCameraProvider.unbindAll() }
-    }
-
     private fun detectLandmarks(imgBytes: ByteString) {
 
         val image = Image.newBuilder().setContent(imgBytes).build()
@@ -137,5 +126,23 @@ class CameraViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun toggleInfoScreen() {
+        _uiState.update {
+            it.copy(
+                isInfoScreenOpen = !it.isInfoScreenOpen
+            )
+        }
+    }
+
+    suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {
+        val processCameraProvider = ProcessCameraProvider.awaitInstance(appContext)
+        processCameraProvider.bindToLifecycle(
+            lifecycleOwner, DEFAULT_BACK_CAMERA, cameraPreview, imageAnalysis
+        )
+
+        // Cancellation signals we're done with the camera
+        try { awaitCancellation() } finally { processCameraProvider.unbindAll() }
     }
 }

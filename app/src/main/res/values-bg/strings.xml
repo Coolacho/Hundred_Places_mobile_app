@@ -61,4 +61,5 @@
     <string name="place_share_text">Виж това място: %s!</string>
     <string name="search_for_a_place">Потърси обект</string>
     <string name="open_camera_to_search">Отвори камерата, за да търсиш</string>
+    <string name="camera_info_text">Сканирай QR код или насочи към обект, за да видиш повече информация за него!</string>
 </resources>
