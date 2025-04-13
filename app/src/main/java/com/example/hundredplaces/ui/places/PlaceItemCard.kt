@@ -13,12 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,7 +55,6 @@ fun PlaceItem(
     rating: Double,
     isFavorite: Boolean,
     isSelected: Boolean,
-    distance: Float?,
     onClick: () -> Unit,
     toggleFavorite: (placeId: Long, rating: Double, isFavorite: Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -111,9 +111,6 @@ fun PlaceItem(
                         PlaceRating(
                             rating = placeWithCityAndImages.place.rating
                         )
-                        PlaceDistance(
-                            distance = distance
-                        )
                     }
                 }
                 LazyRow(
@@ -121,58 +118,42 @@ fun PlaceItem(
                     modifier = Modifier
                         .padding(top = dimensionResource(R.dimen.padding_small))
                 ) {
-                    item {
-                        OutlinedButton(
-                            onClick = {},
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                            modifier = Modifier
-                                .padding(end = dimensionResource(R.dimen.padding_small))
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.round_star_rate_24),
-                                contentDescription = null,
-                            )
-                            Text(
-                                text = stringResource(R.string.rate),
-                                style = MaterialTheme.typography.labelMedium
-                            )
+
+                    items(ItemActionsEnum.entries.toList()) {
+
+                        val (label, icon, onClick) = when (it) {
+
+                            ItemActionsEnum.RATE -> Triple(
+                                R.string.rate,
+                                R.drawable.round_star_rate_24
+                            ) {}
+
+                            ItemActionsEnum.FAVORITE -> Triple(
+                                if (isFavorite) R.string.remove_from_favorites else R.string.add_to_favorites,
+                                if (isFavorite) R.drawable.round_favorite_filled_24 else R.drawable.rounded_favorite_24
+                            ) { toggleFavorite(placeWithCityAndImages.place.id, rating, isFavorite) }
+
+                            ItemActionsEnum.SHARE -> Triple(
+                                R.string.share,
+                                R.drawable.rounded_ios_share_24
+                            ) { sharePlace(context, placeWithCityAndImages.place.name) }
+
                         }
-                    }
-                    item {
-                        OutlinedButton(
-                            onClick = { toggleFavorite(placeWithCityAndImages.place.id, rating, isFavorite) },
+
+                        Button(
+                            onClick = onClick,
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                             modifier = Modifier
                                 .padding(end = dimensionResource(R.dimen.padding_small))
                         ) {
                             Icon(
-                                painter = painterResource(if (isFavorite) R.drawable.round_favorite_filled_24 else R.drawable.rounded_favorite_24),
+                                painter = painterResource(icon),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .padding(end = dimensionResource(R.dimen.padding_small))
                             )
                             Text(
-                                text = stringResource(if (isFavorite) R.string.remove_from_favorites else R.string.add_to_favorites),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
-                    }
-                    item {
-                        OutlinedButton(
-                            onClick = {
-                                sharePlace(
-                                    context,
-                                    placeWithCityAndImages.place.name
-                                )
-                            },
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.rounded_ios_share_24),
-                                contentDescription = null
-                            )
-                            Text(
-                                text = stringResource(R.string.share),
+                                text = stringResource(label),
                                 style = MaterialTheme.typography.labelMedium
                             )
                         }
