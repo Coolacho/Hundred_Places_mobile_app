@@ -62,4 +62,10 @@
     <string name="search_for_a_place">Потърси обект</string>
     <string name="open_camera_to_search">Отвори камерата, за да търсиш</string>
     <string name="camera_info_text">Сканирай QR код или насочи към обект, за да видиш повече информация за него!</string>
+    <string name="user_updated_successfully">Потребителят е променен успешно!</string>
+    <string name="user_update_failed">Промяната е неуспешна. Моля опитайте отново.</string>
+    <string name="invalid_input_data">Невалидни данни!</string>
+    <string name="user_created_successfully">Потребителят е създаден успешно!</string>
+    <string name="user_creation_failed">Създаването е неуспешно. Моля опитайте отново.</string>
+    <string name="wrong_email_password">Грешни имейл и/или парола. Моля опитайте отново.</string>
 </resources>

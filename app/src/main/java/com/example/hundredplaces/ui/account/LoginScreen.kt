@@ -50,7 +50,7 @@ fun LoginScreen(
             item {
                 OutlinedTextField(
                     value = uiState.userDetails.email,
-                    onValueChange = {viewModel.updateUiState(uiState.userDetails.copy(email = it))},
+                    onValueChange = {viewModel.updateUserDetails(uiState.userDetails.copy(email = it))},
                     label = { Text(
                         text = stringResource(R.string.email),
                         fontSize = 16.sp
@@ -63,7 +63,7 @@ fun LoginScreen(
                 )
                 OutlinedTextField(
                     value = uiState.userDetails.password,
-                    onValueChange = {viewModel.updateUiState(uiState.userDetails.copy(password = it))},
+                    onValueChange = {viewModel.updateUserDetails(uiState.userDetails.copy(password = it))},
                     label = { Text(
                         text = stringResource(R.string.password),
                         fontSize = 16.sp
@@ -76,7 +76,7 @@ fun LoginScreen(
                 )
                 AnimatedVisibility(visible = !uiState.isLoginSuccessful) {
                     Text(
-                        text = "Wrong email/password.\nPlease try again!",
+                        text = stringResource(R.string.wrong_email_password),
                         color = Color.Red,
                         modifier = Modifier
                             .padding(top = dimensionResource(id = R.dimen.padding_medium))

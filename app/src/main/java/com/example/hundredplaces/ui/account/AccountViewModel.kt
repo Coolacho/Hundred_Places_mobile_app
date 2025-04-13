@@ -3,6 +3,7 @@ package com.example.hundredplaces.ui.account
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hundredplaces.R
 import com.example.hundredplaces.data.UserPreferencesRepository
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.repositories.UsersRepository
@@ -24,22 +25,23 @@ class AccountViewModel(
     val uiState: StateFlow<AccountUiState> = _uiState
 
     init {
-        checkAutoLogin()
+        autoLogin()
     }
 
-    private fun checkAutoLogin() {
+    private fun autoLogin() {
         viewModelScope.launch{
-            if (userPreferencesRepository.prefUsername.first() != "") {
+            if (userPreferencesRepository.prefUsername.first().isNotEmpty()) {
                 val user = userRepository.getUserByEmail(userPreferencesRepository.prefUsername.first())
-                _uiState.update {
-                    it.copy(
-                        isLoggedIn = true,
-                        userDetails = user,
-                        currentUser = user
-                    )
+                if (user != null) {
+                    _uiState.update {
+                        it.copy(
+                            isLoggedIn = true,
+                            userDetails = user
+                        )
+                    }
+                    setUserId(user.id)
+                    workManagerRepository.startSync(user.id)
                 }
-                setUserId(user.id)
-                workManagerRepository.startSync(user.id)
             }
         }
     }
@@ -48,11 +50,10 @@ class AccountViewModel(
         if (validateInput()) {
             viewModelScope.launch {
                 val user = userRepository.getUserByEmailAndPassword(uiState.value.userDetails.email, uiState.value.userDetails.password)
-                if (validateInput(user)) {
+                if (user != null) {
                     _uiState.update {
                         it.copy(
                             userDetails = user,
-                            currentUser = user,
                             isLoggedIn = true
                         )
                     }
@@ -68,9 +69,8 @@ class AccountViewModel(
                     }
                 }
             }
-            return uiState.value.isLoggedIn
         }
-        return false
+        return uiState.value.isLoggedIn
     }
 
     fun logOut() {
@@ -78,7 +78,6 @@ class AccountViewModel(
             _uiState.update {
                 it.copy(
                     userDetails = User(name = "", email = "", password = ""),
-                    currentUser = User(name = "", email = "", password = ""),
                     isLoggedIn = false
                 )
             }
@@ -86,30 +85,36 @@ class AccountViewModel(
         }
     }
 
-    fun saveUser() {
+    fun updateUser() {
         if (validateInput()) {
             viewModelScope.launch {
-                userRepository.updateUser(uiState.value.userDetails)
+                if (userRepository.updateUser(uiState.value.userDetails)) {
+                    userPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
+                    showSnackbarMessage(R.string.user_updated_successfully)
+                }
+                else showSnackbarMessage(R.string.user_update_failed)
             }
         }
+        else showSnackbarMessage(R.string.invalid_input_data)
     }
 
     fun createUser() {
         if (validateInput()) {
-            viewModelScope.launch{
-                userRepository.insertUser(uiState.value.userDetails)
-                _uiState.update {
-                    it.copy(
-                        currentUser = uiState.value.userDetails,
-                        isLoggedIn = true
-                    )
-                }
-                userPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
+            viewModelScope.launch {
+                if (userRepository.insertUser(uiState.value.userDetails)) {
+                    _uiState.update {
+                        it.copy(
+                            isLoggedIn = true
+                        )
+                    }
+                    userPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
+                    showSnackbarMessage(R.string.user_created_successfully)
+                } else showSnackbarMessage(R.string.user_creation_failed)
             }
-        }
+        } else showSnackbarMessage(R.string.invalid_input_data)
     }
 
-    fun updateUiState(userDetails: User) {
+    fun updateUserDetails(userDetails: User) {
         _uiState.update {
             it.copy(
                 userDetails = userDetails,
@@ -127,5 +132,21 @@ class AccountViewModel(
 
     fun setUserId(id: Long) {
         savedStateHandle["CURRENT_USER"] = id
+    }
+
+    fun snackbarMessageShown() {
+        _uiState.update {
+            it.copy(
+                userMessage = null
+            )
+        }
+    }
+
+    private fun showSnackbarMessage(message: Int) {
+        _uiState.update {
+            it.copy(
+                userMessage = message
+            )
+        }
     }
 }

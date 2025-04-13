@@ -7,5 +7,5 @@ data class AccountUiState(
     val isLoggedIn: Boolean = false,
     val isLoginSuccessful: Boolean = true,
     val userDetails: User = User(name = "", email = "", password = ""),
-    val currentUser: User = User(name = "", email = "", password = "")
+    val userMessage: Int? = null
 )

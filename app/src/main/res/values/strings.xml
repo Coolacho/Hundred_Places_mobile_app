@@ -61,4 +61,10 @@
     <string name="search_for_a_place">Search for a place</string>
     <string name="open_camera_to_search">Open camera to search</string>
     <string name="camera_info_text">Scan a qr code or point at a place to see more details about it!</string>
+    <string name="user_updated_successfully">User updated successfully!</string>
+    <string name="user_update_failed">User update failed. Please try again.</string>
+    <string name="invalid_input_data">The input data is not valid!</string>
+    <string name="user_created_successfully">User created successfully!</string>
+    <string name="user_creation_failed">User creation failed. Please try again.</string>
+    <string name="wrong_email_password">Wrong email and/or password.\nPlease try again!</string>
 </resources>
