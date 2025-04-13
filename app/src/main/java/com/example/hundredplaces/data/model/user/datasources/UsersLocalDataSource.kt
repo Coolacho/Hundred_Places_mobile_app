@@ -7,8 +7,8 @@ class UsersLocalDataSource(
     private val userDao: UserDao
 ) {
 
-    suspend fun getUserByEmailAndPassword(email: String, password: String): User = userDao.getUserByEmailAndPassword(email, password)
-    suspend fun getUserByEmail(email: String): User = userDao.getUserByEmail(email)
+    suspend fun getUserByEmailAndPassword(email: String, password: String): User? = userDao.getUserByEmailAndPassword(email, password)
+    suspend fun getUserByEmail(email: String): User? = userDao.getUserByEmail(email)
 
     suspend fun insertUser(user: User) = userDao.insert(user)
 

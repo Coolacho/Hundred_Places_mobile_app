@@ -14,12 +14,12 @@ interface UsersRestApi {
     suspend fun getUserByEmailAndPassword(
         @Query("email") email: String,
         @Query("password") password: String
-    ): User
+    ): User?
 
     @GET("$baseUrl/user/existing")
     suspend fun getUserByEmail(
         @Query("email") email: String
-    ): User
+    ): User?
 
     @POST("$baseUrl/new")
     suspend fun insertUser(@Body user: User)

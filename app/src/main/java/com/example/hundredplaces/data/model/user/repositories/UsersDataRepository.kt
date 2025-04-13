@@ -8,83 +8,97 @@ import com.example.hundredplaces.util.NetworkConnection
 import kotlinx.serialization.SerializationException
 import java.net.SocketTimeoutException
 
+const val USER_REPOSITORY_TAG = "userDataRepository"
+
 class UsersDataRepository(
     private val usersLocalDataSource: UsersLocalDataSource,
     private val usersRemoteDataSource: UsersRemoteDataSource,
     private val networkConnection: NetworkConnection
 ) : UsersRepository{
 
-    override suspend fun getUserByEmailAndPassword(email: String, password: String): User {
-        var user: User
-        if (networkConnection.isNetworkConnected) {
+    override suspend fun getUserByEmailAndPassword(email: String, password: String): User? {
+
+        var user: User? = null
+
+        user = usersLocalDataSource.getUserByEmailAndPassword(email, password)
+
+        if (networkConnection.isNetworkConnected && user == null) {
             try {
                 user = usersRemoteDataSource.getUserByEmailAndPassword(email, password)
-                usersLocalDataSource.insertUser(user)
+                if (user != null) usersLocalDataSource.insertUser(user)
             }
-            catch (e: SerializationException) {
-                user = User(name ="", email = "", password = "")
-                Log.d("UserRepository", "User is null")
+            catch (_: SerializationException) {
+                Log.e(USER_REPOSITORY_TAG, "Serialization error occurred!")
             }
-            catch (e: SocketTimeoutException) {
-                user = usersLocalDataSource.getUserByEmailAndPassword(email, password)
+            catch (_: SocketTimeoutException) {
+                Log.e(USER_REPOSITORY_TAG, "Server is not reachable!")
             }
         }
-        else {
-            user = usersLocalDataSource.getUserByEmailAndPassword(email, password)
-        }
+
         return user
     }
 
-    override suspend fun getUserByEmail(email: String): User {
-        var user: User
-        if (networkConnection.isNetworkConnected) {
+    override suspend fun getUserByEmail(email: String): User? {
+
+        var user: User? = null
+
+        user = usersLocalDataSource.getUserByEmail(email)
+
+        if (networkConnection.isNetworkConnected && user == null) {
             try {
                 user = usersRemoteDataSource.getUserByEmail(email)
-                usersLocalDataSource.insertUser(user)
+                if (user != null) usersLocalDataSource.insertUser(user)
             }
-            catch (e: SerializationException) {
-                user = User(name ="", email = "", password = "")
-                Log.d("UserRepository", "User is null")
+            catch (_: SerializationException) {
+                Log.e(USER_REPOSITORY_TAG, "Serialization error occurred!")
             }
-            catch (e: SocketTimeoutException) {
-                user = usersLocalDataSource.getUserByEmail(email)
+            catch (_: SocketTimeoutException) {
+                Log.e(USER_REPOSITORY_TAG, "Server is not reachable!")
             }
-        } else {
-            user = usersLocalDataSource.getUserByEmail(email)
         }
+
         return user
     }
 
-    override suspend fun insertUser(user: User) {
+    override suspend fun insertUser(user: User) : Boolean {
+        var result = false
         if (networkConnection.isNetworkConnected) {
             try {
                 usersRemoteDataSource.insertUser(user)
-            } catch (e: SocketTimeoutException) {
+                usersLocalDataSource.insertUser(user)
+                result = true
+            } catch (_: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Insert in remote failed.")
             }
         }
-        usersLocalDataSource.insertUser(user)
+        return result
     }
 
-    override suspend fun deleteUser(user: User) {
+    override suspend fun deleteUser(user: User) : Boolean {
+        var result = false
         if (networkConnection.isNetworkConnected) {
             try {
                 usersRemoteDataSource.deleteUser(user)
-            } catch (e: SocketTimeoutException) {
+                usersLocalDataSource.deleteUser(user)
+                result = true
+            } catch (_: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Delete in remote failed.")
             }
         }
-        usersLocalDataSource.deleteUser(user)
+        return result
     }
 
-    override suspend fun updateUser(user: User) {
+    override suspend fun updateUser(user: User) : Boolean {
+        var result = false
         if (networkConnection.isNetworkConnected) {
             try {
                 usersRemoteDataSource.updateUser(user)
-            } catch (e: SocketTimeoutException) {
+                usersLocalDataSource.updateUser(user)
+                result = true
+            } catch (_: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Update in remote failed.")
             }
         }
-        usersLocalDataSource.updateUser(user)
+        return result
     }
 }

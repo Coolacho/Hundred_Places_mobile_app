@@ -7,22 +7,22 @@ import com.example.hundredplaces.data.model.user.User
  */
 interface UsersRepository {
 
-    suspend fun getUserByEmailAndPassword(email: String, password: String): User
+    suspend fun getUserByEmailAndPassword(email: String, password: String): User?
 
-    suspend fun getUserByEmail(email: String): User
+    suspend fun getUserByEmail(email: String): User?
 
     /**
      * Insert user in the data source
      */
-    suspend fun insertUser(user: User)
+    suspend fun insertUser(user: User) : Boolean
 
     /**
      * Delete user from the data source
      */
-    suspend fun deleteUser(user: User)
+    suspend fun deleteUser(user: User) : Boolean
 
     /**
      * Update user in the data source
      */
-    suspend fun updateUser(user: User)
+    suspend fun updateUser(user: User) : Boolean
 }

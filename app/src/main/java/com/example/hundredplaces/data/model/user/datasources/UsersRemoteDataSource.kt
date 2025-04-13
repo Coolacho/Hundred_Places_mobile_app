@@ -7,8 +7,8 @@ class UsersRemoteDataSource(
     private val usersRestApi: UsersRestApi
 ) {
 
-    suspend fun getUserByEmailAndPassword(email: String, password: String): User = usersRestApi.getUserByEmailAndPassword(email, password)
-    suspend fun getUserByEmail(email: String): User = usersRestApi.getUserByEmail(email)
+    suspend fun getUserByEmailAndPassword(email: String, password: String): User? = usersRestApi.getUserByEmailAndPassword(email, password)
+    suspend fun getUserByEmail(email: String): User? = usersRestApi.getUserByEmail(email)
 
     suspend fun insertUser(user: User) = usersRestApi.insertUser(user)
 
