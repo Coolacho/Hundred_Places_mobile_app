@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -52,7 +53,7 @@ fun AchievementsScreen(
                 end = dimensionResource(id = R.dimen.padding_small))
     ) {
         items(uiState.achievements.entries.toList()) {
-            val upperBound = getUpperBound(it.key, it.value)
+            val (upperBound, tint) = getUpperBound(it.key, it.value)
             Card(
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.padding_small))
@@ -70,7 +71,8 @@ fun AchievementsScreen(
                             .clip(MaterialTheme.shapes.small),
                         contentScale = ContentScale.Crop,
                         painter = painterResource(id = it.key.icon),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(tint)
                     )
                     Column(
                         horizontalAlignment = Alignment.Start,
@@ -103,8 +105,8 @@ fun AchievementsScreen(
     }
 }
 
-private fun getUpperBound(achievementType: AchievementTypeEnum, visited: Int): Int {
-    return if (achievementType.firstMilestone > visited) achievementType.firstMilestone
-    else if (achievementType.secondMilestone > visited) achievementType.secondMilestone
-    else achievementType.thirdMilestone
+private fun getUpperBound(achievementType: AchievementTypeEnum, visited: Int): Pair<Int, Color> {
+    return if (achievementType.firstMilestone > visited) achievementType.firstMilestone to Color(0xFFA9671D)
+    else if (achievementType.secondMilestone > visited) achievementType.secondMilestone to Color(0xFFA7A7A7)
+    else achievementType.thirdMilestone to Color(0xFFD4AF37)
 }
