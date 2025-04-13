@@ -56,102 +56,98 @@ fun CameraScreen(
         cameraViewModel.bindToCamera(context.applicationContext, lifecycleOwner)
     }
 
-    when(uiState.qrContent) {
-        null -> {
+    if (uiState.qrContent != null) {
+        val browserIntent = Intent(
+            ACTION_VIEW,
+            uiState.qrContent,
+            context,
+            MainActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .putExtra("navigateToPlacesDetails", true)
+            .putExtra("placeId", uiState.qrContent.lastPathSegment?.toLongOrDefault(0L))
+        context.startActivity(browserIntent)
+    }
 
-            if (uiState.isInfoScreenOpen) {
-                LaunchedEffect(Unit) {
-                    delay(5000)
-                    cameraViewModel.toggleInfoScreen()
-                }
-            }
+    if (uiState.isInfoScreenOpen) {
+        LaunchedEffect(Unit) {
+            delay(5000)
+            cameraViewModel.toggleInfoScreen()
+        }
+    }
 
-            uiState.surfaceRequest?.let { request ->
-                CameraXViewfinder(
-                    surfaceRequest = request,
-                    modifier = modifier
-                        .fillMaxSize()
-                )
-                Box(
-                    contentAlignment = Alignment.BottomEnd,
+    uiState.surfaceRequest?.let { request ->
+        CameraXViewfinder(
+            surfaceRequest = request,
+            modifier = modifier
+                .fillMaxSize()
+        )
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            AnimatedVisibility(
+                visible = uiState.isInfoScreenOpen
+            ) {
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxSize()
+                        .padding(
+                            end = 55.dp,
+                            bottom = 24.dp
+                        )
+                        .background(
+                            Color.LightGray.copy(alpha = 0.5f),
+                            MaterialTheme.shapes.small
+                        )
+                        .width(275.dp)
                 ) {
-                    AnimatedVisibility(
-                        visible = uiState.isInfoScreenOpen
-                    ) {
-                        Row (
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .padding(
-                                    end = 55.dp,
-                                    bottom = 24.dp
-                                )
-                                .background(
-                                    Color.LightGray.copy(alpha = 0.5f),
-                                    MaterialTheme.shapes.small
-                                )
-                                .width(275.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.camera_info_text),
-                                textAlign = TextAlign.Justify,
-                                modifier = Modifier
-                                    .padding(dimensionResource(R.dimen.padding_small))
-                            )
-                        }
-                    }
-                    IconButton(
-                        onClick = cameraViewModel::toggleInfoScreen,
+                    Text(
+                        text = stringResource(R.string.camera_info_text),
+                        textAlign = TextAlign.Justify,
                         modifier = Modifier
                             .padding(dimensionResource(R.dimen.padding_small))
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.round_info_outline_24),
-                            contentDescription = "Info button",
-                            tint = Color.White
-                        )
-                    }
-                    Canvas(
-                        modifier = Modifier
-                            .size(240.dp)
-                            .align(Alignment.Center)
-                    ) {
-                        val cornerLength = 40.dp.toPx() // Corner line length
-                        val strokeWidth = 5.dp.toPx() // Stroke thickness
-                        val color = Color.White // Corner color
-
-                        val capStyle = StrokeCap.Round // Makes the corners round
-
-                        // Top-left corner
-                        drawLine(color, Offset(0f, 0f), Offset(cornerLength, 0f), strokeWidth, capStyle)
-                        drawLine(color, Offset(0f, 0f), Offset(0f, cornerLength), strokeWidth, capStyle)
-
-                        // Top-right corner
-                        drawLine(color, Offset(size.width, 0f), Offset(size.width - cornerLength, 0f), strokeWidth, capStyle)
-                        drawLine(color, Offset(size.width, 0f), Offset(size.width, cornerLength), strokeWidth, capStyle)
-
-                        // Bottom-left corner
-                        drawLine(color, Offset(0f, size.height), Offset(cornerLength, size.height), strokeWidth, capStyle)
-                        drawLine(color, Offset(0f, size.height), Offset(0f, size.height - cornerLength), strokeWidth, capStyle)
-
-                        // Bottom-right corner
-                        drawLine(color, Offset(size.width, size.height), Offset(size.width - cornerLength, size.height), strokeWidth, capStyle)
-                        drawLine(color, Offset(size.width, size.height), Offset(size.width, size.height - cornerLength), strokeWidth, capStyle)
-                    }
+                    )
                 }
             }
-        }
-        else -> {
-            val browserIntent = Intent(
-                ACTION_VIEW,
-                uiState.qrContent,
-                context,
-                MainActivity::class.java)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra("navigateToPlacesDetails", true)
-                .putExtra("placeId", uiState.qrContent.lastPathSegment?.toLongOrDefault(0L))
-            context.startActivity(browserIntent)
+            IconButton(
+                onClick = cameraViewModel::toggleInfoScreen,
+                modifier = Modifier
+                    .padding(dimensionResource(R.dimen.padding_small))
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.round_info_outline_24),
+                    contentDescription = "Info button",
+                    tint = Color.White
+                )
+            }
+            Canvas(
+                modifier = Modifier
+                    .size(240.dp)
+                    .align(Alignment.Center)
+            ) {
+                val cornerLength = 40.dp.toPx() // Corner line length
+                val strokeWidth = 5.dp.toPx() // Stroke thickness
+                val color = Color.White // Corner color
+
+                val capStyle = StrokeCap.Round // Makes the corners round
+
+                // Top-left corner
+                drawLine(color, Offset(0f, 0f), Offset(cornerLength, 0f), strokeWidth, capStyle)
+                drawLine(color, Offset(0f, 0f), Offset(0f, cornerLength), strokeWidth, capStyle)
+
+                // Top-right corner
+                drawLine(color, Offset(size.width, 0f), Offset(size.width - cornerLength, 0f), strokeWidth, capStyle)
+                drawLine(color, Offset(size.width, 0f), Offset(size.width, cornerLength), strokeWidth, capStyle)
+
+                // Bottom-left corner
+                drawLine(color, Offset(0f, size.height), Offset(cornerLength, size.height), strokeWidth, capStyle)
+                drawLine(color, Offset(0f, size.height), Offset(0f, size.height - cornerLength), strokeWidth, capStyle)
+
+                // Bottom-right corner
+                drawLine(color, Offset(size.width, size.height), Offset(size.width - cornerLength, size.height), strokeWidth, capStyle)
+                drawLine(color, Offset(size.width, size.height), Offset(size.width, size.height - cornerLength), strokeWidth, capStyle)
+            }
         }
     }
 }
