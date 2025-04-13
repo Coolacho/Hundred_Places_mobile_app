@@ -23,18 +23,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.HundredPlacesApp
 import com.example.hundredplaces.ui.account.AccountViewModel
-import com.example.hundredplaces.ui.map.MapViewModel
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesDestination
-import com.example.hundredplaces.ui.places.PlacesViewModel
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -48,20 +40,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val placesViewModel: PlacesViewModel = viewModel(
-                        factory = AppViewModelProvider.Factory
-                    )
                     val accountViewModel: AccountViewModel = viewModel (
                         factory = AppViewModelProvider.Factory
                     )
                     val placeDetailsViewModel: PlaceDetailsViewModel = viewModel (
                         factory = AppViewModelProvider.Factory
                     )
-                    val mapViewModel: MapViewModel = viewModel  (
-                        factory = AppViewModelProvider.Factory
-                    )
-
-
 
                     val windowSize = calculateWindowSizeClass(activity = this)
                     val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
@@ -94,26 +78,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                     if (ContextCompat.checkSelfPermission(
                             this,
                             Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED) {
-                        fusedLocationClient.requestLocationUpdates(
-                            LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 10000).build(),
-                            Executors.newSingleThreadExecutor(),
-                            object: LocationCallback() {
-                                override fun onLocationResult(locationResult: LocationResult) {
-                                    val location = locationResult.lastLocation
-                                    if (location != null) {
-                                        placesViewModel.getDistances(location)
-                                        mapViewModel.updateCameraPositionState(location)
-                                    }
-                                }
-                            }
-                        )
-                    }
-                    else {
+                        ) != PackageManager.PERMISSION_GRANTED) {
                         LaunchedEffect(Unit) {
                             permissionLauncher.launch(
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -164,14 +132,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-
                     HundredPlacesApp(
                         windowSize = windowSize.widthSizeClass,
                         startDestination = startDestination,
                         accountViewModel = accountViewModel,
-                        placesViewModel = placesViewModel,
                         placeDetailsViewModel = placeDetailsViewModel,
-                        mapViewModel = mapViewModel
                     )
                 }
             }

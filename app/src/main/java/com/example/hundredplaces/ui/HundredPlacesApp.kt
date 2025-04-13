@@ -15,19 +15,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.home.HomeScreen
-import com.example.hundredplaces.ui.map.MapViewModel
 import com.example.hundredplaces.ui.navigation.AppNavigationType
 import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
-import com.example.hundredplaces.ui.places.PlacesViewModel
 
 @Composable
 fun HundredPlacesApp(
     windowSize: WindowWidthSizeClass,
     startDestination: String,
-    placesViewModel: PlacesViewModel,
     placeDetailsViewModel: PlaceDetailsViewModel,
-    mapViewModel: MapViewModel,
     accountViewModel: AccountViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
@@ -69,9 +65,7 @@ fun HundredPlacesApp(
             HomeScreen(
                 accountUiState = accountUiState.value,
                 accountViewModel = accountViewModel,
-                placesViewModel = placesViewModel,
                 placeDetailsViewModel = placeDetailsViewModel,
-                mapViewModel = mapViewModel,
                 startDestination = startDestination,
                 navController = navController,
                 navigationType = navigationType
@@ -82,9 +76,7 @@ fun HundredPlacesApp(
         HomeScreen(
             accountUiState = accountUiState.value,
             accountViewModel = accountViewModel,
-            placesViewModel = placesViewModel,
             placeDetailsViewModel = placeDetailsViewModel,
-            mapViewModel = mapViewModel,
             startDestination = startDestination,
             navController = navController,
             navigationType = navigationType,

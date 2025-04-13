@@ -17,20 +17,18 @@ import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.account.CreateAccountDestination
 import com.example.hundredplaces.ui.account.CreateAccountScreen
-import com.example.hundredplaces.ui.achievements.AchievementsDestination
-import com.example.hundredplaces.ui.achievements.AchievementsScreen
 import com.example.hundredplaces.ui.account.LoginDestination
 import com.example.hundredplaces.ui.account.LoginScreen
+import com.example.hundredplaces.ui.achievements.AchievementsDestination
+import com.example.hundredplaces.ui.achievements.AchievementsScreen
 import com.example.hundredplaces.ui.camera.CameraScreen
 import com.example.hundredplaces.ui.camera.CameraScreenDestination
 import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.map.MapScreen
-import com.example.hundredplaces.ui.map.MapViewModel
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
-import com.example.hundredplaces.ui.places.PlacesDestination
-import com.example.hundredplaces.ui.places.PlacesViewModel
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsScreen
+import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
+import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.places.PlacesScreenV2
 
 /**
@@ -42,9 +40,7 @@ fun HundredPlacesNavHost(
     navController: NavHostController,
     accountViewModel: AccountViewModel,
     accountUiState: AccountUiState,
-    placesViewModel: PlacesViewModel,
     placeDetailsViewModel: PlaceDetailsViewModel,
-    mapViewModel: MapViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -58,7 +54,6 @@ fun HundredPlacesNavHost(
             PlacesScreenV2(
                 onCameraButtonClick = {navController.navigate(CameraScreenDestination.route)},
                 placesDetailsViewModel = placeDetailsViewModel,
-                placesViewModel = placesViewModel
             )
         }
         composable(
@@ -78,7 +73,6 @@ fun HundredPlacesNavHost(
             route = MapDestination.route
         ) {
             MapScreen(
-                mapViewModel = mapViewModel,
                 navigateToPlaceEntry = {
                     placeDetailsViewModel.setPlaceId(it)
                     navController.navigate("${PlaceDetailsDestination.route}/${it}")}

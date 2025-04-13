@@ -34,9 +34,7 @@ import com.example.hundredplaces.ui.places.PlacesViewModel
 fun HomeScreen(
     accountUiState: AccountUiState,
     accountViewModel: AccountViewModel,
-    placesViewModel: PlacesViewModel,
     placeDetailsViewModel: PlaceDetailsViewModel,
-    mapViewModel: MapViewModel,
     startDestination: String,
     navController: NavHostController,
     navigationType: AppNavigationType,
@@ -89,9 +87,7 @@ fun HomeScreen(
                         navController = navController,
                         accountViewModel = accountViewModel,
                         accountUiState = accountUiState,
-                        placesViewModel = placesViewModel,
                         placeDetailsViewModel = placeDetailsViewModel,
-                        mapViewModel = mapViewModel,
                         modifier = Modifier.weight(1f)
                     )
                 }
