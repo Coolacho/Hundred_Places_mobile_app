@@ -1,6 +1,5 @@
 package com.example.hundredplaces.ui.places
 
-import android.location.Location
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RangeSliderState
 import androidx.lifecycle.SavedStateHandle
@@ -28,7 +27,6 @@ class PlacesViewModel(
     private val userId: Long = 1//savedStateHandle["CURRENT_USER"]!!
 
     private val _searchText = MutableStateFlow("")
-    private val _distances = MutableStateFlow(mapOf<Long, Float>())
     private val _favorites = usersPlacesPreferencesRepository.getFavoritePlacesByUserId(userId)
     private val _ratings = usersPlacesPreferencesRepository.getPlacesRatingsByUserId(userId)
     private val _isFilterScreenOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -85,21 +83,19 @@ class PlacesViewModel(
     }
 
     val uiState = combine(
-        _searchText, _filteredPlaces, _distances, _ratings, _favorites, _isFilterScreenOpen, _filtersSet, _rangeSliderState
+        _searchText, _filteredPlaces, _ratings, _favorites, _isFilterScreenOpen, _filtersSet, _rangeSliderState
     ) { result ->
         val searchText = result[0] as String
         val filteredPlaces = result[1] as List<PlaceWithCityAndImages>
-        val distances = result[2] as Map<Long, Float>
-        val ratings = result[3] as Map<Long, Double>
-        val favorites = result[4] as List<Long>
-        val isFilterScreenOpen = result[5] as Boolean
-        val filtersSet = result[6] as Set<PlaceFiltersEnum>
-        val rangeSliderState = result[7] as RangeSliderState
+        val ratings = result[2] as Map<Long, Double>
+        val favorites = result[3] as List<Long>
+        val isFilterScreenOpen = result[4] as Boolean
+        val filtersSet = result[5] as Set<PlaceFiltersEnum>
+        val rangeSliderState = result[6] as RangeSliderState
         rangeSliderState.onValueChangeFinished = { updateSliderState() }
         PlacesUiState(
             searchText = searchText,
             filteredPlaces = filteredPlaces,
-            distances = distances,
             ratings = ratings,
             favorites = favorites,
             isFilterScreenOpen = isFilterScreenOpen,
@@ -128,17 +124,6 @@ class PlacesViewModel(
 
     fun openFilterScreen() {
         _isFilterScreenOpen.update { !it }
-    }
-
-    fun getDistances(location: Location) {
-        _distances.value = buildMap {
-            uiState.value.filteredPlaces.forEach {
-                val placeLocation = Location("")
-                placeLocation.latitude = it.place.latitude
-                placeLocation.longitude = it.place.longitude
-                put(it.place.id, location.distanceTo(placeLocation))
-            }
-        }
     }
 
     fun toggleFavorite(placeId: Long, rating: Double, isFavorite: Boolean) {
