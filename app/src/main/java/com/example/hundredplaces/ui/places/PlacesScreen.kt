@@ -1,6 +1,5 @@
 package com.example.hundredplaces.ui.places
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -42,14 +41,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
-import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,10 +62,13 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.R
+import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsScreen
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
+import kotlinx.coroutines.launch
 
 object PlacesDestination : MenuNavigationDestination {
     override val route = "Places"
@@ -78,19 +81,17 @@ object PlacesDestination : MenuNavigationDestination {
 fun PlacesScreenV2(
     onCameraButtonClick: () -> Unit,
     placesDetailsViewModel: PlaceDetailsViewModel,
-    placesViewModel: PlacesViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    placesViewModel: PlacesViewModel = viewModel  (
+            factory = AppViewModelProvider.Factory
+            ),
 ) {
     val uiState = placesViewModel.uiState.collectAsStateWithLifecycle().value
     val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+    val scope = rememberCoroutineScope()
 
-    BackHandler(navigator.canNavigateBack()) {
-        navigator.navigateBack()
-    }
-
-    ListDetailPaneScaffold(
-        directive = navigator.scaffoldDirective,
-        value = navigator.scaffoldValue,
+    NavigableListDetailPaneScaffold(
+        navigator = navigator,
         modifier = modifier,
         listPane = {
             AnimatedPane {
@@ -134,14 +135,15 @@ fun PlacesScreenV2(
                                 placeWithCityAndImages = it,
                                 rating = 0.0,
                                 isFavorite = uiState.favorites.contains(it.place.id),
-                                isSelected = navigator.currentDestination?.content == it.place.id && navigator.isDetailExpanded(),
-                                distance = uiState.distances[it.place.id],
+                                isSelected = navigator.currentDestination?.contentKey == it.place.id && navigator.isDetailExpanded(),
                                 onClick = {
-                                    navigator.navigateTo(
-                                        ListDetailPaneScaffoldRole.Detail,
-                                        it.place.id
-                                    )
-                                    placesDetailsViewModel.setPlaceId(it.place.id)
+                                    scope.launch {
+                                        navigator.navigateTo(
+                                            ListDetailPaneScaffoldRole.Detail,
+                                            it.place.id
+                                        )
+                                        placesDetailsViewModel.setPlaceId(it.place.id)
+                                    }
                                 },
                                 toggleFavorite = placesViewModel::toggleFavorite,
                                 modifier = Modifier
@@ -155,9 +157,9 @@ fun PlacesScreenV2(
         },
         detailPane = {
             AnimatedPane {
-                navigator.currentDestination?.content?.let {
+                navigator.currentDestination?.contentKey?.let {
                     PlaceDetailsScreen(
-                        navigateBack = { navigator.navigateBack() },
+                        navigateBack = { scope.launch { navigator.navigateBack() } },
                         isFullScreen = navigator.isListExpanded(),
                         placesDetailsViewModel = placesDetailsViewModel
                     )
@@ -533,7 +535,6 @@ private fun PlacesListOnlyContent(
                 rating = 0.0,
                 isFavorite = placesUiState.favorites.contains(it.place.id),
                 isSelected = false,
-                distance = placesUiState.distances[it.place.id],
                 onClick = { cardOnClick(it.place.id) },
                 toggleFavorite = toggleFavorite,
                 modifier = Modifier
@@ -572,7 +573,6 @@ private fun PlacesListAndDetailsContent(
                     rating = 0.0,
                     isFavorite = placesUiState.favorites.contains(it.place.id),
                     isSelected = placesDetailsViewModel.getPlaceId() == it.place.id,
-                    distance = placesUiState.distances[it.place.id],
                     onClick = { cardOnClick(it.place.id) },
                     toggleFavorite = toggleFavorite,
                     modifier = Modifier
