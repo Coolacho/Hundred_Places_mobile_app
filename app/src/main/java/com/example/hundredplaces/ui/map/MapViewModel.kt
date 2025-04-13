@@ -5,14 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hundredplaces.data.model.place.repositories.PlacesRepository
 import com.example.hundredplaces.workers.WorkManagerRepository
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 
 class MapViewModel(
     placesRepository: PlacesRepository,
@@ -20,11 +16,11 @@ class MapViewModel(
 ) : ViewModel() {
 
     private val _places = placesRepository.allPlacesWithCityAndImages
-    private val _cameraPositionState: MutableStateFlow<CameraPositionState> = MutableStateFlow(CameraPositionState(CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 15f)))
+    private val _distances = MutableStateFlow(mapOf<Long, Float>())
 
     val uiState = combine(
-        _places, _cameraPositionState
-    ) { places, cameraPositionState ->
+        _places, _distances
+    ) { places, distances ->
         workManagerRepository.addGeofences() /*TODO:
                                                 1. Instead of passing places as an argument,
                                                 make the work collect the places separately
@@ -33,7 +29,7 @@ class MapViewModel(
                                                 */
         MapUiState(
             places = places,
-            cameraPositionState = cameraPositionState
+            distances = distances
         )
     }
         .stateIn(
@@ -42,15 +38,14 @@ class MapViewModel(
             initialValue = MapUiState()
         )
 
-    fun updateCameraPositionState(location: Location) {
-        _cameraPositionState.update {
-            CameraPositionState(
-                CameraPosition.fromLatLngZoom(
-                    LatLng(
-                        location.latitude,
-                        location.longitude
-                    ), it.position.zoom
-                ))
+    fun getDistances(location: Location) {
+        _distances.value = buildMap {
+            uiState.value.places.forEach {
+                val placeLocation = Location("")
+                placeLocation.latitude = it.place.latitude
+                placeLocation.longitude = it.place.longitude
+                put(it.place.id, location.distanceTo(placeLocation))
+            }
         }
     }
 }
