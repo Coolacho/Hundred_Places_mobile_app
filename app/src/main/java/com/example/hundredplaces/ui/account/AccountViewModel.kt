@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hundredplaces.R
-import com.example.hundredplaces.data.UserPreferencesRepository
+import com.example.hundredplaces.data.UserAppPreferencesRepository
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.repositories.UsersRepository
 import com.example.hundredplaces.workers.WorkManagerRepository
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class AccountViewModel(
     private val userRepository: UsersRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val userAppPreferencesRepository: UserAppPreferencesRepository,
     private val workManagerRepository: WorkManagerRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -30,8 +30,8 @@ class AccountViewModel(
 
     private fun autoLogin() {
         viewModelScope.launch{
-            if (userPreferencesRepository.prefUsername.first().isNotEmpty()) {
-                val user = userRepository.getUserByEmail(userPreferencesRepository.prefUsername.first())
+            if (userAppPreferencesRepository.prefUsername.first().isNotEmpty()) {
+                val user = userRepository.getUserByEmail(userAppPreferencesRepository.prefUsername.first())
                 if (user != null) {
                     _uiState.update {
                         it.copy(
@@ -57,7 +57,7 @@ class AccountViewModel(
                             isLoggedIn = true
                         )
                     }
-                    userPreferencesRepository.saveUsernamePreference(user.email)
+                    userAppPreferencesRepository.saveUsernamePreference(user.email)
                     workManagerRepository.startSync(user.id)
                 }
                 else {
@@ -81,7 +81,7 @@ class AccountViewModel(
                     isLoggedIn = false
                 )
             }
-            userPreferencesRepository.saveUsernamePreference("")
+            userAppPreferencesRepository.saveUsernamePreference("")
         }
     }
 
@@ -89,7 +89,7 @@ class AccountViewModel(
         if (validateInput()) {
             viewModelScope.launch {
                 if (userRepository.updateUser(uiState.value.userDetails)) {
-                    userPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
+                    userAppPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
                     showSnackbarMessage(R.string.user_updated_successfully)
                 }
                 else showSnackbarMessage(R.string.user_update_failed)
@@ -107,7 +107,7 @@ class AccountViewModel(
                             isLoggedIn = true
                         )
                     }
-                    userPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
+                    userAppPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
                     showSnackbarMessage(R.string.user_created_successfully)
                 } else showSnackbarMessage(R.string.user_creation_failed)
             }

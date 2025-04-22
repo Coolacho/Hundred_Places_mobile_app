@@ -1,11 +1,10 @@
 package com.example.hundredplaces.ui.placeDetails
 
-import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.data.model.place.repositories.PlacesRepository
+import com.example.hundredplaces.data.model.user.repositories.UsersRepository
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.data.model.visit.repositories.VisitsRepository
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +12,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,22 +28,17 @@ import java.net.URL
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlaceDetailsViewModel(
     placesRepository: PlacesRepository,
+    usersRepository: UsersRepository,
     private val visitsRepository: VisitsRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val _placeId: Long
 ) : ViewModel() {
 
-    private val placeIdFlow: StateFlow<Long> = savedStateHandle.getStateFlow(
-        key = PlaceDetailsDestination.PLACE_ID_ARG,
-        initialValue = 0L
-    )
-    private val userId: Long = 1//savedStateHandle["CURRENT_USER"]!!
+    private val _userId = usersRepository.userId
 
-    private val _visits = placeIdFlow.flatMapLatest { placeId ->
-        visitsRepository.getAllVisitDatesByUserIdAndPlaceId(userId, placeId)
+    private val _visits = _userId.flatMapLatest { userId ->
+        userId?.let { visitsRepository.getAllVisitDatesByUserIdAndPlaceId(userId, _placeId) } ?: flowOf(emptyList())
     }
-    private val _place: Flow<PlaceWithCityAndImages?> = placeIdFlow.flatMapLatest { placeId ->
-        placesRepository.getPlaceWithCityAndImages(placeId)
-    }
+    private val _place: Flow<PlaceWithCityAndImages?> = placesRepository.getPlaceWithCityAndImages(_placeId)
     private val _descriptionText = _place.flatMapLatest { place ->
         place?.place?.descriptionPath?.let { path ->
             if (path.isNotEmpty()) {
@@ -101,20 +95,11 @@ class PlaceDetailsViewModel(
         viewModelScope.launch {
             visitsRepository.insertVisit(
                 Visit(
-                    userId = userId,
-                    placeId = placeIdFlow.value
+                    userId = _userId.value!!,
+                    placeId = _placeId
                 )
             )
         }
     }
 
-    fun setPlaceId(id: Long) {
-        savedStateHandle[PlaceDetailsDestination.PLACE_ID_ARG] = id
-        Log.d("SavedStateHandle Test", "$id")
-        Log.d("SavedStateHandle Test", "${savedStateHandle[PlaceDetailsDestination.PLACE_ID_ARG] ?: 0L}" )
-    }
-
-    fun getPlaceId(): Long {
-        return savedStateHandle[PlaceDetailsDestination.PLACE_ID_ARG] ?: 0
-    }
 }

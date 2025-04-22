@@ -5,6 +5,8 @@ import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.datasources.UsersLocalDataSource
 import com.example.hundredplaces.data.model.user.datasources.UsersRemoteDataSource
 import com.example.hundredplaces.util.NetworkConnection
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.SerializationException
 import java.net.SocketTimeoutException
 
@@ -15,6 +17,9 @@ class UsersDataRepository(
     private val usersRemoteDataSource: UsersRemoteDataSource,
     private val networkConnection: NetworkConnection
 ) : UsersRepository{
+
+    private val _userId = MutableStateFlow<Long?>(null)
+    override val userId: StateFlow<Long?> = _userId
 
     override suspend fun getUserByEmailAndPassword(email: String, password: String): User? {
 
@@ -33,6 +38,10 @@ class UsersDataRepository(
             catch (_: SocketTimeoutException) {
                 Log.e(USER_REPOSITORY_TAG, "Server is not reachable!")
             }
+        }
+
+        if (user != null) {
+            _userId.value = user.id
         }
 
         return user
@@ -57,6 +66,10 @@ class UsersDataRepository(
             }
         }
 
+        if (user != null) {
+            _userId.value = user.id
+        }
+
         return user
     }
 
@@ -66,6 +79,7 @@ class UsersDataRepository(
             try {
                 usersRemoteDataSource.insertUser(user)
                 usersLocalDataSource.insertUser(user)
+                _userId.value = user.id
                 result = true
             } catch (_: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Insert in remote failed.")
@@ -80,6 +94,7 @@ class UsersDataRepository(
             try {
                 usersRemoteDataSource.deleteUser(user)
                 usersLocalDataSource.deleteUser(user)
+                _userId.value = null
                 result = true
             } catch (_: SocketTimeoutException) {
                 Log.e("Retrofit", "Server is not accessible. Delete in remote failed.")

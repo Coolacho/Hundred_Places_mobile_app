@@ -18,26 +18,30 @@ import com.example.hundredplaces.ui.places.PlacesViewModel
  * Provides Factory to create instance of ViewModel for the entire Inventory app
  */
 object AppViewModelProvider {
+
+    val PLACE_ID_KEY = object : CreationExtras.Key<Long> {}
+
     val Factory = viewModelFactory {
         // Initializer for AppContentViewModel
         initializer {
             AppContentViewModel (
-                hundredPlacesApplication().container.userPreferencesRepository
+                hundredPlacesApplication().container.userAppPreferencesRepository
             )
         }
         // Initializer for PlacesViewModel
         initializer {
             PlacesViewModel (
                 hundredPlacesApplication().container.placesRepository,
+                hundredPlacesApplication().container.usersRepository,
                 hundredPlacesApplication().container.usersPlacesPreferencesDataRepository,
-                createSavedStateHandle()
             )
         }
         initializer {
             PlaceDetailsViewModel (
                 hundredPlacesApplication().container.placesRepository,
+                hundredPlacesApplication().container.usersRepository,
                 hundredPlacesApplication().container.visitsRepository,
-                createSavedStateHandle()
+                this[PLACE_ID_KEY] as Long
             )
         }
         initializer {
@@ -50,7 +54,7 @@ object AppViewModelProvider {
         initializer {
             AccountViewModel (
                 hundredPlacesApplication().container.usersRepository,
-                hundredPlacesApplication().container.userPreferencesRepository,
+                hundredPlacesApplication().container.userAppPreferencesRepository,
                 hundredPlacesApplication().container.workManagerRepository,
                 createSavedStateHandle()
             )
@@ -59,7 +63,7 @@ object AppViewModelProvider {
         initializer {
             AchievementsViewModel (
                 hundredPlacesApplication().container.visitsRepository,
-                createSavedStateHandle()
+                hundredPlacesApplication().container.usersRepository
             )
         }
     }
