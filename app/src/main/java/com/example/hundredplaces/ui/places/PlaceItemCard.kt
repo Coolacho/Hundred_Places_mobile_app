@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,8 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -52,29 +51,30 @@ import kotlin.math.round
 @Composable
 fun PlaceItem(
     placeWithCityAndImages: PlaceWithCityAndImages,
-    rating: Double,
+    userRating: Double,
     isFavorite: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
+    saveRating: (placeId: Long, rating: Double, isFavorite: Boolean) -> Unit,
     toggleFavorite: (placeId: Long, rating: Double, isFavorite: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val color by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.tertiaryContainer
-        else MaterialTheme.colorScheme.secondaryContainer,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceVariant
+        else MaterialTheme.colorScheme.surfaceContainerHigh,
         label = "Color Animation"
     )
     val context = LocalContext.current
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
-        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = color),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
+        shape = MaterialTheme.shapes.medium,
         onClick = onClick,
         modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .background(color)
                 .padding(dimensionResource(id = R.dimen.padding_small))
         ) {
             AsyncImage(
@@ -91,7 +91,7 @@ fun PlaceItem(
                 modifier = Modifier
                     .size(128.dp, 110.dp)
                     .padding(end = dimensionResource(id = R.dimen.padding_small))
-                    .clip(MaterialTheme.shapes.medium)
+                    .clip(MaterialTheme.shapes.small)
             )
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -131,7 +131,7 @@ fun PlaceItem(
                             ItemActionsEnum.FAVORITE -> Triple(
                                 if (isFavorite) R.string.remove_from_favorites else R.string.add_to_favorites,
                                 if (isFavorite) R.drawable.round_favorite_filled_24 else R.drawable.rounded_favorite_24
-                            ) { toggleFavorite(placeWithCityAndImages.place.id, rating, isFavorite) }
+                            ) { toggleFavorite(placeWithCityAndImages.place.id, userRating, isFavorite) }
 
                             ItemActionsEnum.SHARE -> Triple(
                                 R.string.share,
@@ -142,7 +142,11 @@ fun PlaceItem(
 
                         Button(
                             onClick = onClick,
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                contentColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            contentPadding = PaddingValues(horizontal = 10.dp),
                             modifier = Modifier
                                 .padding(end = dimensionResource(R.dimen.padding_small))
                         ) {

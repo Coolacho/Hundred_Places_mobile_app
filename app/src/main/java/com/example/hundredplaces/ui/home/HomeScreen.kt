@@ -21,20 +21,17 @@ import androidx.navigation.NavHostController
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.account.AccountUiState
 import com.example.hundredplaces.ui.account.AccountViewModel
-import com.example.hundredplaces.ui.map.MapViewModel
 import com.example.hundredplaces.ui.navigation.AppBottomNavigationBar
 import com.example.hundredplaces.ui.navigation.AppNavigationRail
 import com.example.hundredplaces.ui.navigation.AppNavigationType
 import com.example.hundredplaces.ui.navigation.HundredPlacesNavHost
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
-import com.example.hundredplaces.ui.places.PlacesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     accountUiState: AccountUiState,
     accountViewModel: AccountViewModel,
-    placeDetailsViewModel: PlaceDetailsViewModel,
     startDestination: String,
     navController: NavHostController,
     navigationType: AppNavigationType,
@@ -47,7 +44,8 @@ fun HomeScreen(
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
-                            style = MaterialTheme.typography.displayLarge
+                            style = MaterialTheme.typography.displayLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -87,7 +85,6 @@ fun HomeScreen(
                         navController = navController,
                         accountViewModel = accountViewModel,
                         accountUiState = accountUiState,
-                        placeDetailsViewModel = placeDetailsViewModel,
                         modifier = Modifier.weight(1f)
                     )
                 }
