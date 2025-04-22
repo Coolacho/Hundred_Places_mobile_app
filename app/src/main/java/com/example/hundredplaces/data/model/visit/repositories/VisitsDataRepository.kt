@@ -45,7 +45,7 @@ class VisitsDataRepository(
             .catch { Log.e("Visit flow", "${it.message}") }
             .collect { visits ->
                 val remoteIds = visits.map { it.id }
-                visitsLocalDataSource.deleteVisitsNotIn(remoteIds)
+                visitsLocalDataSource.deleteVisitsNotIn(remoteIds, userId)
                 visitsLocalDataSource.insertAll(visits)
                 Log.d("Flows test", "$visits")
             }

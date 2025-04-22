@@ -40,8 +40,8 @@ interface VisitDao {
     @Upsert
     suspend fun insertAll(visits: List<Visit>)
 
-    @Query("DELETE FROM visits WHERE id NOT IN (:ids)")
-    suspend fun deleteVisitsNotIn(ids: List<UUID>)
+    @Query("DELETE FROM visits WHERE id NOT IN (:ids) AND user_id = :userId")
+    suspend fun deleteVisitsNotIn(ids: List<UUID>, userId: Long)
 
     @Transaction
     @Query("SELECT * FROM visits WHERE user_id = :userId")

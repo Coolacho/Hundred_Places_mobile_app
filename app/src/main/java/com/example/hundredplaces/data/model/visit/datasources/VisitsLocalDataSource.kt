@@ -11,7 +11,7 @@ class VisitsLocalDataSource(
 
     suspend fun insertAll(visits: List<Visit>) = visitDao.insertAll(visits)
 
-    suspend fun deleteVisitsNotIn(ids: List<UUID>) = visitDao.deleteVisitsNotIn(ids)
+    suspend fun deleteVisitsNotIn(ids: List<UUID>, userId: Long) = visitDao.deleteVisitsNotIn(ids, userId)
 
     fun getAllVisitsByUserId(userId: Long) = visitDao.getAllVisitsByUserId(userId)
 
