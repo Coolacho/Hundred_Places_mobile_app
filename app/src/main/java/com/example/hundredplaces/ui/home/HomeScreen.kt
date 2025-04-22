@@ -25,7 +25,6 @@ import com.example.hundredplaces.ui.navigation.AppBottomNavigationBar
 import com.example.hundredplaces.ui.navigation.AppNavigationRail
 import com.example.hundredplaces.ui.navigation.AppNavigationType
 import com.example.hundredplaces.ui.navigation.HundredPlacesNavHost
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

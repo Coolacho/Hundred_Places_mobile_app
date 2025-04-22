@@ -17,7 +17,6 @@ import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.home.HomeScreen
 import com.example.hundredplaces.ui.navigation.AppNavigationType
 import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 
 @Composable
 fun HundredPlacesApp(
