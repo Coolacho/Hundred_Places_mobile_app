@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -19,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.sp
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.navigation.NavigationDestination
@@ -57,6 +60,7 @@ fun LoginScreen(
                     ) },
                     singleLine = true,
                     isError = !uiState.isLoginSuccessful,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier
                         .padding(top = dimensionResource(id = R.dimen.padding_medium))
                         .fillMaxWidth()
@@ -70,6 +74,8 @@ fun LoginScreen(
                     ) },
                     singleLine = true,
                     isError = !uiState.isLoginSuccessful,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     modifier = Modifier
                         .padding(top = dimensionResource(id = R.dimen.padding_medium))
                         .fillMaxWidth()
