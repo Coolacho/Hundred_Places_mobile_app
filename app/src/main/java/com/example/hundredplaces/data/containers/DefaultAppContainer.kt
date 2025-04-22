@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.hundredplaces.data.HundredPlacesLocalDatabase
-import com.example.hundredplaces.data.UserPreferencesRepository
+import com.example.hundredplaces.data.UserAppPreferencesRepository
 import com.example.hundredplaces.workers.WorkManagerRepository
 import com.example.hundredplaces.data.model.city.CitiesRestApi
 import com.example.hundredplaces.data.model.city.repositories.CitiesDataRepository
@@ -72,8 +72,8 @@ class DefaultAppContainer(
         NetworkConnection(context)
     }
 
-    override val userPreferencesRepository: UserPreferencesRepository by lazy {
-        UserPreferencesRepository(context.dataStore)
+    override val userAppPreferencesRepository: UserAppPreferencesRepository by lazy {
+        UserAppPreferencesRepository(context.dataStore)
     }
 
     override val workManagerRepository: WorkManagerRepository by lazy {

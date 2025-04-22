@@ -2,7 +2,7 @@ package com.example.hundredplaces.ui.components
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hundredplaces.data.UserPreferencesRepository
+import com.example.hundredplaces.data.UserAppPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AppContentViewModel(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userAppPreferencesRepository: UserAppPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AppContentUiState())
 
     // UI states access for various [HomeUiState]
     val uiState: StateFlow<AppContentUiState> =
-        userPreferencesRepository.isLinearLayout
+        userAppPreferencesRepository.isLinearLayout
             .map { isLinearLayout ->
                 AppContentUiState(isLinearLayout = isLinearLayout)
             }
@@ -34,7 +34,7 @@ class AppContentViewModel(
      */
     fun selectLayout() {
         viewModelScope.launch {
-            userPreferencesRepository.saveLayoutPreference(!_uiState.value.isLinearLayout)
+            userAppPreferencesRepository.saveLayoutPreference(!_uiState.value.isLinearLayout)
         }
     }
 
