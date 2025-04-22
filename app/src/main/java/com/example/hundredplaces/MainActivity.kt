@@ -24,7 +24,6 @@ import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.HundredPlacesApp
 import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
 
@@ -43,18 +42,13 @@ class MainActivity : ComponentActivity() {
                     val accountViewModel: AccountViewModel = viewModel (
                         factory = AppViewModelProvider.Factory
                     )
-                    val placeDetailsViewModel: PlaceDetailsViewModel = viewModel (
-                        factory = AppViewModelProvider.Factory
-                    )
 
                     val windowSize = calculateWindowSizeClass(activity = this)
                     val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
                     val placeId = intent.getLongExtra("placeId", 0L)
-                    val startDestination: String
-                    if (navigateToPlaceDetails && placeId != 0L) {
-                        startDestination = "${PlaceDetailsDestination.route}/${placeId}"
-                        placeDetailsViewModel.setPlaceId(placeId)
-                    } else startDestination = PlacesDestination.route
+                    val startDestination: String = if (navigateToPlaceDetails && placeId != 0L) {
+                        "${PlaceDetailsDestination.route}/${placeId}"
+                    } else PlacesDestination.route
 
                     val permissionLauncher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -136,7 +130,6 @@ class MainActivity : ComponentActivity() {
                         windowSize = windowSize.widthSizeClass,
                         startDestination = startDestination,
                         accountViewModel = accountViewModel,
-                        placeDetailsViewModel = placeDetailsViewModel,
                     )
                 }
             }

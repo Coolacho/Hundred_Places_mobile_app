@@ -23,7 +23,6 @@ import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 fun HundredPlacesApp(
     windowSize: WindowWidthSizeClass,
     startDestination: String,
-    placeDetailsViewModel: PlaceDetailsViewModel,
     accountViewModel: AccountViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
@@ -65,7 +64,6 @@ fun HundredPlacesApp(
             HomeScreen(
                 accountUiState = accountUiState.value,
                 accountViewModel = accountViewModel,
-                placeDetailsViewModel = placeDetailsViewModel,
                 startDestination = startDestination,
                 navController = navController,
                 navigationType = navigationType
@@ -76,7 +74,6 @@ fun HundredPlacesApp(
         HomeScreen(
             accountUiState = accountUiState.value,
             accountViewModel = accountViewModel,
-            placeDetailsViewModel = placeDetailsViewModel,
             startDestination = startDestination,
             navController = navController,
             navigationType = navigationType,

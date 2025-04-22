@@ -3,6 +3,9 @@ package com.example.hundredplaces.ui.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.HasDefaultViewModelProviderFactory
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,7 +30,6 @@ import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.map.MapScreen
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsScreen
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.places.PlacesScreenV2
 
@@ -40,7 +42,6 @@ fun HundredPlacesNavHost(
     navController: NavHostController,
     accountViewModel: AccountViewModel,
     accountUiState: AccountUiState,
-    placeDetailsViewModel: PlaceDetailsViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -53,7 +54,6 @@ fun HundredPlacesNavHost(
         ) {
             PlacesScreenV2(
                 onCameraButtonClick = {navController.navigate(CameraScreenDestination.route)},
-                placesDetailsViewModel = placeDetailsViewModel,
             )
         }
         composable(
@@ -62,20 +62,29 @@ fun HundredPlacesNavHost(
             arguments = listOf(navArgument(PlaceDetailsDestination.PLACE_ID_ARG) {
                 type = NavType.LongType
             })
-        ) {
-            PlaceDetailsScreen(
-                isFullScreen = false,
-                placesDetailsViewModel = placeDetailsViewModel,
-                navigateBack = { navController.navigateUp() }
-            )
+        ) { navBackStackEntry ->
+
+            val placeId = navBackStackEntry.arguments?.getLong(PlaceDetailsDestination.PLACE_ID_ARG)
+            val defaultExtras = (navBackStackEntry as? HasDefaultViewModelProviderFactory)?.defaultViewModelCreationExtras ?: CreationExtras.Empty
+
+            placeId?.let {
+                PlaceDetailsScreen(
+                    isFullScreen = false,
+                    placesDetailsViewModel = viewModel(
+                        factory = AppViewModelProvider.Factory,
+                        extras = MutableCreationExtras(defaultExtras).apply {
+                            set(AppViewModelProvider.PLACE_ID_KEY, placeId)
+                        }
+                    ),
+                    navigateBack = { navController.navigateUp() }
+                )
+            }
         }
         composable(
             route = MapDestination.route
         ) {
             MapScreen(
-                navigateToPlaceEntry = {
-                    placeDetailsViewModel.setPlaceId(it)
-                    navController.navigate("${PlaceDetailsDestination.route}/${it}")}
+                navigateToPlaceEntry = { navController.navigate("${PlaceDetailsDestination.route}/${it}") }
             )
         }
         composable(
