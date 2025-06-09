@@ -6,34 +6,32 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.hundredplaces.data.HundredPlacesLocalDatabase
 import com.example.hundredplaces.data.UserAppPreferencesRepository
-import com.example.hundredplaces.workers.WorkManagerRepository
-import com.example.hundredplaces.data.model.city.CitiesRestApi
-import com.example.hundredplaces.data.model.city.repositories.CitiesDataRepository
-import com.example.hundredplaces.data.model.city.datasources.CitiesLocalDataSource
-import com.example.hundredplaces.data.model.city.datasources.CitiesRemoteDataSource
-import com.example.hundredplaces.data.model.image.ImagesRestApi
-import com.example.hundredplaces.data.model.image.repositories.ImagesDataRepository
-import com.example.hundredplaces.data.model.image.datasources.ImagesLocalDataSource
-import com.example.hundredplaces.data.model.image.datasources.ImagesRemoteDataSource
-import com.example.hundredplaces.data.model.place.PlacesRestApi
-import com.example.hundredplaces.data.model.place.repositories.PlacesDataRepository
-import com.example.hundredplaces.data.model.place.datasources.PlacesLocalDataSource
-import com.example.hundredplaces.data.model.place.datasources.PlacesRemoteDataSource
-import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferencesRestApi
-import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.UsersPlacesPreferencesDataRepository
-import com.example.hundredplaces.data.model.usersPlacesPreferences.datasources.UsersPlacesPreferencesLocalDataSource
-import com.example.hundredplaces.data.model.usersPlacesPreferences.datasources.UsersPlacesPreferencesRemoteDataSource
+import com.example.hundredplaces.data.model.city.datasources.CityRestApi
+import com.example.hundredplaces.data.model.city.repositories.CityRepository
+import com.example.hundredplaces.data.model.city.repositories.DefaultCityRepository
+import com.example.hundredplaces.data.model.image.datasources.ImageRestApi
+import com.example.hundredplaces.data.model.image.repositories.DefaultImageRepository
+import com.example.hundredplaces.data.model.image.repositories.ImageRepository
+import com.example.hundredplaces.data.model.place.datasources.PlaceRestApi
+import com.example.hundredplaces.data.model.place.repositories.DefaultPlaceRepository
+import com.example.hundredplaces.data.model.place.repositories.PlaceRepository
+import com.example.hundredplaces.data.model.user.datasources.UserRestApi
+import com.example.hundredplaces.data.model.user.repositories.DefaultUserRepository
+import com.example.hundredplaces.data.model.user.repositories.UserRepository
+import com.example.hundredplaces.data.model.usersPlacesPreferences.datasources.UsersPlacesPreferencesRestApi
+import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.DefaultUsersPlacesPreferencesRepository
 import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.UsersPlacesPreferencesRepository
-import com.example.hundredplaces.data.model.user.UsersRestApi
-import com.example.hundredplaces.data.model.user.repositories.UsersDataRepository
-import com.example.hundredplaces.data.model.user.datasources.UsersLocalDataSource
-import com.example.hundredplaces.data.model.user.datasources.UsersRemoteDataSource
-import com.example.hundredplaces.data.model.visit.VisitsRestApi
-import com.example.hundredplaces.data.model.visit.repositories.VisitsDataRepository
-import com.example.hundredplaces.data.model.visit.datasources.VisitsLocalDataSource
-import com.example.hundredplaces.data.model.visit.datasources.VisitsRemoteDataSource
+import com.example.hundredplaces.data.model.visit.datasources.VisitRestApi
+import com.example.hundredplaces.data.model.visit.repositories.DefaultVisitRepository
+import com.example.hundredplaces.data.model.visit.repositories.VisitRepository
+import com.example.hundredplaces.data.services.distance.DistanceService
+import com.example.hundredplaces.data.services.distance.DistanceServiceImpl
+import com.example.hundredplaces.data.services.landmark.LandmarkRestApi
+import com.example.hundredplaces.data.services.landmark.LandmarkService
+import com.example.hundredplaces.data.services.landmark.LandmarkServiceImpl
 import com.example.hundredplaces.util.InstantConverter
 import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.workers.WorkManagerRepository
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -80,58 +78,60 @@ class DefaultAppContainer(
         WorkManagerRepository(context)
     }
 
-    override val citiesRepository: CitiesDataRepository by lazy {
-        CitiesDataRepository(
-            CitiesLocalDataSource(hundredPlacesLocalDatabase.cityDao()),
-            CitiesRemoteDataSource(
-                retrofit.create(CitiesRestApi::class.java),
-                networkConnection
-            )
-        )
-    }
-    override val placesRepository: PlacesDataRepository by lazy {
-        PlacesDataRepository(
-            PlacesLocalDataSource(hundredPlacesLocalDatabase.placeDao()),
-            PlacesRemoteDataSource(
-                retrofit.create(PlacesRestApi::class.java),
-                networkConnection
-            )
-        )
-    }
-    override val imagesRepository: ImagesDataRepository by lazy {
-        ImagesDataRepository(
-            ImagesLocalDataSource(hundredPlacesLocalDatabase.imageDao()),
-            ImagesRemoteDataSource(
-                retrofit.create(ImagesRestApi::class.java),
-                networkConnection
-            )
-        )
-    }
-    override val usersRepository: UsersDataRepository by lazy {
-        UsersDataRepository(
-            UsersLocalDataSource(hundredPlacesLocalDatabase.userDao()),
-            UsersRemoteDataSource(retrofit.create(UsersRestApi::class.java)),
+    override val cityRepository: CityRepository by lazy {
+        DefaultCityRepository(
+            hundredPlacesLocalDatabase.cityDao(),
+            retrofit.create(CityRestApi::class.java),
             networkConnection
         )
     }
-    override val visitsRepository: VisitsDataRepository by lazy {
-        VisitsDataRepository(
-            VisitsLocalDataSource(hundredPlacesLocalDatabase.visitDao()),
-            VisitsRemoteDataSource(
-                retrofit.create(VisitsRestApi::class.java),
-                networkConnection
-                ),
+    override val placeRepository: PlaceRepository by lazy {
+        DefaultPlaceRepository(
+            hundredPlacesLocalDatabase.placeDao(),
+            retrofit.create(PlaceRestApi::class.java),
+            networkConnection
+        )
+    }
+    override val imageRepository: ImageRepository by lazy {
+        DefaultImageRepository(
+            hundredPlacesLocalDatabase.imageDao(),
+            retrofit.create(ImageRestApi::class.java),
+            networkConnection
+        )
+    }
+    override val userRepository: UserRepository by lazy {
+        DefaultUserRepository(
+            hundredPlacesLocalDatabase.userDao(),
+            retrofit.create(UserRestApi::class.java),
+            networkConnection
+        )
+    }
+    override val visitRepository: VisitRepository by lazy {
+        DefaultVisitRepository(
+            hundredPlacesLocalDatabase.visitDao(),
+            retrofit.create(VisitRestApi::class.java),
             networkConnection
         )
     }
 
-    override val usersPlacesPreferencesDataRepository: UsersPlacesPreferencesRepository by lazy {
-        UsersPlacesPreferencesDataRepository(
-            UsersPlacesPreferencesLocalDataSource(hundredPlacesLocalDatabase.usersPlacesPreferencesDao()),
-            UsersPlacesPreferencesRemoteDataSource(
-                retrofit.create(UsersPlacesPreferencesRestApi::class.java),
-                networkConnection),
+    override val usersPlacesPreferencesRepository: UsersPlacesPreferencesRepository by lazy {
+        DefaultUsersPlacesPreferencesRepository(
+            hundredPlacesLocalDatabase.usersPlacesPreferencesDao(),
+            retrofit.create(UsersPlacesPreferencesRestApi::class.java),
             networkConnection
+        )
+    }
+
+    override val landmarkService: LandmarkService by lazy {
+        LandmarkServiceImpl(
+            retrofit.create(LandmarkRestApi::class.java),
+            networkConnection
+        )
+    }
+
+    override val distanceService: DistanceService by lazy {
+        DistanceServiceImpl(
+            placeRepository
         )
     }
 

@@ -1,7 +1,6 @@
 package com.example.hundredplaces.fakedata
 
 import com.example.hundredplaces.data.model.city.City
-import com.example.hundredplaces.data.model.city.datasources.CitiesRemoteDataSource
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

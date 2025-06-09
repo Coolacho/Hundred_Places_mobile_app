@@ -1,4 +1,4 @@
-package com.example.hundredplaces.data.model.usersPlacesPreferences
+package com.example.hundredplaces.data.model.usersPlacesPreferences.datasources
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,6 +6,7 @@ import androidx.room.MapColumn
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
 import kotlinx.coroutines.flow.Flow
 
 @Dao

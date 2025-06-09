@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Repository that provides a [Flow] to retrieve all records of [City] from a given data source.
  */
-interface CitiesRepository {
+interface CityRepository {
     /**
      * [Flow] to retrieve all cities from the given data source.
      */

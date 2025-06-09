@@ -1,9 +1,10 @@
-package com.example.hundredplaces.data.model.city
+package com.example.hundredplaces.data.model.city.datasources
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import com.example.hundredplaces.data.model.city.City
 import kotlinx.coroutines.flow.Flow
 
 @Dao

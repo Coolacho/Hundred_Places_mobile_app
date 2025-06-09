@@ -9,7 +9,7 @@ import java.time.Instant
 /**
  * Repository that provides insert, update, delete, and retrieve of [Visit] from a given data source.
  */
-interface VisitsRepository {
+interface VisitRepository {
     /**
      * Retrieve all the visits for a given place by userId from the given data source.
      */
@@ -34,7 +34,7 @@ interface VisitsRepository {
     /**
      * Insert visit in the data source
      */
-    suspend fun insertVisit(visit: Visit)
+    suspend fun insertVisit(visit: Visit) : Boolean
 
     suspend fun pushVisits(userId: Long)
 

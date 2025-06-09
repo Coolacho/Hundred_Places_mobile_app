@@ -1,7 +1,8 @@
 @file:JvmName("UsersPlacesPreferencesKt")
 
-package com.example.hundredplaces.data.model.usersPlacesPreferences
+package com.example.hundredplaces.data.model.usersPlacesPreferences.datasources
 
+import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

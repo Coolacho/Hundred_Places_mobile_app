@@ -1,4 +1,4 @@
-package com.example.hundredplaces.data.model.visit
+package com.example.hundredplaces.data.model.visit.datasources
 
 import androidx.room.Dao
 import androidx.room.MapColumn
@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.example.hundredplaces.data.model.place.PlaceTypeEnum
+import com.example.hundredplaces.data.model.visit.Visit
 import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 import java.util.UUID
@@ -49,7 +50,7 @@ interface VisitDao {
 
     @Transaction
     @Query("SELECT date_visited FROM visits WHERE user_id = :userId AND place_id = :placeId")
-    fun getAllVisitDatesByUserIdAndPlaceId(userId: Long, placeId: Long): Flow<List<Instant>>
+    fun getAllVisitDatesByUserIdAndByPlaceId(userId: Long, placeId: Long): Flow<List<Instant>>
 
     @Transaction
     @Query("SELECT COUNT(visits.id) FROM visits LEFT JOIN places ON visits.place_id = places.id WHERE visits.user_id = :userId AND places.is_100_places")
@@ -57,7 +58,7 @@ interface VisitDao {
 
     @Transaction
     @Query("SELECT places.type, COUNT(visits.id) AS visitsCount FROM visits LEFT JOIN places ON visits.place_id = places.id WHERE visits.user_id = :userId GROUP BY places.type")
-    fun getVisitsCountByPlaceTypeAndUserId(userId: Long): Flow<Map<@MapColumn(columnName = "type")PlaceTypeEnum, @MapColumn(columnName = "visitsCount")Int>>
+    fun getVisitsCountByPlaceTypeAndByUserId(userId: Long): Flow<Map<@MapColumn(columnName = "type")PlaceTypeEnum, @MapColumn(columnName = "visitsCount")Int>>
 
     @Transaction
     @Query("SELECT COUNT(visits.id) FROM visits LEFT JOIN places ON visits.place_id = places.id WHERE visits.user_id = :userId")

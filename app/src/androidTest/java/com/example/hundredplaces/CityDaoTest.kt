@@ -1,19 +1,6 @@
 package com.example.hundredplaces
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.hundredplaces.data.HundredPlacesLocalDatabase
-import com.example.hundredplaces.data.model.city.City
-import com.example.hundredplaces.data.model.city.CityDao
-import kotlinx.coroutines.runBlocking
-import okio.IOException
-import org.junit.After
-import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)

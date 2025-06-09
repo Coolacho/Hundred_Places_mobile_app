@@ -32,7 +32,7 @@ class UserAppPreferencesRepository(
             }
         }
         .map {preferences ->
-            preferences[IS_LINEAR_LAYOUT] ?: true
+            preferences[IS_LINEAR_LAYOUT] != false
         }
 
     val prefUsername: Flow<String> = dataStore.data

@@ -1,8 +1,5 @@
 package com.example.hundredplaces.fakedata
 
-import com.example.hundredplaces.data.model.city.City
-import com.example.hundredplaces.data.model.city.CitiesRestApi
-
 class FakeCitiesRestApi {
 //    override suspend fun getAllCities(): List<City> {
 //        return FakeCityDataSource.citiesList
