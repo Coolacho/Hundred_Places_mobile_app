@@ -3,8 +3,8 @@ package com.example.hundredplaces.ui.achievements
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hundredplaces.data.model.place.PlaceTypeEnum
-import com.example.hundredplaces.data.model.user.repositories.UsersRepository
-import com.example.hundredplaces.data.model.visit.repositories.VisitsRepository
+import com.example.hundredplaces.data.model.user.repositories.UserRepository
+import com.example.hundredplaces.data.model.visit.repositories.VisitRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,18 +15,18 @@ import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AchievementsViewModel(
-    visitsRepository: VisitsRepository,
-    usersRepository: UsersRepository
+    visitRepository: VisitRepository,
+    userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _userId = usersRepository.userId
+    private val _userId = userRepository.userId
 
     private val _hundredPlacesVisitsCount: Flow<Int> = _userId.flatMapLatest { userId ->
-        userId?.let { visitsRepository.getVisitsCountByIsHundredPlacesAndUserId(userId) } ?: flowOf(0)
+        userId?.let { visitRepository.getVisitsCountByIsHundredPlacesAndUserId(userId) } ?: flowOf(0)
     }
 
     private val _placeTypeVisitsCount: Flow<Map<PlaceTypeEnum, Int>> = _userId.flatMapLatest { userId ->
-        userId?.let { visitsRepository.getVisitsCountByPlaceTypeAndUserId(userId) } ?: flowOf(emptyMap())
+        userId?.let { visitRepository.getVisitsCountByPlaceTypeAndUserId(userId) } ?: flowOf(emptyMap())
     }
 
     val uiState = combine(

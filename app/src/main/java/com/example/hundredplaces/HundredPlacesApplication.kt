@@ -22,11 +22,8 @@ class HundredPlacesApplication : Application(), Configuration.Provider {
             val customWorkerFactory = DelegatingWorkerFactory()
             customWorkerFactory.addFactory(
                 CustomWorkerFactory(
-                    container.citiesRepository,
-                    container.placesRepository,
-                    container.imagesRepository,
-                    container.usersPlacesPreferencesDataRepository,
-                    container.visitsRepository
+                    container.placeRepository,
+                    container.distanceService
                 )
             )
 

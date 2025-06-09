@@ -2,14 +2,15 @@ package com.example.hundredplaces.ui
 
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.hundredplaces.HundredPlacesApplication
 import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.achievements.AchievementsViewModel
+import com.example.hundredplaces.ui.camera.CameraViewModel
 import com.example.hundredplaces.ui.components.AppContentViewModel
+import com.example.hundredplaces.ui.login.LoginViewModel
 import com.example.hundredplaces.ui.map.MapViewModel
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import com.example.hundredplaces.ui.places.PlacesViewModel
@@ -22,48 +23,57 @@ object AppViewModelProvider {
     val PLACE_ID_KEY = object : CreationExtras.Key<Long> {}
 
     val Factory = viewModelFactory {
-        // Initializer for AppContentViewModel
         initializer {
             AppContentViewModel (
                 hundredPlacesApplication().container.userAppPreferencesRepository
             )
         }
-        // Initializer for PlacesViewModel
         initializer {
             PlacesViewModel (
-                hundredPlacesApplication().container.placesRepository,
-                hundredPlacesApplication().container.usersRepository,
-                hundredPlacesApplication().container.usersPlacesPreferencesDataRepository,
+                hundredPlacesApplication().container.placeRepository,
+                hundredPlacesApplication().container.cityRepository,
+                hundredPlacesApplication().container.imageRepository,
+                hundredPlacesApplication().container.userRepository,
+                hundredPlacesApplication().container.usersPlacesPreferencesRepository,
             )
         }
         initializer {
             PlaceDetailsViewModel (
-                hundredPlacesApplication().container.placesRepository,
-                hundredPlacesApplication().container.usersRepository,
-                hundredPlacesApplication().container.visitsRepository,
+                hundredPlacesApplication().container.placeRepository,
+                hundredPlacesApplication().container.userRepository,
+                hundredPlacesApplication().container.visitRepository,
                 this[PLACE_ID_KEY] as Long
             )
         }
         initializer {
             MapViewModel (
-                hundredPlacesApplication().container.placesRepository,
-                hundredPlacesApplication().container.workManagerRepository
+                hundredPlacesApplication().container.placeRepository,
+                hundredPlacesApplication().container.distanceService
             )
         }
-        // Initializer for AccountViewModel
         initializer {
             AccountViewModel (
-                hundredPlacesApplication().container.usersRepository,
+                hundredPlacesApplication().container.userRepository,
                 hundredPlacesApplication().container.userAppPreferencesRepository,
-                hundredPlacesApplication().container.workManagerRepository,
-                createSavedStateHandle()
             )
         }
-        // Initializer for AchievementsViewModel
         initializer {
             AchievementsViewModel (
-                hundredPlacesApplication().container.visitsRepository,
-                hundredPlacesApplication().container.usersRepository
+                hundredPlacesApplication().container.visitRepository,
+                hundredPlacesApplication().container.userRepository
+            )
+        }
+        initializer {
+            CameraViewModel(
+                hundredPlacesApplication().container.landmarkService,
+                hundredPlacesApplication().container.placeRepository
+            )
+        }
+        initializer {
+            LoginViewModel(
+                hundredPlacesApplication().container.userRepository,
+                hundredPlacesApplication().container.userAppPreferencesRepository,
+                hundredPlacesApplication().container.imageRepository
             )
         }
     }

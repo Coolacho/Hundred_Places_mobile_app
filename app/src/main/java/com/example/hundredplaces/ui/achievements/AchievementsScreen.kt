@@ -1,8 +1,11 @@
 package com.example.hundredplaces.ui.achievements
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,7 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.hundredplaces.R
+import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 
 object AchievementsDestination : MenuNavigationDestination {
@@ -39,30 +44,23 @@ object AchievementsDestination : MenuNavigationDestination {
  */
 @Composable
 fun AchievementsScreen(
-    achievementsViewModel: AchievementsViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    achievementsViewModel: AchievementsViewModel = viewModel (
+        factory = AppViewModelProvider.Factory),
 ) {
     val uiState = achievementsViewModel.uiState.collectAsStateWithLifecycle().value
 
-    LazyColumn(
+    LazyColumn (
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small)),
+        contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium)),
         modifier = modifier
-            .padding(
-                bottom = 0.dp,
-                top = dimensionResource(id = R.dimen.padding_small),
-                start = dimensionResource(id = R.dimen.padding_small),
-                end = dimensionResource(id = R.dimen.padding_small))
+            .fillMaxSize()
     ) {
         items(uiState.achievements.entries.toList()) {
             val (upperBound, tint) = getUpperBound(it.key, it.value)
-            Card(
-                modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.padding_small))
-                    .fillMaxWidth()
-            ) {
+            Card {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
                 ) {
                     Image(
                         modifier = Modifier

@@ -115,6 +115,8 @@ dependencies {
     //Google cloud vision api
     implementation(libs.google.cloud.vision)
     implementation(libs.play.services.vision)
+    //Google fonts
+    implementation(libs.androidx.ui.text.google.fonts)
 
     testImplementation(libs.junit)
     //Coroutines test

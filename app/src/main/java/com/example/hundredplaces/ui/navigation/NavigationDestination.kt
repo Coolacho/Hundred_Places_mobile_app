@@ -1,8 +1,5 @@
 package com.example.hundredplaces.ui.navigation
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-
 /**
  * Interface to describe the navigation destinations for the app
  */
