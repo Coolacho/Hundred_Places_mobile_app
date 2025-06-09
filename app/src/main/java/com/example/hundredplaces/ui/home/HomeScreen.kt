@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.example.hundredplaces.R
-import com.example.hundredplaces.ui.account.AccountUiState
-import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.navigation.AppBottomNavigationBar
 import com.example.hundredplaces.ui.navigation.AppNavigationRail
 import com.example.hundredplaces.ui.navigation.AppNavigationType
@@ -29,8 +27,7 @@ import com.example.hundredplaces.ui.navigation.HundredPlacesNavHost
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    accountUiState: AccountUiState,
-    accountViewModel: AccountViewModel,
+    userId: Long?,
     startDestination: String,
     navController: NavHostController,
     navigationType: AppNavigationType,
@@ -38,23 +35,23 @@ fun HomeScreen(
 ) {
     Scaffold (
         topBar = {
-            if (navigationType != AppNavigationType.PERMANENT_NAVIGATION_DRAWER || !accountUiState.isLoggedIn) {
+            if (navigationType != AppNavigationType.PERMANENT_NAVIGATION_DRAWER || userId == null) {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
                             text = stringResource(id = R.string.app_name),
-                            style = MaterialTheme.typography.displayLarge,
+                            style = MaterialTheme.typography.displayMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
                     )
                 )
             }
         },
         bottomBar = {
-            AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION && accountUiState.isLoggedIn) {
+            AnimatedVisibility(visible = navigationType == AppNavigationType.BOTTOM_NAVIGATION && userId != null) {
                 AppBottomNavigationBar(
                     navController = navController,
                     modifier = Modifier
@@ -70,7 +67,7 @@ fun HomeScreen(
             .padding(it)
         ) {
             Row(modifier = Modifier.fillMaxSize()) {
-                AnimatedVisibility(visible = navigationType == AppNavigationType.NAVIGATION_RAIL && accountUiState.isLoggedIn) {
+                AnimatedVisibility(visible = navigationType == AppNavigationType.NAVIGATION_RAIL && userId != null) {
                     AppNavigationRail(
                         navController = navController,
                     )
@@ -82,8 +79,7 @@ fun HomeScreen(
                     HundredPlacesNavHost(
                         startDestination = startDestination,
                         navController = navController,
-                        accountViewModel = accountViewModel,
-                        accountUiState = accountUiState,
+                        userId = userId,
                         modifier = Modifier.weight(1f)
                     )
                 }

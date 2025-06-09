@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -32,10 +33,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.hundredplaces.R
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.achievements.AchievementsDestination
+import com.example.hundredplaces.ui.camera.CameraScreenDestination
+import com.example.hundredplaces.ui.camera.CameraUseCaseEnum
 import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.places.PlacesDestination
 
-val navigationItemContentList = listOf(PlacesDestination, MapDestination, AchievementsDestination, AccountDestination)
+val navigationDestinationList = listOf<MenuNavigationDestination>(PlacesDestination, MapDestination, CameraScreenDestination, AchievementsDestination, AccountDestination)
 
 @Composable
 fun AppBottomNavigationBar(
@@ -47,31 +50,40 @@ fun AppBottomNavigationBar(
     NavigationBar(
         modifier = modifier
     ) {
-        for (navItem in navigationItemContentList) {
+        for (navDestination in navigationDestinationList) {
             NavigationBarItem(
-                selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
-                onClick = { navController.navigate(navItem.route){
-                    // Pop up to the start destination of the graph to
-                    // avoid building up a large stack of destinations
-                    // on the back stack as users select items
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                selected = currentDestination?.hierarchy?.any { it.route == navDestination.route } == true,
+                onClick = {
+                    val route = when (navDestination)
+                    {
+                        CameraScreenDestination -> "${CameraScreenDestination.route}/${CameraUseCaseEnum.QR_CODE.name}"
+                        else -> navDestination.route
                     }
-                    // Avoid multiple copies of the same destination when
-                    // re-selecting the same item
-                    launchSingleTop = true
-                    // Restore state when re-selecting a previously selected item
-                    restoreState = true
-                }},
+                    navController.navigate(route){
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // re-selecting the same item
+                        launchSingleTop = true
+                        // Restore state when re-selecting a previously selected item
+                        restoreState = true
+                    }
+                },
                 icon = {
                     Icon(
-                        painter = painterResource(navItem.iconRes),
-                        contentDescription = stringResource(id = navItem.title)
+                        painter = painterResource(navDestination.iconRes),
+                        contentDescription = stringResource(id = navDestination.title)
                     )
                 },
                 label = {
                     Text(
-                        text = stringResource(id = navItem.title)
+                        text = stringResource(id = navDestination.title),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
                     )
                 }
             )
@@ -90,31 +102,38 @@ fun AppNavigationRail(
         modifier = modifier
             .padding(dimensionResource(id = R.dimen.padding_small))
     ) {
-        for (navItem in navigationItemContentList) {
+        for (navDestination in navigationDestinationList) {
             NavigationRailItem(
-                selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
-                onClick = { navController.navigate(navItem.route){
-                    // Pop up to the start destination of the graph to
-                    // avoid building up a large stack of destinations
-                    // on the back stack as users select items
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                selected = currentDestination?.hierarchy?.any { it.route == navDestination.route } == true,
+                onClick = {
+                    val route = when (navDestination)
+                    {
+                        CameraScreenDestination -> "${CameraScreenDestination.route}/${CameraUseCaseEnum.QR_CODE.name}"
+                        else -> navDestination.route
                     }
-                    // Avoid multiple copies of the same destination when
-                    // re-selecting the same item
-                    launchSingleTop = true
-                    // Restore state when re-selecting a previously selected item
-                    restoreState = true
-                }},
+                    navController.navigate(route){
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // re-selecting the same item
+                        launchSingleTop = true
+                        // Restore state when re-selecting a previously selected item
+                        restoreState = true
+                    }
+                },
                 icon = {
                     Icon(
-                        painter = painterResource(navItem.iconRes),
-                        contentDescription = stringResource(navItem.title)
+                        painter = painterResource(navDestination.iconRes),
+                        contentDescription = stringResource(navDestination.title)
                     )
                 },
                 label = {
                     Text(
-                        text = stringResource(navItem.title)
+                        text = stringResource(navDestination.title)
                     )
                 }
             )
@@ -154,32 +173,39 @@ fun NavigationDrawerContent(
                         end = dimensionResource(R.dimen.padding_small))
             )
         }
-        for (navItem in navigationItemContentList) {
+        for (navDestination in navigationDestinationList) {
             NavigationDrawerItem(
-                selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
-                onClick = { navController.navigate(navItem.route){
-                    // Pop up to the start destination of the graph to
-                    // avoid building up a large stack of destinations
-                    // on the back stack as users select items
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                selected = currentDestination?.hierarchy?.any { it.route == navDestination.route } == true,
+                onClick = {
+                    val route = when (navDestination)
+                    {
+                        CameraScreenDestination -> "${CameraScreenDestination.route}/${CameraUseCaseEnum.QR_CODE.name}"
+                        else -> navDestination.route
                     }
-                    // Avoid multiple copies of the same destination when
-                    // re-selecting the same item
-                    launchSingleTop = true
-                    // Restore state when re-selecting a previously selected item
-                    restoreState = true
-                }},
+                    navController.navigate(route){
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // re-selecting the same item
+                        launchSingleTop = true
+                        // Restore state when re-selecting a previously selected item
+                        restoreState = true
+                    }
+                },
                 label = {
                     Text(
-                        text = stringResource(navItem.title),
+                        text = stringResource(navDestination.title),
                         modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.padding_medium))
                     )
                 },
                 icon = {
                     Icon(
-                        painter = painterResource(navItem.iconRes),
-                        contentDescription = stringResource(navItem.title)
+                        painter = painterResource(navDestination.iconRes),
+                        contentDescription = stringResource(navDestination.title)
                     )
                 },
                 colors = NavigationDrawerItemDefaults.colors(

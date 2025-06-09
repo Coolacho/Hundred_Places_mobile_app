@@ -1,6 +1,5 @@
 package com.example.hundredplaces.ui.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
@@ -16,16 +15,13 @@ import androidx.navigation.navDeepLink
 import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.account.AccountDestination
 import com.example.hundredplaces.ui.account.AccountScreen
-import com.example.hundredplaces.ui.account.AccountUiState
-import com.example.hundredplaces.ui.account.AccountViewModel
-import com.example.hundredplaces.ui.account.CreateAccountDestination
-import com.example.hundredplaces.ui.account.CreateAccountScreen
-import com.example.hundredplaces.ui.account.LoginDestination
-import com.example.hundredplaces.ui.account.LoginScreen
 import com.example.hundredplaces.ui.achievements.AchievementsDestination
 import com.example.hundredplaces.ui.achievements.AchievementsScreen
 import com.example.hundredplaces.ui.camera.CameraScreen
 import com.example.hundredplaces.ui.camera.CameraScreenDestination
+import com.example.hundredplaces.ui.camera.CameraUseCaseEnum
+import com.example.hundredplaces.ui.login.LoginDestination
+import com.example.hundredplaces.ui.login.LoginScreen
 import com.example.hundredplaces.ui.map.MapDestination
 import com.example.hundredplaces.ui.map.MapScreen
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
@@ -40,36 +36,37 @@ import com.example.hundredplaces.ui.places.PlacesScreenV2
 fun HundredPlacesNavHost(
     startDestination: String,
     navController: NavHostController,
-    accountViewModel: AccountViewModel,
-    accountUiState: AccountUiState,
+    userId: Long?,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (accountUiState.isLoggedIn) startDestination else LoginDestination.route,
+        startDestination = if (userId != null) startDestination else LoginDestination.route,
         modifier = modifier
         ) {
         composable(
             route = PlacesDestination.route
         ) {
             PlacesScreenV2(
-                onCameraButtonClick = {navController.navigate(CameraScreenDestination.route)},
+                onCameraButtonClick = {navController.navigate("${CameraScreenDestination.route}/${CameraUseCaseEnum.LANDMARK.name}")},
             )
         }
         composable(
             route = PlaceDetailsDestination.routeWithArgs,
-            deepLinks = listOf(navDeepLink<Long>(basePath = "http://192.168.2.150:8080/places/{placeId}")),
-            arguments = listOf(navArgument(PlaceDetailsDestination.PLACE_ID_ARG) {
-                type = NavType.LongType
-            })
+            deepLinks = listOf(navDeepLink<Long>(basePath = "http://192.168.2.150:8080/places/{${PlaceDetailsDestination.PLACE_ID_ARG}}?addVisit={${PlaceDetailsDestination.ADD_VISIT_ARG}}")),
+            arguments = listOf(
+                navArgument(PlaceDetailsDestination.PLACE_ID_ARG) { type = NavType.LongType },
+                navArgument(PlaceDetailsDestination.ADD_VISIT_ARG) { type = NavType.BoolType })
         ) { navBackStackEntry ->
 
             val placeId = navBackStackEntry.arguments?.getLong(PlaceDetailsDestination.PLACE_ID_ARG)
+            val addVisit = navBackStackEntry.arguments?.getBoolean(PlaceDetailsDestination.ADD_VISIT_ARG) == true
             val defaultExtras = (navBackStackEntry as? HasDefaultViewModelProviderFactory)?.defaultViewModelCreationExtras ?: CreationExtras.Empty
 
             placeId?.let {
                 PlaceDetailsScreen(
                     isFullScreen = false,
+                    addVisit = addVisit,
                     placesDetailsViewModel = viewModel(
                         factory = AppViewModelProvider.Factory,
                         extras = MutableCreationExtras(defaultExtras).apply {
@@ -84,52 +81,44 @@ fun HundredPlacesNavHost(
             route = MapDestination.route
         ) {
             MapScreen(
-                navigateToPlaceEntry = { navController.navigate("${PlaceDetailsDestination.route}/${it}") }
+                navigateToPlaceEntry = { navController.navigate("${PlaceDetailsDestination.route}/${it}?addVisit=${false}") }
             )
         }
         composable(
             route = AchievementsDestination.route
         ) {
-            AchievementsScreen(
-                achievementsViewModel = viewModel (
-                    factory = AppViewModelProvider.Factory
-                )
-            )
+            AchievementsScreen()
         }
         composable(
             route = AccountDestination.route
         ) {
-            AccountScreen(
-                uiState = accountUiState,
-                viewModel = accountViewModel,
-                navigateToLogIn = {navController.navigate(LoginDestination.route)}
-            )
+            AccountScreen()
         }
         composable(
             route = LoginDestination.route
         ) {
             LoginScreen(
-                uiState = accountUiState,
-                viewModel = accountViewModel,
                 navigateToHome = { navController.navigate(PlacesDestination.route) },
-                navigateToCreateAccount = { navController.navigate(CreateAccountDestination.route) },
-                modifier = Modifier
-                    .fillMaxSize()
             )
         }
         composable(
-            route = CreateAccountDestination.route
-        ) {
-            CreateAccountScreen(
-                uiState = accountUiState,
-                viewModel = accountViewModel,
-                navigateToHome = { navController.navigate(PlacesDestination.route) },
-                navigateToLogin = { navController.navigate(LoginDestination.route) })
-        }
-        composable(
-            route = CameraScreenDestination.route
-        ) {
-            CameraScreen()
+            route = CameraScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(CameraScreenDestination.USE_CASE_ARG) { type = NavType.StringType}
+            )
+        ) { navBackStackEntry ->
+
+            val useCase = navBackStackEntry.arguments?.getString(CameraScreenDestination.USE_CASE_ARG)
+
+            useCase?.let {
+                CameraScreen(
+                    navigateToPlace = { placeId, addVisit -> navController.navigate("${PlaceDetailsDestination.route}/${placeId}?addVisit=${addVisit}") },
+                    useCase = CameraUseCaseEnum.valueOf(useCase),
+                    cameraViewModel = viewModel (
+                        factory = AppViewModelProvider.Factory
+                    )
+                )
+            }
         }
     }
 }

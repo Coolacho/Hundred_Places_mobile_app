@@ -8,12 +8,10 @@ import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.home.HomeScreen
 import com.example.hundredplaces.ui.navigation.AppNavigationType
 import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
@@ -22,12 +20,11 @@ import com.example.hundredplaces.ui.navigation.NavigationDrawerContent
 fun HundredPlacesApp(
     windowSize: WindowWidthSizeClass,
     startDestination: String,
-    accountViewModel: AccountViewModel,
+    userId: Long?,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
 
-    val accountUiState = accountViewModel.uiState.collectAsState()
     val navigationType: AppNavigationType = when (windowSize) {
         WindowWidthSizeClass.Compact -> {
             AppNavigationType.BOTTOM_NAVIGATION
@@ -43,7 +40,7 @@ fun HundredPlacesApp(
         }
     }
 
-    if (navigationType == AppNavigationType.PERMANENT_NAVIGATION_DRAWER && accountUiState.value.isLoggedIn) {
+    if (navigationType == AppNavigationType.PERMANENT_NAVIGATION_DRAWER && userId != null) {
         PermanentNavigationDrawer(
             drawerContent = {
                 PermanentDrawerSheet(
@@ -61,8 +58,7 @@ fun HundredPlacesApp(
             modifier = modifier
         ) {
             HomeScreen(
-                accountUiState = accountUiState.value,
-                accountViewModel = accountViewModel,
+                userId = userId,
                 startDestination = startDestination,
                 navController = navController,
                 navigationType = navigationType
@@ -71,8 +67,7 @@ fun HundredPlacesApp(
     }
     else {
         HomeScreen(
-            accountUiState = accountUiState.value,
-            accountViewModel = accountViewModel,
+            userId = userId,
             startDestination = startDestination,
             navController = navController,
             navigationType = navigationType,
