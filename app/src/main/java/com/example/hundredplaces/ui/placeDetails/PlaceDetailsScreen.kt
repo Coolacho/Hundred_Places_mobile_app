@@ -1,5 +1,9 @@
 package com.example.hundredplaces.ui.placeDetails
 
+import android.content.Context
+import android.icu.util.TimeZone
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,27 +25,34 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -49,55 +60,168 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.hundredplaces.R
+import com.example.hundredplaces.ui.components.LoadingScreen
 import com.example.hundredplaces.ui.navigation.NavigationDestination
 import com.example.hundredplaces.ui.places.PlaceRating
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
+import java.net.ConnectException
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.URL
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 object PlaceDetailsDestination : NavigationDestination {
     override val route = "Place Details"
     const val PLACE_ID_ARG = "placeId"
-    val routeWithArgs = "$route/{$PLACE_ID_ARG}"
+    const val ADD_VISIT_ARG = "addVisit"
+    val routeWithArgs = "$route/{$PLACE_ID_ARG}?addVisit={$ADD_VISIT_ARG}"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceDetailsScreen(
     navigateBack: () -> Unit,
     isFullScreen: Boolean,
+    addVisit: Boolean,
     placesDetailsViewModel: PlaceDetailsViewModel,
     modifier: Modifier = Modifier
 ) {
     val uiState = placesDetailsViewModel.uiState.collectAsStateWithLifecycle().value
+    var isTTSInit by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
 
-    when(uiState.place) {
-        null -> {
+    val textToSpeech = remember {
+        TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                isTTSInit = true
+                Log.d("TTS", "TTS is initialized")
+            }
+        }
+    }
+    var isSpeaking by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isTTSInit) {
+        if (isTTSInit) {
+            val locale = configuration.locales.get(0)
+            if (textToSpeech.isLanguageAvailable(locale) == TextToSpeech.LANG_AVAILABLE) {
+                textToSpeech.language = locale
+            } else {
+                textToSpeech.language = Locale.US
+            }
+            isTTSInit = false
+        }
+    }
+
+    DisposableEffect(context) {
+
+        onDispose {
+            textToSpeech.stop()
+            textToSpeech.shutdown()
+        }
+    }
+
+    when(uiState) {
+        is PlaceDetailsUiState.Error -> {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = modifier
                     .fillMaxSize()
+                    .padding(horizontal = dimensionResource(R.dimen.padding_small))
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 Text(
-                    text = stringResource(R.string.select_place_see_details)
+                    text = stringResource(R.string.place_not_available)
                 )
             }
         }
-        else -> {
+        is PlaceDetailsUiState.Loading -> {
+            LoadingScreen(
+                modifier = modifier
+            )
+        }
+        is PlaceDetailsUiState.Success -> {
+
+            var showDialog by remember { mutableStateOf(false) }
+            var result by remember { mutableStateOf(false) }
+
+            val tabs = listOf(R.string.information, R.string.visits)
+            val pagerState = rememberPagerState(
+                initialPage = tabs.indexOf(R.string.information),
+                pageCount = { tabs.size }
+            )
+            val coroutineScope = rememberCoroutineScope()
+
+            LaunchedEffect(addVisit) {
+                if (addVisit) {
+                    result = placesDetailsViewModel.addVisit()
+                    showDialog = true
+                }
+            }
+
+            LaunchedEffect(uiState.place) {
+                var text: String? = null
+                if (uiState.place.place.descriptionPath.isNotEmpty()) {
+                    while (true) {
+                        text = getDescriptionText(context, uiState.place.place.descriptionPath)
+                        if (text != null) break
+                        delay(60_000)
+                    }
+                }
+                placesDetailsViewModel.updateDescriptionText(text)
+            }
+
+            if (showDialog) {
+                VisitDialog(
+                    onDismissRequest = { showDialog = false },
+                    onConfirmClick = {
+                        showDialog = false
+                        coroutineScope.launch { pagerState.animateScrollToPage(tabs.indexOf(R.string.visits)) }
+                    },
+                    result = result
+                )
+            }
+
             Scaffold(
                 floatingActionButton = {
-                    Button(
-                        onClick = { placesDetailsViewModel.addVisit() }
-                    ) {
-                        Text(text = stringResource(R.string.take_your_badge))
+                    if (uiState.descriptionText != null) {
+                        FloatingActionButton (
+                            onClick = {
+                                if (isSpeaking) {
+                                    Log.d("TTS", "Stopped speaking")
+                                    textToSpeech.stop()
+                                    isSpeaking = !isSpeaking
+                                } else {
+                                    Log.d("TTS", "Started speaking")
+                                    textToSpeech.speak(uiState.descriptionText, TextToSpeech.QUEUE_FLUSH, null, null)
+                                    isSpeaking = !isSpeaking
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(if (isSpeaking) R.drawable.rounded_stop_circle_24 else R.drawable.headphones_24px),
+                                contentDescription = "Description narration button"
+                            )
+                        }
                     }
                 },
-                floatingActionButtonPosition = FabPosition.Center,
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 modifier = modifier
             ) {
@@ -112,15 +236,15 @@ fun PlaceDetailsScreen(
                             modifier = Modifier
                                 .padding(dimensionResource(id = R.dimen.padding_small))
                                 .align(Alignment.TopStart)
-                                .zIndex(3f)
+                                .zIndex(0.1f)
                                 .background(
-                                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f),
+                                    color = MaterialTheme.colorScheme.surfaceContainer,
                                     shape = CircleShape
                                 )
                                 .size(40.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                painter = painterResource(R.drawable.rounded_arrow_back_24),
                                 contentDescription = stringResource(R.string.back_button)
                             )
                         }
@@ -134,7 +258,7 @@ fun PlaceDetailsScreen(
                             images = uiState.place.images,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp)
+                                .height(225.dp)
                                 .padding(
                                     bottom = dimensionResource(id = R.dimen.padding_medium)
                                 )
@@ -147,25 +271,17 @@ fun PlaceDetailsScreen(
                                 ) {
                                     Text(
                                         text = uiState.place.place.name,
-                                        fontSize = 20.sp
+                                        style = MaterialTheme.typography.titleLarge
                                     )
                                     Text(
                                         text = uiState.place.city,
-                                        style = MaterialTheme.typography.bodyLarge
                                     )
                                 }
                                 PlaceRating(rating = uiState.place.place.rating)
                             }
                         }
 
-                        val tabs = listOf(R.string.information, R.string.visits)
-                        val pagerState = rememberPagerState(
-                            initialPage = 0,
-                            pageCount = { tabs.size }
-                        )
-                        val coroutineScope = rememberCoroutineScope()
-
-                        TabRow(
+                        PrimaryTabRow(
                             selectedTabIndex = pagerState.currentPage,
                             modifier = Modifier
                                 .padding(dimensionResource(id = R.dimen.padding_small))
@@ -175,14 +291,13 @@ fun PlaceDetailsScreen(
                                     text = {
                                         Text(
                                             text = stringResource(id = title),
-                                            style = MaterialTheme.typography.titleMedium,
+                                            style = MaterialTheme.typography.labelLarge,
                                             overflow = TextOverflow.Ellipsis,
                                             maxLines = 1,
                                         )
                                     },
                                     selected = pagerState.currentPage == index,
-                                    onClick = {
-                                        coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) }
                                     }
                                 )
                             }
@@ -193,17 +308,16 @@ fun PlaceDetailsScreen(
                             pageSpacing = 48.dp,
                             verticalAlignment = Alignment.Top,
                             modifier = Modifier
-                                .height(340.dp)
+                                .weight(1f)
                                 .fillMaxWidth()
                                 .padding(
                                     horizontal = 20.dp,
                                     vertical = dimensionResource(R.dimen.padding_small)
                                 )
-                        ) {
-                                page ->
+                        ) { page ->
                             when(page){
-                                0 -> InformationTab(uiState.descriptionText)
-                                1 -> VisitsTab(uiState.visits)
+                                tabs.indexOf(R.string.information) -> InformationTab(uiState.descriptionText)
+                                tabs.indexOf(R.string.visits) -> VisitsTab(uiState.visits)
                             }
                         }
                     }
@@ -213,6 +327,55 @@ fun PlaceDetailsScreen(
     }
 }
 
+@Composable
+fun VisitDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmClick: () -> Unit,
+    result: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            if (result) {
+                TextButton(
+                    onClick = onConfirmClick
+                ) {
+                    Text(
+                        text = stringResource(R.string.view_visit)
+                    )
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ) {
+                Text(
+                    text = stringResource(R.string.dismiss)
+                )
+            }
+        },
+        title = {
+            Text(
+                text = if (result) stringResource(R.string.visit_added) else stringResource(R.string.failed_to_add_visit)
+            )
+        },
+        icon = {
+            Icon(
+                painter = painterResource(if (result) R.drawable.rounded_check_circle_24 else R.drawable.rounded_cancel_24),
+                contentDescription = null,
+                tint = if (result) Color.Green.copy(alpha = 0.5f) else Color.Red.copy(alpha = 0.65f)
+            )
+        },
+        text = {
+            Text(
+                text = if (result) stringResource(R.string.view_visit_in_visits_tab) else stringResource(R.string.add_visit_manually)
+            )
+        },
+        modifier = modifier
+    )
+}
 
 @Composable
 fun ImageCarousel(
@@ -287,10 +450,10 @@ fun InformationTab(
     modifier: Modifier = Modifier
 )
 {
+    val scrollState = rememberScrollState()
     Box(
         modifier = modifier
     ) {
-        val scrollState = rememberScrollState()
         Text(
             text = descriptionText ?: stringResource(R.string.no_description_available),
             textAlign = TextAlign.Justify,
@@ -324,6 +487,9 @@ fun VisitsTab(
     modifier: Modifier = Modifier
 )
 {
+    val timeZone = TimeZone.getDefault()
+    val zoneId = ZoneId.of(timeZone.id)
+
     LazyColumn(
         modifier = modifier
     ) {
@@ -336,8 +502,65 @@ fun VisitsTab(
         else
         {
             items(visits, key = { visits.indexOf(it) }) {
-                Text(text = it.toString())
+                val localDateTime = LocalDateTime.ofInstant(it, zoneId)
+                Text(
+                    text = "${localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))}",
+                    modifier = Modifier
+                        .padding(bottom = dimensionResource(R.dimen.padding_medium))
+                )
             }
+        }
+    }
+}
+
+private fun isCacheExpired(file: File): Boolean {
+    if (!file.exists()) return true
+
+    return System.currentTimeMillis() - file.lastModified() > 24 * 60 * 60 * 1000L // 24 hours
+}
+
+private fun getCachedDescriptionFile(context: Context, path: String): File {
+    val fileName = path.hashCode().toString() + ".txt" // Unique name based on URL
+    return File(context.cacheDir, fileName)
+}
+
+private suspend fun getDescriptionText(context: Context, path: String): String? {
+    return withContext(Dispatchers.IO) {
+        val cachedFile = getCachedDescriptionFile(context, path)
+
+        if (cachedFile.exists() && !isCacheExpired(cachedFile)) {
+            cachedFile.bufferedReader().use { return@withContext it.readText() }
+        }
+
+        try {
+            val stringBuilder = StringBuilder()
+            val url = URL(path)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.connectTimeout = 3000
+            connection.readTimeout = 3000
+            connection.requestMethod = "GET"
+
+            connection.connect()
+
+            if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                    reader.forEachLine { line ->
+                        stringBuilder.append(line)
+                    } }
+
+                cachedFile.writeText(stringBuilder.toString())
+                cachedFile.setReadOnly()
+
+                return@withContext stringBuilder.toString()
+            }
+            else return@withContext null
+
+        }
+        catch (_: ConnectException) {
+            return@withContext null
+        }
+        catch (_: SocketTimeoutException) {
+            return@withContext null
         }
     }
 }
