@@ -31,7 +31,6 @@
     <string name="total_visited_places">Общо посетени обекти</string>
     <string name="log_in">Влез</string>
     <string name="create_an_account">Създай профил</string>
-    <string name="take_your_badge">Вземи значката си</string>
     <string name="place_nearby">Един обект e наблизо. Кликни тук, за да получиш посещението си.</string>
     <string name="kilometres">км</string>
     <string name="metres">м</string>
@@ -53,7 +52,6 @@
     <string name="waterfalls_category_name">Водопади</string>
     <string name="others_category_name">Други</string>
     <string name="no_description_available">Няма налично описание за това място.</string>
-    <string name="load_description_exception">Неуспешно зареждане на описанието.</string>
     <string name="rate">Оцени</string>
     <string name="add_to_favorites">Добави в любими</string>
     <string name="remove_from_favorites">Премахни от любими</string>
@@ -64,7 +62,6 @@
     <string name="camera_landmark_info">Снимай даден обект, за да получиш повече информация за него!</string>
     <string name="user_updated_successfully">Потребителят е променен успешно!</string>
     <string name="user_update_failed">Промяната е неуспешна. Моля опитайте отново.</string>
-    <string name="invalid_input_data">Невалидни данни!</string>
     <string name="user_creation_failed">Създаването е неуспешно. Моля опитайте отново.</string>
     <string name="wrong_email_password">Грешни имейл и/или парола. Моля опитайте отново.</string>
     <string name="camera_screen_title">Сканирай</string>
