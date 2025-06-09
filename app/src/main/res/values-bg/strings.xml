@@ -93,4 +93,7 @@
     <string name="edit">Редактирай</string>
     <string name="change_password">Смяна на парола</string>
     <string name="rate_place_name">Оцени: \"%s\"</string>
+    <string name="old_password">Стара парола</string>
+    <string name="new_password">Нова парола</string>
+    <string name="repeat_new_password">Повтори новата парола</string>
 </resources>
