@@ -1,137 +1,114 @@
 package com.example.hundredplaces.ui.account
 
-import androidx.lifecycle.SavedStateHandle
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hundredplaces.R
 import com.example.hundredplaces.data.UserAppPreferencesRepository
-import com.example.hundredplaces.data.model.user.User
-import com.example.hundredplaces.data.model.user.repositories.UsersRepository
-import com.example.hundredplaces.workers.WorkManagerRepository
+import com.example.hundredplaces.data.model.user.repositories.UserRepository
+import com.example.hundredplaces.util.hashPassword
+import com.example.hundredplaces.util.validateEmail
+import com.example.hundredplaces.util.validateName
+import com.example.hundredplaces.util.validatePassword
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AccountViewModel(
-    private val userRepository: UsersRepository,
+    private val userRepository: UserRepository,
     private val userAppPreferencesRepository: UserAppPreferencesRepository,
-    private val workManagerRepository: WorkManagerRepository,
-    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AccountUiState())
     val uiState: StateFlow<AccountUiState> = _uiState
 
-    init {
-        autoLogin()
-    }
+    val userId = userRepository.userId
 
-    private fun autoLogin() {
-        viewModelScope.launch{
-            if (userAppPreferencesRepository.prefUsername.first().isNotEmpty()) {
-                val user = userRepository.getUserByEmail(userAppPreferencesRepository.prefUsername.first())
-                if (user != null) {
-                    _uiState.update {
-                        it.copy(
-                            isLoggedIn = true,
-                            userDetails = user
-                        )
-                    }
-                    setUserId(user.id)
-                    workManagerRepository.startSync(user.id)
-                }
-            }
-        }
-    }
+    val nameState = TextFieldState()
+    val emailState = TextFieldState()
+    val oldPasswordState = TextFieldState()
+    val newPasswordState = TextFieldState()
+    val repeatNewPasswordState = TextFieldState()
 
-    fun logIn(): Boolean {
-        if (validateInput()) {
-            viewModelScope.launch {
-                val user = userRepository.getUserByEmailAndPassword(uiState.value.userDetails.email, uiState.value.userDetails.password)
-                if (user != null) {
-                    _uiState.update {
-                        it.copy(
-                            userDetails = user,
-                            isLoggedIn = true
-                        )
-                    }
-                    userAppPreferencesRepository.saveUsernamePreference(user.email)
-                    workManagerRepository.startSync(user.id)
-                }
-                else {
-                    _uiState.update {
-                        it.copy(
-                            userDetails = User(name = "", email = "", password = ""),
-                            isLoginSuccessful = false
-                        )
-                    }
-                }
-            }
-        }
-        return uiState.value.isLoggedIn
-    }
+    val nameHasErrors by derivedStateOf { validateName(nameState.text) }
+    val emailHasErrors by derivedStateOf { validateEmail(emailState.text) }
+    val oldPasswordHasErrors by derivedStateOf { validatePassword(oldPasswordState.text) }
+    val newPasswordHasErrors by derivedStateOf { validatePassword(newPasswordState.text) && (newPasswordState.text != oldPasswordState.text) }
+    val repeatNewPasswordHasErrors by derivedStateOf { validatePassword(repeatNewPasswordState.text) && (repeatNewPasswordState.text != newPasswordState.text) }
 
     fun logOut() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    userDetails = User(name = "", email = "", password = ""),
-                    isLoggedIn = false
+                    userName = "",
+                    userEmail = ""
                 )
             }
             userAppPreferencesRepository.saveUsernamePreference("")
+            userRepository.logOut()
+        }
+    }
+
+    fun pullUser() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val result = userRepository.pullUser()
+            _uiState.update { it.copy(isLoading = false) }
+            result?.let {
+                _uiState.update {
+                    it.copy(
+                        userName = result.first,
+                        userEmail = result.second
+                    )
+                }
+            }
         }
     }
 
     fun updateUser() {
-        if (validateInput()) {
+        if (canUpdateAccount()) {
             viewModelScope.launch {
-                if (userRepository.updateUser(uiState.value.userDetails)) {
-                    userAppPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
+                if (userRepository.updateUserDetails(nameState.text.toString(), emailState.text.toString())) {
+                    userAppPreferencesRepository.saveUsernamePreference(emailState.text.toString())
                     showSnackbarMessage(R.string.user_updated_successfully)
                 }
                 else showSnackbarMessage(R.string.user_update_failed)
+                nameState.clearText()
+                emailState.clearText()
             }
         }
-        else showSnackbarMessage(R.string.invalid_input_data)
     }
 
-    fun createUser() {
-        if (validateInput()) {
+    fun updatePassword() {
+        if (canUpdatePassword()) {
+            val hashedOldPassword = hashPassword(oldPasswordState.text.toString().toByteArray())
+            val hashedNewPassword = hashPassword(newPasswordState.text.toString().toByteArray())
+            val hexHashedOldPassword = hashedOldPassword.joinToString("") { "%02x".format(it) }
+            val hexHashedNewPassword = hashedNewPassword.joinToString("") { "%02x".format(it) }
             viewModelScope.launch {
-                if (userRepository.insertUser(uiState.value.userDetails)) {
-                    _uiState.update {
-                        it.copy(
-                            isLoggedIn = true
-                        )
-                    }
-                    userAppPreferencesRepository.saveUsernamePreference(uiState.value.userDetails.email)
-                    showSnackbarMessage(R.string.user_created_successfully)
-                } else showSnackbarMessage(R.string.user_creation_failed)
+                if (userRepository.updateUserPassword(hexHashedOldPassword, hexHashedNewPassword)) {
+                    showSnackbarMessage(R.string.user_updated_successfully)
+                }
+                else showSnackbarMessage(R.string.user_update_failed)
+                oldPasswordState.clearText()
+                newPasswordState.clearText()
+                repeatNewPasswordState.clearText()
             }
-        } else showSnackbarMessage(R.string.invalid_input_data)
-    }
-
-    fun updateUserDetails(userDetails: User) {
-        _uiState.update {
-            it.copy(
-                userDetails = userDetails,
-                isEntryValid = validateInput(userDetails),
-            )
         }
     }
 
-    fun validateInput(userDetails: User = uiState.value.userDetails): Boolean {
-        return with(userDetails) {
-            if (uiState.value.isLoggedIn) name.isNotBlank() && email.isNotBlank() && password.isNotBlank()
-            else email.isNotBlank() && password.isNotBlank()
-        }
+    fun canUpdateAccount(): Boolean {
+        return !(nameHasErrors || emailHasErrors ||
+                nameState.text.isEmpty() || emailState.text.isEmpty())
     }
 
-    fun setUserId(id: Long) {
-        savedStateHandle["CURRENT_USER"] = id
+    fun canUpdatePassword(): Boolean {
+        return !(oldPasswordHasErrors || newPasswordHasErrors || repeatNewPasswordHasErrors ||
+                oldPasswordState.text.isEmpty() || newPasswordState.text.isEmpty() || repeatNewPasswordState.text.isEmpty())
     }
 
     fun snackbarMessageShown() {
