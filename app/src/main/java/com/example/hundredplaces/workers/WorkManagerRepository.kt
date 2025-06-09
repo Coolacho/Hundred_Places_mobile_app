@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 
 class WorkManagerRepository(
     context: Context
@@ -15,42 +17,27 @@ class WorkManagerRepository(
     private val workManager = WorkManager.getInstance(context)
 
     fun addGeofences() {
-        workManager.beginUniqueWork(
-            "geofence_adding_work",
-            ExistingWorkPolicy.REPLACE,
-            OneTimeWorkRequestBuilder<GeofenceWorker>()
+        workManager.enqueue(
+            PeriodicWorkRequestBuilder<GeofenceAddingWorker>(4, TimeUnit.HOURS)
                 .setConstraints(
                     Constraints.Builder()
                         .setRequiresBatteryNotLow(true)
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build()
                 )
+                .addTag("geofence_adding_work")
                 .build()
-        ).enqueue()
+        )
     }
 
-    fun sendNotification(placeId: Long) {
+    fun removeGeofence(placeId: String) {
         workManager.beginUniqueWork(
-            "notification_sending_work",
+            "geofence_removing_work",
             ExistingWorkPolicy.REPLACE,
-            OneTimeWorkRequestBuilder<NotificationWorker>()
+            OneTimeWorkRequestBuilder<GeofenceRemovingWorker>()
                 .setInputData(
                     Data.Builder()
-                        .putLong("PlaceId", placeId)
-                        .build()
-                )
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-        ).enqueue()
-    }
-
-    fun startSync(userId: Long) {
-        workManager.beginUniqueWork(
-            "sync_work",
-            ExistingWorkPolicy.REPLACE,
-            OneTimeWorkRequestBuilder<SyncWorker>()
-                .setInputData(
-                    Data.Builder()
-                        .putLong("UserId", userId)
+                        .putString("PlaceId", placeId)
                         .build()
                 )
                 .build()
