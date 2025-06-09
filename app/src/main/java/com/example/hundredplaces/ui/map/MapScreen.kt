@@ -24,7 +24,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -35,19 +34,14 @@ import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
 import com.example.hundredplaces.ui.places.PlaceDistance
 import com.example.hundredplaces.ui.places.PlaceRating
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import java.util.concurrent.Executors
 
 object MapDestination : MenuNavigationDestination {
     override val route = "Map"
@@ -68,34 +62,23 @@ fun MapScreen(
 ) {
     val uiState = mapViewModel.uiState.collectAsStateWithLifecycle().value
     val context = LocalContext.current
-
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    if (context.checkSelfPermission(
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED) {
-        fusedLocationClient.requestLocationUpdates(
-            LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 10000).build(),
-            Executors.newSingleThreadExecutor(),
-            object: LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult) {
-                    val location = locationResult.lastLocation
-                    if (location != null) {
-                        mapViewModel.getDistances(location)
-                    }
-                }
-            }
-        )
+    val bulgariaBounds = LatLngBounds(
+        LatLng(41.24, 22.37),  // SW bounds
+        LatLng(44.18, 28.66) // NE bounds
+    )
+    val cameraPositionState = rememberCameraPositionState{
+        position = CameraPosition.fromLatLngZoom(LatLng(42.499912, 25.231491), 7.5f)
     }
 
     GoogleMap(
         modifier = modifier
             .fillMaxSize(),
-        cameraPositionState = rememberCameraPositionState{
-            position = CameraPosition.fromLatLngZoom(LatLng(42.499912, 25.231491), 6.5f)
-        },
+        cameraPositionState = cameraPositionState,
         properties = MapProperties(
-            isMyLocationEnabled = ContextCompat.checkSelfPermission(
-                LocalContext.current,
+            maxZoomPreference = 18.5f,
+            minZoomPreference = 7.5f,
+            latLngBoundsForCameraTarget = bulgariaBounds,
+            isMyLocationEnabled = context.checkSelfPermission(
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         )
