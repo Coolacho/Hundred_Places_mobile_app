@@ -3,6 +3,7 @@ package com.example.hundredplaces.ui.places
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,11 +25,10 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.RangeSliderState
@@ -44,6 +45,7 @@ import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,7 +70,6 @@ import com.example.hundredplaces.R
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
 import com.example.hundredplaces.ui.AppViewModelProvider
 import com.example.hundredplaces.ui.navigation.MenuNavigationDestination
-import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsScreen
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsViewModel
 import kotlinx.coroutines.launch
@@ -76,7 +77,7 @@ import kotlinx.coroutines.launch
 object PlacesDestination : MenuNavigationDestination {
     override val route = "Places"
     override val title = R.string.places
-    override val iconRes = R.drawable.rounded_museum_24
+    override val iconRes = R.drawable.baseline_location_pin_24
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
@@ -104,6 +105,7 @@ fun PlacesScreenV2(
                     onCameraButtonClick = onCameraButtonClick,
                     onFilterActionButtonClick = placesViewModel::openFilterScreen,
                     onFilterChipClick = placesViewModel::toggleFilter,
+                    onRefresh = placesViewModel::refresh,
                     onItemClick = {
                         scope.launch {
                             navigator.navigateTo(
@@ -119,22 +121,35 @@ fun PlacesScreenV2(
         },
         detailPane = {
             AnimatedPane {
-                navigator.currentDestination?.contentKey?.let {
-
+                val contentKey = navigator.currentDestination?.contentKey
+                if (contentKey != null) {
                     val owner = LocalViewModelStoreOwner.current
                     val defaultExtras = (owner as? HasDefaultViewModelProviderFactory)?.defaultViewModelCreationExtras ?: CreationExtras.Empty
 
                     PlaceDetailsScreen(
                         navigateBack = { scope.launch { navigator.navigateBack() } },
                         isFullScreen = navigator.isListExpanded(),
+                        addVisit = false,
                         placesDetailsViewModel = viewModel(
-                            key = "${PlaceDetailsDestination.route}/${it}",
+                            key = "$contentKey",
                             factory = AppViewModelProvider.Factory,
                             extras = MutableCreationExtras(defaultExtras).apply {
-                                set(AppViewModelProvider.PLACE_ID_KEY, it)
+                                set(AppViewModelProvider.PLACE_ID_KEY, contentKey)
                             }
                         )
                     )
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = modifier
+                            .fillMaxSize()
+                            .padding(horizontal = dimensionResource(R.dimen.padding_small))
+                    ) {
+                        Text(
+                            text = stringResource(R.string.select_place_see_details)
+                        )
+                    }
                 }
             }
         }
@@ -150,61 +165,73 @@ fun PlacesListContent(
     onCameraButtonClick: () -> Unit,
     onFilterActionButtonClick: () -> Unit,
     onFilterChipClick: (PlaceFiltersEnum) -> Unit,
+    onRefresh: () -> Unit,
     onItemClick: (PlaceWithCityAndImages) -> Unit,
     saveRating: (Long, Double, Boolean) -> Unit,
     toggleFavorite: (Long, Double, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = {
-            SearchBarWithCameraButton(
-                searchText = uiState.searchText,
-                onSearchTextChange = onSearchTextChange,
-                onCameraButtonClick = onCameraButtonClick
-            )
-        },
-        floatingActionButton = {
-            FilterButton(
-                filtersScreenAlignment = if (navigator.isDetailExpanded()) Alignment.BottomStart else Alignment.BottomEnd,
-                isFiltersScreenOpen = uiState.isFilterScreenOpen,
-                filtersSetSize = uiState.filtersSet.size,
-                onClick = onFilterActionButtonClick,
-            ) {
-                PlacesFilterCategories(
-                    onFilterChipClick = onFilterChipClick,
-                    rangeSliderState = uiState.rangeSliderState,
-                    filtersSet = uiState.filtersSet,
-                    modifier = Modifier
-                        .padding(48.dp)
-                )
-            }
-        },
-        floatingActionButtonPosition = if (navigator.isDetailExpanded()) FabPosition.Start else FabPosition.End,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    PullToRefreshBox(
+        isRefreshing = uiState.isRefreshing,
+        onRefresh = onRefresh,
         modifier = modifier
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(dimensionResource(id = R.dimen.padding_small)),
-            modifier = Modifier
-                .padding(it)
-                .fillMaxHeight()
-        ) {
-            items(uiState.filteredPlaces, key = { it.place.id }) {
-                PlaceItem(
-                    placeWithCityAndImages = it,
-                    userRating = 0.0,
-                    isFavorite = uiState.favorites.contains(it.place.id),
-                    isSelected = navigator.currentDestination?.contentKey == it.place.id && navigator.isDetailExpanded(),
-                    onClick = { onItemClick(it) },
-                    saveRating = saveRating,
-                    toggleFavorite = toggleFavorite,
-                    modifier = Modifier
-                        .padding(dimensionResource(id = R.dimen.padding_small))
-                        .fillMaxWidth()
+        Scaffold(
+            topBar = {
+                SearchBarWithCameraButton(
+                    searchText = uiState.searchText,
+                    onSearchTextChange = onSearchTextChange,
+                    onCameraButtonClick = onCameraButtonClick
                 )
+            },
+            floatingActionButton = {
+                FilterButton(
+                    filtersScreenAlignment = if (navigator.isDetailExpanded()) Alignment.BottomStart else Alignment.BottomEnd,
+                    isFiltersScreenOpen = uiState.isFilterScreenOpen,
+                    filtersSetSize = uiState.filtersSet.size,
+                    onClick = onFilterActionButtonClick,
+                ) {
+                    PlacesFilterCategories(
+                        onFilterChipClick = onFilterChipClick,
+                        rangeSliderState = uiState.rangeSliderState,
+                        filtersSet = uiState.filtersSet,
+                        modifier = Modifier
+                            .padding(52.dp)
+                    )
+                }
+            },
+            floatingActionButtonPosition = if (navigator.isDetailExpanded()) FabPosition.Start else FabPosition.End,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            modifier = modifier
+        ) {
+            val shimmer = shimmerBrush()
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium)),
+                contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium)),
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize()
+            ) {
+                items(uiState.filteredPlaces, key = { it.place.id }) {
+                    if (uiState.isRefreshing) {
+                        PlaceItemLoading(shimmer)
+                    }
+                    else {
+                        PlaceItem(
+                            placeWithCityAndImages = it,
+                            userRating = 0.0,
+                            isFavorite = uiState.favorites.contains(it.place.id),
+                            isSelected = navigator.currentDestination?.contentKey == it.place.id && navigator.isDetailExpanded(),
+                            onClick = { onItemClick(it) },
+                            saveRating = saveRating,
+                            toggleFavorite = toggleFavorite,
+                        )
+                    }
+                }
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -227,6 +254,7 @@ fun SearchBarWithCameraButton(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .semantics { traversalIndex = 0f }
+                .fillMaxWidth()
                 .padding(
                     vertical = dimensionResource(R.dimen.padding_small),
                     horizontal = dimensionResource(R.dimen.padding_medium)
@@ -312,20 +340,14 @@ fun FilterButton(
                 }
             }
         ) {
-            IconButton(
+            FloatingActionButton (
                 onClick = onClick,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier
-                    .size(48.dp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.rounded_filter_alt_24),
                     contentDescription = stringResource(R.string.filter),
-                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(40.dp)
                         .padding(top = 5.dp)
                 )
             }
@@ -566,6 +588,7 @@ private fun PlacesListAndDetailsContent(
         PlaceDetailsScreen(
             navigateBack = { activity?.finish() },
             isFullScreen = true,
+            addVisit = false,
             placesDetailsViewModel = placesDetailsViewModel,
             modifier = Modifier
                 .weight(1f)

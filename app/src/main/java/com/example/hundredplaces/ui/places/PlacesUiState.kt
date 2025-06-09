@@ -16,5 +16,6 @@ data class PlacesUiState @OptIn(ExperimentalMaterial3Api::class) constructor(
         activeRangeEnd = 5f,
         steps = 49,
         valueRange = 0f..5f
-    )
+    ),
+    val isRefreshing: Boolean = false,
 )

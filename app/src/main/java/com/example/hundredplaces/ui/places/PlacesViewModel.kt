@@ -4,9 +4,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RangeSliderState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hundredplaces.data.model.city.repositories.CityRepository
+import com.example.hundredplaces.data.model.image.repositories.ImageRepository
 import com.example.hundredplaces.data.model.place.PlaceWithCityAndImages
-import com.example.hundredplaces.data.model.place.repositories.PlacesRepository
-import com.example.hundredplaces.data.model.user.repositories.UsersRepository
+import com.example.hundredplaces.data.model.place.repositories.PlaceRepository
+import com.example.hundredplaces.data.model.user.repositories.UserRepository
 import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
 import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.UsersPlacesPreferencesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,13 +24,17 @@ import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class)
 class PlacesViewModel(
-    placesRepository: PlacesRepository,
-    usersRepository: UsersRepository,
+    private val placeRepository: PlaceRepository,
+    private val cityRepository: CityRepository,
+    private val imageRepository: ImageRepository,
+    userRepository: UserRepository,
     private val usersPlacesPreferencesRepository: UsersPlacesPreferencesRepository,
 ) : ViewModel() {
 
-    private val _userId = usersRepository.userId
+    private val _userId = userRepository.userId
 
+    private val _places = placeRepository.allPlacesWithCityAndImages
+    private val _isRefreshing = MutableStateFlow(false)
     private val _searchText = MutableStateFlow("")
     private val _isFilterScreenOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val _filtersSet: MutableStateFlow<Set<PlaceFiltersEnum>> = MutableStateFlow(emptySet())
@@ -46,7 +52,7 @@ class PlacesViewModel(
         userId?.let { usersPlacesPreferencesRepository.getPlacesRatingsByUserId(userId) } ?: flowOf(emptyMap())
     }
     private val _filteredPlaces = combine(
-        placesRepository.allPlacesWithCityAndImages,
+        _places,
         _filtersSet,
         _favorites,
         _rangeSliderState,
@@ -90,15 +96,16 @@ class PlacesViewModel(
     }
 
     val uiState = combine(
-        _searchText, _filteredPlaces, _ratings, _favorites, _isFilterScreenOpen, _filtersSet, _rangeSliderState
+        _searchText, _isRefreshing, _isFilterScreenOpen, _filtersSet, _rangeSliderState, _favorites, _ratings, _filteredPlaces
     ) { result ->
         val searchText = result[0] as String
-        val filteredPlaces = result[1] as List<PlaceWithCityAndImages>
-        val ratings = result[2] as Map<Long, Double>
-        val favorites = result[3] as List<Long>
-        val isFilterScreenOpen = result[4] as Boolean
-        val filtersSet = result[5] as Set<PlaceFiltersEnum>
-        val rangeSliderState = result[6] as RangeSliderState
+        val isRefreshing = result[1] as Boolean
+        val isFilterScreenOpen = result[2] as Boolean
+        val filtersSet = result[3] as Set<PlaceFiltersEnum>
+        val rangeSliderState = result[4] as RangeSliderState
+        val favorites = result[5] as List<Long>
+        val ratings = result[6] as Map<Long, Double>
+        val filteredPlaces = result[7] as List<PlaceWithCityAndImages>
         rangeSliderState.onValueChangeFinished = { updateSliderState() }
         PlacesUiState(
             searchText = searchText,
@@ -107,7 +114,8 @@ class PlacesViewModel(
             favorites = favorites,
             isFilterScreenOpen = isFilterScreenOpen,
             filtersSet = filtersSet,
-            rangeSliderState = rangeSliderState
+            rangeSliderState = rangeSliderState,
+            isRefreshing = isRefreshing
         )
     }
         .stateIn(
@@ -118,6 +126,16 @@ class PlacesViewModel(
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
+    }
+
+    fun refresh() {
+        _isRefreshing.value = true
+        viewModelScope.launch {
+            cityRepository.pullCities()
+            placeRepository.pullPlaces()
+            imageRepository.pullImages()
+            _isRefreshing.value = false
+        }
     }
 
     fun toggleFilter(filter: PlaceFiltersEnum) {
