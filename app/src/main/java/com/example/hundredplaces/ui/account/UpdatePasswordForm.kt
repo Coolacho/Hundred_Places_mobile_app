@@ -54,19 +54,19 @@ fun UpdatePasswordForm(
         OutlinedSecureTextField(
             state = accountViewModel.oldPasswordState,
             isError = accountViewModel.oldPasswordHasErrors,
-            label = { Text("Old password") }, //TODO
+            label = { Text(stringResource(R.string.old_password)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         OutlinedSecureTextField(
             state = accountViewModel.newPasswordState,
             isError = accountViewModel.newPasswordHasErrors,
-            label = { Text("New password") }, //TODO
+            label = { Text(stringResource(R.string.new_password)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         OutlinedSecureTextField(
             state = accountViewModel.repeatNewPasswordState,
             isError = accountViewModel.repeatNewPasswordHasErrors,
-            label = { Text("Repeat new password") }, //TODO
+            label = { Text(stringResource(R.string.repeat_new_password)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         )
         Row (

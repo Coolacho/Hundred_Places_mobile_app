@@ -132,7 +132,7 @@ class LoginViewModel(
     }
 
     fun canLogIn(): Boolean {
-        return !(emailHasErrors && passwordHasErrors //TODO change to ||
+        return !(emailHasErrors || passwordHasErrors
                 || emailState.text.isEmpty() || passwordState.text.isEmpty())
     }
 
