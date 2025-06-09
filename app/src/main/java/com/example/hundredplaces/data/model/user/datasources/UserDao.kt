@@ -1,4 +1,4 @@
-package com.example.hundredplaces.data.model.user
+package com.example.hundredplaces.data.model.user.datasources
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.hundredplaces.data.model.user.User
 
 @Dao
 interface UserDao {

@@ -6,13 +6,17 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Repository that provides insert, update, delete, and retrieve of [User] from a given data source.
  */
-interface UsersRepository {
+interface UserRepository {
 
     val userId: StateFlow<Long?>
 
-    suspend fun getUserByEmailAndPassword(email: String, password: String): User?
+    fun logOut()
 
-    suspend fun getUserByEmail(email: String): User?
+    suspend fun getUserByEmailAndPassword(email: String, password: String)
+
+    suspend fun getUserByEmail(email: String)
+
+    suspend fun pullUser() : Pair<String, String>?
 
     /**
      * Insert user in the data source
@@ -25,7 +29,12 @@ interface UsersRepository {
     suspend fun deleteUser(user: User) : Boolean
 
     /**
-     * Update user in the data source
+     * Update user's details
      */
-    suspend fun updateUser(user: User) : Boolean
+    suspend fun updateUserDetails(name: String, email: String) : Boolean
+
+    /**
+     * Update user's password
+     */
+    suspend fun updateUserPassword(oldPassword: String, newPassword: String): Boolean
 }
