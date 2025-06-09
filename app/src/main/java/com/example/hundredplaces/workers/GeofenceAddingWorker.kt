@@ -6,10 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.hundredplaces.data.model.place.repositories.PlacesRepository
+import com.example.hundredplaces.data.model.place.repositories.PlaceRepository
+import com.example.hundredplaces.data.services.distance.DistanceService
 import com.example.hundredplaces.util.GeofenceBroadcastReceiver
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.Geofence
@@ -21,20 +21,31 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-const val GEOFENCE_WORK_TAG = "GeofenceWorker"
+const val GEOFENCE_ADD_WORK_TAG = "GeofenceAddingWorker"
 
-class GeofenceWorker(
+class GeofenceAddingWorker(
     context: Context,
     params: WorkerParameters,
-    private val placesRepository: PlacesRepository
+    private val placeRepository: PlaceRepository,
+    private val distanceService: DistanceService
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
 
-        val places = placesRepository.allPlaces.first()
+        val distances = distanceService.distances.value
+            .toList()
+            .sortedBy { (_, value) -> value }
+            .take(20)
+            .toMap()
+        val places = placeRepository.allPlaces.first().filter { place ->
+            if (distances.isNotEmpty()) {
+                distances.contains(place.id)
+            }
+            true
+        }.take(20)
+
 
         return try {
-            if (ContextCompat.checkSelfPermission(
-                    applicationContext,
+            if (applicationContext.checkSelfPermission(
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED) {
                 throw Throwable("Permissions not granted!")
@@ -54,14 +65,15 @@ class GeofenceWorker(
                                 place.longitude,
                                 100f
                             )
-                            .setExpirationDuration(3600000)
+                            .setExpirationDuration(14_400_000) //4 hours
                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
-                            .setLoiteringDelay(60000) //Add one 0 for 10 minutes
-                            .setNotificationResponsiveness(300000)
+                            .setLoiteringDelay(60_000) //300000 (5 min) for real use case
+                            .setNotificationResponsiveness(300_000)
                             .build()
                     )
                 }
                 val geofencingRequest = GeofencingRequest.Builder()
+                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
                     .addGeofences(geofenceList)
                     .build()
 
@@ -83,12 +95,10 @@ class GeofenceWorker(
                     geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
                         addOnSuccessListener {
                             // Geofences added
-                            Log.d(GEOFENCE_WORK_TAG, "Geofences added successfully!")
+                            Log.d(GEOFENCE_ADD_WORK_TAG, "Geofences added successfully!")
                             cont.resume(Unit)
                         }
-                        addOnFailureListener {
-                            // Failed to add geofences
-                                exception ->
+                        addOnFailureListener { exception ->
                             // Failed to add geofences
                             val errorMessage = when (exception) {
                                 is ApiException -> {
@@ -104,7 +114,7 @@ class GeofenceWorker(
 
                                 else -> exception.message ?: "Unknown error"
                             }
-                            Log.e(GEOFENCE_WORK_TAG, "Failed to add geofences: $errorMessage")
+                            Log.e(GEOFENCE_ADD_WORK_TAG, "Failed to add geofences: $errorMessage")
                             cont.resumeWithException(exception)
                         }
                     }
@@ -113,11 +123,11 @@ class GeofenceWorker(
             Result.success()
         }
         catch (e: IllegalArgumentException) {
-            Log.e(GEOFENCE_WORK_TAG, "Failed to add geofences: ${e.message}")
+            Log.e(GEOFENCE_ADD_WORK_TAG, "Failed to add geofences: ${e.message}")
             Result.failure()
         }
         catch (e: Throwable) {
-            Log.e(GEOFENCE_WORK_TAG, "Failed to add geofences: ${e.message}")
+            Log.e(GEOFENCE_ADD_WORK_TAG, "Failed to add geofences: ${e.message}")
             Result.failure()
         }
     }
