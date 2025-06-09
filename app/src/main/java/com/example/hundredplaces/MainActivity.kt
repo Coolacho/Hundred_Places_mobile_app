@@ -17,15 +17,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hundredplaces.ui.AppViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.hundredplaces.ui.HundredPlacesApp
-import com.example.hundredplaces.ui.account.AccountViewModel
 import com.example.hundredplaces.ui.placeDetails.PlaceDetailsDestination
 import com.example.hundredplaces.ui.places.PlacesDestination
 import com.example.hundredplaces.ui.theme.HundredPlacesTheme
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -39,15 +46,41 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val accountViewModel: AccountViewModel = viewModel (
-                        factory = AppViewModelProvider.Factory
-                    )
+                    val coroutineScope = rememberCoroutineScope(getContext = { Dispatchers.IO })
+
+                    LaunchedEffect(Unit) {
+                        coroutineScope.launch {
+                            (application as HundredPlacesApplication).container.cityRepository.pullCities()
+                            (application as HundredPlacesApplication).container.placeRepository.pullPlaces()
+                            (application as HundredPlacesApplication).container.imageRepository.pullImages()
+                        }
+                    }
+
+                    val userId = (application as HundredPlacesApplication).container.userRepository.userId.collectAsStateWithLifecycle().value
+                    userId?.let {
+                        LaunchedEffect(it) {
+                            coroutineScope.launch {
+                                (application as HundredPlacesApplication).container.visitRepository.pushVisits(userId)
+                            }
+                            coroutineScope.launch {
+                                (application as HundredPlacesApplication).container.usersPlacesPreferencesRepository.pushUsersPlacesPreferences(userId)
+                            }
+                            //Update local data source after pushing local updates
+                            coroutineScope.launch {
+                                while (true) {
+                                    (application as HundredPlacesApplication).container.visitRepository.pullVisits(userId)
+                                    (application as HundredPlacesApplication).container.usersPlacesPreferencesRepository.pullUsersPlacesPreferences(userId)
+                                    delay(60_000)
+                                }
+                            }
+                        }
+                    }
 
                     val windowSize = calculateWindowSizeClass(activity = this)
                     val navigateToPlaceDetails = intent.getBooleanExtra("navigateToPlacesDetails", false)
                     val placeId = intent.getLongExtra("placeId", 0L)
                     val startDestination: String = if (navigateToPlaceDetails && placeId != 0L) {
-                        "${PlaceDetailsDestination.route}/${placeId}"
+                        "${PlaceDetailsDestination.route}/${placeId}?addVisit=${true}"
                     } else PlacesDestination.route
 
                     val permissionLauncher = rememberLauncherForActivityResult(
@@ -65,6 +98,11 @@ class MainActivity : ComponentActivity() {
                                 Log.d("LocationRequest", "Received Coarse location")
                             }
 
+                            permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
+                                // Background location access granted.
+                                Log.d("LocationRequest", "Received Background location")
+                            }
+
                             else -> {
                                 // No location access granted.
                                 Log.d("LocationRequest", "No location permission")
@@ -72,8 +110,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    if (ContextCompat.checkSelfPermission(
-                            this,
+                    if (applicationContext.checkSelfPermission(
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) != PackageManager.PERMISSION_GRANTED) {
                         LaunchedEffect(Unit) {
@@ -95,8 +132,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        if (ContextCompat.checkSelfPermission(
-                                this,
+                        if (applicationContext.checkSelfPermission(
                                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
@@ -106,8 +142,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     if (Build.VERSION.SDK_INT >= TIRAMISU) {
-                        if (ContextCompat.checkSelfPermission(
-                                this,
+                        if (applicationContext.checkSelfPermission(
                                 Manifest.permission.POST_NOTIFICATIONS
                             ) != PackageManager.PERMISSION_GRANTED
                         ) {
@@ -116,8 +151,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    if (ContextCompat.checkSelfPermission(
-                            this,
+                    if (applicationContext.checkSelfPermission(
                             Manifest.permission.CAMERA
                         ) != PackageManager.PERMISSION_GRANTED
                     ) {
@@ -126,10 +160,34 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
+                    if (applicationContext.checkSelfPermission(
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED) {
+                        fusedLocationClient.requestLocationUpdates(
+                            LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 10000).build(),
+                            Executors.newSingleThreadExecutor(),
+                            object: LocationCallback() {
+                                override fun onLocationResult(locationResult: LocationResult) {
+                                    val location = locationResult.lastLocation
+                                    if (location != null) {
+                                        (application as HundredPlacesApplication).container.distanceService.getDistances(location)
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    if (applicationContext.checkSelfPermission(
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED) {
+                        (application as HundredPlacesApplication).container.workManagerRepository.addGeofences()
+                    }
+
                     HundredPlacesApp(
                         windowSize = windowSize.widthSizeClass,
                         startDestination = startDestination,
-                        accountViewModel = accountViewModel,
+                        userId = userId
                     )
                 }
             }
