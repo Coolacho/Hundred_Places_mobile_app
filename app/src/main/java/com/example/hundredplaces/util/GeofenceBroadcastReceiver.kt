@@ -40,28 +40,23 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         // Test that the reported transition was of interest.
         if ((geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) or
         (geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL)) {
-            // Get the geofences that were triggered. A single event can trigger
-            // multiple geofences.
+            // Get the geofences that were triggered.
             val triggeringGeofences = geofencingEvent?.triggeringGeofences
 
             if (triggeringGeofences!= null) {
-                // Send notification and log the transition details.
-                //context.hundredPlacesApplication().container.workManagerRepository.sendNotification(triggeringGeofences[0].requestId.toLong())
+                // Send notification and remove the triggered geofence.
                 sendNotification(context, triggeringGeofences[0].requestId.toLong())
                 context.hundredPlacesApplication().container.workManagerRepository.removeGeofence(triggeringGeofences[0].requestId)
             }
             Log.i(TAG, "Successful transition: $geofenceTransition")
         } else {
-            // Log the error.
             Log.e(TAG, "Unsuccessful transition: $geofenceTransition")
         }
     }
 
     fun sendNotification(context: Context, placeId: Long) {
         try {
-            // Make a channel if necessary
-            // Create the NotificationChannel, but only on API 26+ because
-            // the NotificationChannel class is new and not in the support library
+            // Create the NotificationChannel
             val name = "Nearby places"
             val description = "Send notification when user is near a place"
             val importance = NotificationManager.IMPORTANCE_HIGH

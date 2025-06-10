@@ -25,7 +25,7 @@ import com.example.hundredplaces.data.model.visit.datasources.VisitRestApi
 import com.example.hundredplaces.data.model.visit.repositories.DefaultVisitRepository
 import com.example.hundredplaces.data.model.visit.repositories.VisitRepository
 import com.example.hundredplaces.data.services.distance.DistanceService
-import com.example.hundredplaces.data.services.distance.DistanceServiceImpl
+import com.example.hundredplaces.data.services.distance.DefaultDistanceService
 import com.example.hundredplaces.data.services.landmark.LandmarkRestApi
 import com.example.hundredplaces.data.services.landmark.LandmarkService
 import com.example.hundredplaces.data.services.landmark.LandmarkServiceImpl
@@ -130,7 +130,7 @@ class DefaultAppContainer(
     }
 
     override val distanceService: DistanceService by lazy {
-        DistanceServiceImpl(
+        DefaultDistanceService(
             placeRepository
         )
     }
