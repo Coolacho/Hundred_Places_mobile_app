@@ -48,14 +48,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val coroutineScope = rememberCoroutineScope(getContext = { Dispatchers.IO })
 
-                    LaunchedEffect(Unit) {
-                        coroutineScope.launch {
-                            (application as HundredPlacesApplication).container.cityRepository.pullCities()
-                            (application as HundredPlacesApplication).container.placeRepository.pullPlaces()
-                            (application as HundredPlacesApplication).container.imageRepository.pullImages()
-                        }
-                    }
-
                     val userId = (application as HundredPlacesApplication).container.userRepository.userId.collectAsStateWithLifecycle().value
                     userId?.let {
                         LaunchedEffect(it) {

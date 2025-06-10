@@ -82,21 +82,18 @@ class DefaultAppContainer(
         DefaultCityRepository(
             hundredPlacesLocalDatabase.cityDao(),
             retrofit.create(CityRestApi::class.java),
-            networkConnection
         )
     }
     override val placeRepository: PlaceRepository by lazy {
         DefaultPlaceRepository(
             hundredPlacesLocalDatabase.placeDao(),
             retrofit.create(PlaceRestApi::class.java),
-            networkConnection
         )
     }
     override val imageRepository: ImageRepository by lazy {
         DefaultImageRepository(
             hundredPlacesLocalDatabase.imageDao(),
             retrofit.create(ImageRestApi::class.java),
-            networkConnection
         )
     }
     override val userRepository: UserRepository by lazy {

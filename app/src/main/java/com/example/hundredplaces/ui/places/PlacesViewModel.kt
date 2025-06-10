@@ -1,5 +1,6 @@
 package com.example.hundredplaces.ui.places
 
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RangeSliderState
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,8 @@ import com.example.hundredplaces.data.model.place.repositories.PlaceRepository
 import com.example.hundredplaces.data.model.user.repositories.UserRepository
 import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
 import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.UsersPlacesPreferencesRepository
+import com.example.hundredplaces.util.NetworkConnection
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalCoroutinesApi::class)
@@ -29,6 +33,7 @@ class PlacesViewModel(
     private val imageRepository: ImageRepository,
     userRepository: UserRepository,
     private val usersPlacesPreferencesRepository: UsersPlacesPreferencesRepository,
+    private val networkConnection: NetworkConnection
 ) : ViewModel() {
 
     private val _userId = userRepository.userId
@@ -130,10 +135,17 @@ class PlacesViewModel(
 
     fun refresh() {
         _isRefreshing.value = true
-        viewModelScope.launch {
-            cityRepository.pullCities()
-            placeRepository.pullPlaces()
-            imageRepository.pullImages()
+        viewModelScope.launch(Dispatchers.IO) {
+            if (networkConnection.isNetworkConnected) {
+                try {
+                    cityRepository.pullCities()
+                    placeRepository.pullPlaces()
+                    imageRepository.pullImages()
+                }
+                catch (_: SocketTimeoutException) {
+                    Log.e("Static data refresh", "Server is not reachable.")
+                }
+            }
             _isRefreshing.value = false
         }
     }

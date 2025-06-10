@@ -47,6 +47,7 @@ import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -92,6 +93,10 @@ fun PlacesScreenV2(
     val uiState = placesViewModel.uiState.collectAsStateWithLifecycle().value
     val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        placesViewModel.refresh()
+    }
 
     NavigableListDetailPaneScaffold(
         navigator = navigator,
