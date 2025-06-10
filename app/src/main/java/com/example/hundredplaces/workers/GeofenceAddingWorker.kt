@@ -77,12 +77,8 @@ class GeofenceAddingWorker(
                     .addGeofences(geofenceList)
                     .build()
 
-                // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-                // addGeofences() and removeGeofences().
                 val geofencePendingIntent: PendingIntent by lazy {
                     val intent = Intent(applicationContext, GeofenceBroadcastReceiver::class.java)
-                    // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-                    // addGeofences() and removeGeofences().
                     PendingIntent.getBroadcast(
                         applicationContext,
                         0,
