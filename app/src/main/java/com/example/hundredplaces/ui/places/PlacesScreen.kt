@@ -217,11 +217,15 @@ fun PlacesListContent(
                     .padding(it)
                     .fillMaxSize()
             ) {
-                items(uiState.filteredPlaces, key = { it.place.id }) {
-                    if (uiState.isRefreshing) {
-                        PlaceItemLoading(shimmer)
+                if (uiState.isRefreshing) {
+                    repeat(5) {
+                        item(key = it) {
+                            PlaceItemLoading(shimmer)
+                        }
                     }
-                    else {
+                }
+                else {
+                    items(uiState.filteredPlaces, key = { it.place.id }) {
                         PlaceItem(
                             placeWithCityAndImages = it,
                             userRating = 0.0,
