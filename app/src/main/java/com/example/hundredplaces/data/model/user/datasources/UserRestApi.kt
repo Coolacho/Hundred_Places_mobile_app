@@ -2,6 +2,7 @@ package com.example.hundredplaces.data.model.user.datasources
 
 import com.example.hundredplaces.data.model.user.UpdatePasswordRequest
 import com.example.hundredplaces.data.model.user.User
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -16,7 +17,7 @@ interface UserRestApi {
     suspend fun getUserByEmailAndPassword(
         @Query("email") email: String,
         @Query("password") password: String
-    ): User?
+    ): Response<User>
 
     @GET("$baseUrl/exists")
     suspend fun getIsUserExistingById(@Query("userId") userId: Long): Boolean

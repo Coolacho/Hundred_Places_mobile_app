@@ -59,13 +59,16 @@ class DefaultUserRepository(
             if (networkConnection.isNetworkConnected) {
                 try {
                     _currentUser?.let {
-                        val user = userRemoteDataSource.getUserByEmailAndPassword(it.email, it.password)
-                        if (user != null) {
-                            if (it != user) {
-                                _currentUser = user
-                                userLocalDataSource.update(user)
+                        val response = userRemoteDataSource.getUserByEmailAndPassword(it.email, it.password)
+                        if (response.isSuccessful) {
+                            val user = response.body()
+                            if (user != null) {
+                                if (it != user) {
+                                    _currentUser = user
+                                    userLocalDataSource.update(user)
+                                }
+                                result = Pair(user.name, user.email)
                             }
-                            result = Pair(user.name, user.email)
                         }
                     }
                 }
@@ -83,8 +86,13 @@ class DefaultUserRepository(
 
         if (networkConnection.isNetworkConnected && user == null) {
             try {
-                user = userRemoteDataSource.getUserByEmailAndPassword(email, password)
-                if (user != null) userLocalDataSource.insert(user)
+                val response = userRemoteDataSource.getUserByEmailAndPassword(email, password)
+                if (response.isSuccessful) {
+                    user = response.body()
+                    if (user != null) {
+                        userLocalDataSource.insert(user)
+                    }
+                }
             }
             catch (_: SerializationException) {
                 Log.e(USER_REPOSITORY_TAG, "Serialization error occurred!")
