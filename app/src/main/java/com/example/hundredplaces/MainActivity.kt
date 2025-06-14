@@ -60,9 +60,9 @@ class MainActivity : ComponentActivity() {
                             //Update local data source after pushing local updates
                             coroutineScope.launch {
                                 while (true) {
+                                    delay(60_000)
                                     (application as HundredPlacesApplication).container.visitRepository.pullVisits(userId)
                                     (application as HundredPlacesApplication).container.usersPlacesPreferencesRepository.pullUsersPlacesPreferences(userId)
-                                    delay(60_000)
                                 }
                             }
                         }
