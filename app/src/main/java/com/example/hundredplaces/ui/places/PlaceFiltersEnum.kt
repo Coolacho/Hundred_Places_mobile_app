@@ -15,7 +15,7 @@ enum class PlaceFiltersEnum(
     GALLERY(R.string.galleries_category_name),
     CAVE(R.string.caves_category_name),
     CHURCH(R.string.churches_category_name),
-    SANCTUARY(R.string.sanctuaries_category_name),
+    RESERVE(R.string.reserves_category_name),
     FORTRESS(R.string.fortresses_category_name),
     TOMB(R.string.tombs_category_name),
     MONUMENT(R.string.monuments_category_name),

@@ -21,7 +21,7 @@
     <string name="galleries_visited">Посетени галерии</string>
     <string name="caves_visited">Посетени пещери</string>
     <string name="churches_visited">Посетени църкви</string>
-    <string name="sanctuaries_visited">Посетени светилища</string>
+    <string name="reserves_visited">Посетени природни и архитектурни резервати</string>
     <string name="fortresses_visited">Посетени крепости</string>
     <string name="toms_visited">Посетени гробници</string>
     <string name="monuments_visited">Посетени паметници</string>
@@ -45,7 +45,7 @@
     <string name="galleries_category_name">Галерии</string>
     <string name="caves_category_name">Пещери</string>
     <string name="churches_category_name">Църкви</string>
-    <string name="sanctuaries_category_name">Светилища</string>
+    <string name="reserves_category_name">Резервати</string>
     <string name="fortresses_category_name">Крепости</string>
     <string name="tombs_category_name">Гробници</string>
     <string name="monuments_category_name">Паметници</string>

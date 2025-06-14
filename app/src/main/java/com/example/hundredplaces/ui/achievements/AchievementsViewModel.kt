@@ -49,7 +49,7 @@ class AchievementsViewModel(
                     PlaceTypeEnum.GALLERY -> AchievementTypeEnum.GALLERY
                     PlaceTypeEnum.CAVE -> AchievementTypeEnum.CAVE
                     PlaceTypeEnum.CHURCH -> AchievementTypeEnum.CHURCH
-                    PlaceTypeEnum.SANCTUARY -> AchievementTypeEnum.SANCTUARY
+                    PlaceTypeEnum.RESERVE -> AchievementTypeEnum.RESERVE
                     PlaceTypeEnum.FORTRESS -> AchievementTypeEnum.FORTRESS
                     PlaceTypeEnum.TOMB -> AchievementTypeEnum.TOMB
                     PlaceTypeEnum.MONUMENT -> AchievementTypeEnum.MONUMENT

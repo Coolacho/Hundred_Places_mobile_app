@@ -20,7 +20,7 @@
     <string name="galleries_visited">Galleries visited</string>
     <string name="caves_visited">Caves visited</string>
     <string name="churches_visited">Churches visited</string>
-    <string name="sanctuaries_visited">Sanctuaries visited</string>
+    <string name="reserves_visited">Narural and architectural reserves visited</string>
     <string name="fortresses_visited">Fortresses visited</string>
     <string name="toms_visited">Tombs visited</string>
     <string name="monuments_visited">Monuments visited</string>
@@ -42,7 +42,7 @@
     <string name="galleries_category_name">Galleries</string>
     <string name="caves_category_name">Caves</string>
     <string name="churches_category_name">Churches</string>
-    <string name="sanctuaries_category_name">Sanctuaries</string>
+    <string name="reserves_category_name">Reserves</string>
     <string name="fortresses_category_name">Fortresses</string>
     <string name="tombs_category_name">Tombs</string>
     <string name="monuments_category_name">Monuments</string>

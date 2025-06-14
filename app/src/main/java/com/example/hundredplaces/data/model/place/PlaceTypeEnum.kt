@@ -6,7 +6,7 @@ enum class PlaceTypeEnum() {
     GALLERY,
     CAVE,
     CHURCH,
-    SANCTUARY,
+    RESERVE,
     FORTRESS,
     TOMB,
     MONUMENT,

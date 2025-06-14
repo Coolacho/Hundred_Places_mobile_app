@@ -18,7 +18,7 @@ enum class AchievementTypeEnum(
     GALLERY(R.drawable.rounded_wall_art_24, R.string.galleries_visited, 5, 10, 15),
     CAVE(R.drawable.icons8_cave_96, R.string.caves_visited, 3, 5, 10),
     CHURCH(R.drawable.rounded_church_24, R.string.churches_visited, 10, 30, 50),
-    SANCTUARY(R.drawable.icons8_synagogue_96, R.string.sanctuaries_visited, 5, 10, 15),
+    RESERVE(R.drawable.rounded_nature_24, R.string.reserves_visited, 5, 10, 15),
     FORTRESS(R.drawable.rounded_fort_24, R.string.fortresses_visited, 1, 3, 5),
     TOMB(R.drawable.icons8_tomb_100, R.string.toms_visited, 1, 3, 5),
     MONUMENT(R.drawable.icons8_obelisk_100, R.string.monuments_visited, 10, 30, 50),
