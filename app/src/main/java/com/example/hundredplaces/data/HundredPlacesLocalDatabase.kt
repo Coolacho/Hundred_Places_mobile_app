@@ -28,7 +28,7 @@ import com.example.hundredplaces.util.InstantConverter
         Visit::class,
         UsersPlacesPreferences::class
     ],
-    version = 16,
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(

@@ -14,10 +14,6 @@ import kotlinx.parcelize.Parcelize
     tableName = "places",
     indices = [
         Index(
-            value = ["name"],
-            unique = true
-        ),
-        Index(
             value = ["city_id"]
         )
     ],
