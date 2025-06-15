@@ -5,7 +5,7 @@ import com.example.hundredplaces.data.model.place.PlaceTypeEnum
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.data.model.visit.datasources.VisitDao
 import com.example.hundredplaces.data.model.visit.datasources.VisitRestApi
-import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.util.NetworkMonitor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +15,7 @@ import java.net.SocketTimeoutException
 class DefaultVisitRepository(
     private val visitLocalDataSource: VisitDao,
     private val visitRemoteDataSource: VisitRestApi,
-    private val networkConnection: NetworkConnection,
+    private val networkConnection: NetworkMonitor,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : VisitRepository{
 

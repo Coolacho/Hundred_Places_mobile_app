@@ -13,12 +13,12 @@ interface PlaceRepository {
     /**
      * Retrieve all the places from the given data source.
      */
-    val allPlaces: Flow<List<Place>>
+    fun getAllPlaces(): Flow<List<Place>>
 
     /**
      * Retrieve all the places with city and images from the given data source.
      */
-    val allPlacesWithCityAndImages: Flow<List<PlaceWithCityAndImages>>
+    fun getAllPlacesWithCityAndImages(): Flow<List<PlaceWithCityAndImages>>
 
     /**
      * Get the closest place to the given coordinates

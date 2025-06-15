@@ -1,13 +1,13 @@
 package com.example.hundredplaces.data.services.landmark
 
 import android.util.Log
-import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.util.NetworkMonitor
 import okhttp3.MultipartBody
 import java.net.SocketTimeoutException
 
-class LandmarkServiceImpl(
+class DefaultLandmarkService(
     private val landmarkRestApi: LandmarkRestApi,
-    private val networkConnection: NetworkConnection
+    private val networkConnection: NetworkMonitor
 ) : LandmarkService {
     override suspend fun getLandmark(image: MultipartBody.Part): RequestResponse {
         if (networkConnection.isNetworkConnected) {

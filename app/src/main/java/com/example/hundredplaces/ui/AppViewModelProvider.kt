@@ -35,7 +35,6 @@ object AppViewModelProvider {
                 hundredPlacesApplication().container.imageRepository,
                 hundredPlacesApplication().container.userRepository,
                 hundredPlacesApplication().container.usersPlacesPreferencesRepository,
-                hundredPlacesApplication().container.networkConnection
             )
         }
         initializer {

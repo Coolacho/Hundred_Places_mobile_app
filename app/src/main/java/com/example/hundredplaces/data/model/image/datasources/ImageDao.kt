@@ -17,10 +17,6 @@ interface ImageDao {
     suspend fun deleteImagesNotIn(ids: List<Long>)
 
     @Transaction
-    @Query("SELECT * FROM images")
-    fun getAll(): Flow<List<Image>>
-
-    @Transaction
     @Query("SELECT image_path " +
             "FROM (" +
             "   SELECT image_path," +

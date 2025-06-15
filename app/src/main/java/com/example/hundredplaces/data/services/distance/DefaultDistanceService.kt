@@ -12,7 +12,7 @@ class DefaultDistanceService(
     placeRepository: PlaceRepository
 ) : DistanceService {
 
-    private val _places = placeRepository.allPlaces
+    private val _places = placeRepository.getAllPlaces()
     private val _distances = MutableStateFlow<Map<Long, Float>>(emptyMap())
     override val distances: StateFlow<Map<Long, Float>> = _distances
 

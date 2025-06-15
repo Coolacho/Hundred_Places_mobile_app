@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.hundredplaces.data.model.image.Image
 import com.example.hundredplaces.data.model.image.datasources.ImageDao
 import com.example.hundredplaces.data.model.image.datasources.ImageRestApi
+import com.example.hundredplaces.util.NetworkMonitor
 
 /**
  * Implementation of [ImageRepository] that has local and remote datasources. It fetches all the records
@@ -13,19 +14,20 @@ import com.example.hundredplaces.data.model.image.datasources.ImageRestApi
 class DefaultImageRepository(
     private val imageLocalDataSource: ImageDao,
     private val imageRemoteDataSource: ImageRestApi,
+    private val networkMonitor: NetworkMonitor
 ) : ImageRepository{
-
-    override val allImages = imageLocalDataSource.getAll()
 
     override val oneImagePerPlace = imageLocalDataSource.getOneImagePerPlace()
 
     override suspend fun pullImages() {
-        val remoteImages = imageRemoteDataSource.getAllImages()
-        if (remoteImages.isNotEmpty()) {
-            val remoteIds = remoteImages.map { it.id }
-            imageLocalDataSource.deleteImagesNotIn(remoteIds)
-            imageLocalDataSource.insertAll(remoteImages)
-            Log.d("Image repository", "$remoteImages")
+        if (networkMonitor.isNetworkConnected) {
+            val remoteImages = imageRemoteDataSource.getAllImages()
+            if (remoteImages.isNotEmpty()) {
+                val remoteIds = remoteImages.map { it.id }
+                imageLocalDataSource.deleteImagesNotIn(remoteIds)
+                imageLocalDataSource.insertAll(remoteImages)
+                Log.d("Image repository", "$remoteImages")
+            }
         }
     }
 }

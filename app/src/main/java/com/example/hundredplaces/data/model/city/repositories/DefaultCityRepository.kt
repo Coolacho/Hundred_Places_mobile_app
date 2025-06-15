@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.hundredplaces.data.model.city.datasources.CityRestApi
 import com.example.hundredplaces.data.model.city.City
 import com.example.hundredplaces.data.model.city.datasources.CityDao
+import com.example.hundredplaces.util.NetworkMonitor
 
 /**
  * Implementation of [CityRepository] that has local and remote datasources. It fetches all the records
@@ -13,17 +14,18 @@ import com.example.hundredplaces.data.model.city.datasources.CityDao
 class DefaultCityRepository(
     private val cityLocalDataSource: CityDao,
     private val cityRemoteDataSource: CityRestApi,
+    private val networkMonitor: NetworkMonitor
 ) : CityRepository {
 
-    override val allCities = cityLocalDataSource.getAll()
-
     override suspend fun pullCities() {
-        val remoteCities = cityRemoteDataSource.getAllCities()
-        if (remoteCities.isNotEmpty()) {
-            val remoteIds = remoteCities.map { it.id }
-            cityLocalDataSource.deleteCitiesNotIn(remoteIds)
-            cityLocalDataSource.insertAll(remoteCities)
-            Log.d("City Repository", "$remoteCities")
+        if (networkMonitor.isNetworkConnected) {
+            val remoteCities = cityRemoteDataSource.getAllCities()
+            if (remoteCities.isNotEmpty()) {
+                val remoteIds = remoteCities.map { it.id }
+                cityLocalDataSource.deleteCitiesNotIn(remoteIds)
+                cityLocalDataSource.insertAll(remoteCities)
+                Log.d("City Repository", "$remoteCities")
+            }
         }
     }
 

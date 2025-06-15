@@ -5,7 +5,7 @@ import com.example.hundredplaces.data.model.user.UpdatePasswordRequest
 import com.example.hundredplaces.data.model.user.User
 import com.example.hundredplaces.data.model.user.datasources.UserDao
 import com.example.hundredplaces.data.model.user.datasources.UserRestApi
-import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.util.NetworkMonitor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,7 @@ const val USER_REPOSITORY_TAG = "User Repository"
 class DefaultUserRepository(
     private val userLocalDataSource: UserDao,
     private val userRemoteDataSource: UserRestApi,
-    private val networkConnection: NetworkConnection,
+    private val networkConnection: NetworkMonitor,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val refreshIntervalMs: Long = 60_000
 ) : UserRepository{

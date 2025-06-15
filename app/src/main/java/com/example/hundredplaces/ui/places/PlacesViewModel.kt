@@ -12,7 +12,6 @@ import com.example.hundredplaces.data.model.place.repositories.PlaceRepository
 import com.example.hundredplaces.data.model.user.repositories.UserRepository
 import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
 import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.UsersPlacesPreferencesRepository
-import com.example.hundredplaces.util.NetworkConnection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,12 +32,11 @@ class PlacesViewModel(
     private val imageRepository: ImageRepository,
     userRepository: UserRepository,
     private val usersPlacesPreferencesRepository: UsersPlacesPreferencesRepository,
-    private val networkConnection: NetworkConnection
 ) : ViewModel() {
 
     private val _userId = userRepository.userId
 
-    private val _places = placeRepository.allPlacesWithCityAndImages
+    private val _places = placeRepository.getAllPlacesWithCityAndImages()
     private val _isRefreshing = MutableStateFlow(false)
     private val _searchText = MutableStateFlow("")
     private val _isFilterScreenOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -136,15 +134,13 @@ class PlacesViewModel(
     fun refresh() {
         _isRefreshing.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            if (networkConnection.isNetworkConnected) {
-                try {
-                    cityRepository.pullCities()
-                    placeRepository.pullPlaces()
-                    imageRepository.pullImages()
-                }
-                catch (_: SocketTimeoutException) {
-                    Log.e("Static data refresh", "Server is not reachable.")
-                }
+            try {
+                cityRepository.pullCities()
+                placeRepository.pullPlaces()
+                imageRepository.pullImages()
+            }
+            catch (_: SocketTimeoutException) {
+                Log.e("Static data refresh", "Server is not reachable.")
             }
             _isRefreshing.value = false
         }

@@ -1,4 +1,4 @@
-package com.example.hundredplaces.fakedata
+package com.example.hundredplaces.data
 
 import com.example.hundredplaces.data.model.city.City
 

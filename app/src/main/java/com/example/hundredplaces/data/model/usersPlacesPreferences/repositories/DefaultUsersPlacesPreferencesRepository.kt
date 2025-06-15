@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.hundredplaces.data.model.usersPlacesPreferences.UsersPlacesPreferences
 import com.example.hundredplaces.data.model.usersPlacesPreferences.datasources.UsersPlacesPreferencesDao
 import com.example.hundredplaces.data.model.usersPlacesPreferences.datasources.UsersPlacesPreferencesRestApi
-import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.util.NetworkMonitor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +14,7 @@ import java.net.SocketTimeoutException
 class DefaultUsersPlacesPreferencesRepository(
     private val usersPlacesPreferencesLocalDataSource: UsersPlacesPreferencesDao,
     private val usersPlacesPreferencesRemoteDataSource: UsersPlacesPreferencesRestApi,
-    private val networkConnection: NetworkConnection,
+    private val networkConnection: NetworkMonitor,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UsersPlacesPreferencesRepository {
 

@@ -4,11 +4,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 
-class NetworkConnection(context: Context) {
+class DefaultNetworkMonitor(context: Context): NetworkMonitor {
 
     private val connectivityManager: ConnectivityManager = context.getSystemService(ConnectivityManager::class.java)
 
-    val isNetworkConnected: Boolean
+    override val isNetworkConnected: Boolean
         get() = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
             .isNetworkCapabilitiesValid()
 

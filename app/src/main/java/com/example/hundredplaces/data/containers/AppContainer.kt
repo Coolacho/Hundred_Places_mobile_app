@@ -10,7 +10,7 @@ import com.example.hundredplaces.data.model.usersPlacesPreferences.repositories.
 import com.example.hundredplaces.data.model.user.repositories.UserRepository
 import com.example.hundredplaces.data.model.visit.repositories.VisitRepository
 import com.example.hundredplaces.data.services.distance.DistanceService
-import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.util.NetworkMonitor
 
 /**
  * App container for Dependency injection.
@@ -18,7 +18,7 @@ import com.example.hundredplaces.util.NetworkConnection
 interface AppContainer {
     val userAppPreferencesRepository: UserAppPreferencesRepository
     val workManagerRepository: WorkManagerRepository
-    val networkConnection: NetworkConnection
+    val networkMonitor: NetworkMonitor
     val cityRepository: CityRepository
     val placeRepository: PlaceRepository
     val imageRepository: ImageRepository

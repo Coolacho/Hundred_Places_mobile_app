@@ -36,7 +36,7 @@ class GeofenceAddingWorker(
             .sortedBy { (_, value) -> value }
             .take(20)
             .toMap()
-        val places = placeRepository.allPlaces.first().filter { place ->
+        val places = placeRepository.getAllPlaces().first().filter { place ->
             if (distances.isNotEmpty()) {
                 distances.contains(place.id)
             }

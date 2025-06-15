@@ -28,9 +28,9 @@ import com.example.hundredplaces.data.services.distance.DistanceService
 import com.example.hundredplaces.data.services.distance.DefaultDistanceService
 import com.example.hundredplaces.data.services.landmark.LandmarkRestApi
 import com.example.hundredplaces.data.services.landmark.LandmarkService
-import com.example.hundredplaces.data.services.landmark.LandmarkServiceImpl
+import com.example.hundredplaces.data.services.landmark.DefaultLandmarkService
 import com.example.hundredplaces.util.InstantConverter
-import com.example.hundredplaces.util.NetworkConnection
+import com.example.hundredplaces.util.DefaultNetworkMonitor
 import com.example.hundredplaces.workers.WorkManagerRepository
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
@@ -66,8 +66,8 @@ class DefaultAppContainer(
         HundredPlacesLocalDatabase.getDatabase(context)
     }
 
-    override val networkConnection by lazy {
-        NetworkConnection(context)
+    override val networkMonitor by lazy {
+        DefaultNetworkMonitor(context)
     }
 
     override val userAppPreferencesRepository: UserAppPreferencesRepository by lazy {
@@ -82,32 +82,35 @@ class DefaultAppContainer(
         DefaultCityRepository(
             hundredPlacesLocalDatabase.cityDao(),
             retrofit.create(CityRestApi::class.java),
+            networkMonitor
         )
     }
     override val placeRepository: PlaceRepository by lazy {
         DefaultPlaceRepository(
             hundredPlacesLocalDatabase.placeDao(),
             retrofit.create(PlaceRestApi::class.java),
+            networkMonitor
         )
     }
     override val imageRepository: ImageRepository by lazy {
         DefaultImageRepository(
             hundredPlacesLocalDatabase.imageDao(),
             retrofit.create(ImageRestApi::class.java),
+            networkMonitor
         )
     }
     override val userRepository: UserRepository by lazy {
         DefaultUserRepository(
             hundredPlacesLocalDatabase.userDao(),
             retrofit.create(UserRestApi::class.java),
-            networkConnection
+            networkMonitor
         )
     }
     override val visitRepository: VisitRepository by lazy {
         DefaultVisitRepository(
             hundredPlacesLocalDatabase.visitDao(),
             retrofit.create(VisitRestApi::class.java),
-            networkConnection
+            networkMonitor
         )
     }
 
@@ -115,14 +118,14 @@ class DefaultAppContainer(
         DefaultUsersPlacesPreferencesRepository(
             hundredPlacesLocalDatabase.usersPlacesPreferencesDao(),
             retrofit.create(UsersPlacesPreferencesRestApi::class.java),
-            networkConnection
+            networkMonitor
         )
     }
 
     override val landmarkService: LandmarkService by lazy {
-        LandmarkServiceImpl(
+        DefaultLandmarkService(
             retrofit.create(LandmarkRestApi::class.java),
-            networkConnection
+            networkMonitor
         )
     }
 

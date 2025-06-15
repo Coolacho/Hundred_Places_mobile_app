@@ -13,7 +13,7 @@ class MapViewModel(
     distanceService: DistanceService
 ) : ViewModel() {
 
-    private val _places = placeRepository.allPlacesWithCityAndImages
+    private val _places = placeRepository.getAllPlacesWithCityAndImages()
     private val _distances = distanceService.distances
 
     val uiState = combine(
