@@ -91,7 +91,9 @@ class CameraViewModel(
         val barcode = barcodeResults[0]
         when(barcode.valueType) {
             Barcode.URL -> {
-                if (barcode.url!!.url!!.contains("http://192.168.2.150:8080/places/")) {
+                val pattern = Regex("""http://192\.168\.2\.150:8080/places/\d+$""")
+                val url = barcode.url?.url
+                if (url != null && pattern.matches(url)) {
                     _uiState.update {
                         it.copy(
                             qrContent = barcode.url!!.url!!.toUri()
