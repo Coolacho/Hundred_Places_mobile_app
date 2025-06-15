@@ -62,6 +62,7 @@ class PlaceViewModelTest {
 
         val place = FakePlaceDataSource.placesWithCityAndImagesList[3]
         placesViewModel.toggleFilter(PlaceFiltersEnum.FORTRESS)
+        placesViewModel.toggleFilter(PlaceFiltersEnum.HUNDRED_PLACES)
 
         val uiState = placesViewModel.uiState.value
         assertEquals(uiState.filteredPlaces.size, 1)
