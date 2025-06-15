@@ -40,6 +40,6 @@ class PlaceDetailsViewModelTest {
 
         val visits = visitRepository.visits.value
 
-        assertEquals(visits.size, 1)
+        assertEquals(1, visits.size)
     }
 }

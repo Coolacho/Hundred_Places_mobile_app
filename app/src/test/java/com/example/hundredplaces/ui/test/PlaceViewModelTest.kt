@@ -49,8 +49,8 @@ class PlaceViewModelTest {
         placesViewModel.onSearchTextChange(place.place.name)
 
         val uiState = placesViewModel.uiState.value
-        assertEquals(uiState.filteredPlaces.size, 1)
-        assertEquals(uiState.filteredPlaces[0], place)
+        assertEquals(1, uiState.filteredPlaces.size)
+        assertEquals(place, uiState.filteredPlaces[0])
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -65,7 +65,7 @@ class PlaceViewModelTest {
         placesViewModel.toggleFilter(PlaceFiltersEnum.HUNDRED_PLACES)
 
         val uiState = placesViewModel.uiState.value
-        assertEquals(uiState.filteredPlaces.size, 1)
-        assertEquals(uiState.filteredPlaces[0], place)
+        assertEquals(1, uiState.filteredPlaces.size)
+        assertEquals(place, uiState.filteredPlaces[0])
     }
 }
