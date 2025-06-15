@@ -96,7 +96,7 @@ class CameraViewModel(
                 if (url != null && pattern.matches(url)) {
                     _uiState.update {
                         it.copy(
-                            qrContent = barcode.url!!.url!!.toUri()
+                            qrContent = url.toUri()
                         )
                     }
                 }
