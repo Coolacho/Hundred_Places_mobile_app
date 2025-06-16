@@ -114,9 +114,6 @@ fun HundredPlacesNavHost(
                 CameraScreen(
                     navigateToPlace = { placeId, addVisit -> navController.navigate("${PlaceDetailsDestination.route}/${placeId}?addVisit=${addVisit}") },
                     useCase = CameraUseCaseEnum.valueOf(useCase),
-                    cameraViewModel = viewModel (
-                        factory = AppViewModelProvider.Factory
-                    )
                 )
             }
         }
