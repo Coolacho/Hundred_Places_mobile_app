@@ -25,6 +25,7 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode.FORMAT_QR_CODE
+import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,8 +37,10 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.jetbrains.annotations.TestOnly
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
+import kotlinx.coroutines.tasks.await
 
 class CameraViewModel(
     private val landmarkService: LandmarkService,
@@ -109,6 +112,32 @@ class CameraViewModel(
             postRotate(angle)
         }
         return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    @TestOnly
+    suspend fun analyzeImage(bitmap: Bitmap) {
+        val inputImage = InputImage.fromBitmap(bitmap, 0)
+        val barcodes = barcodeScanner.process(inputImage).await()
+        if ((barcodes.isNullOrEmpty()) ||
+            (barcodes.first() == null)
+        ) {
+            return
+        }
+
+        val barcode = barcodes[0]
+        when(barcode.valueType) {
+            Barcode.URL -> {
+                val pattern = Regex("""http://192\.168\.2\.150:8080/places/\d+$""")
+                val url = barcode.url?.url
+                if (url != null && pattern.matches(url)) {
+                    _uiState.update {
+                        it.copy(
+                            qrContent = url.toUri()
+                        )
+                    }
+                }
+            }
+        }
     }
 
     suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner, useCase: CameraUseCaseEnum) {

@@ -46,6 +46,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version = "1.8.2" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationCompose"}
 
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "googleFonts"}
 androidx-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "material3"}
@@ -64,6 +65,7 @@ squareup-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", versi
 squareup-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 jetbrains-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerializationJson" }
 jetbrains-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutinesTest" }
+jetbrains-kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version = "1.7.3"}
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 androidx-work-runtime-ktx = {group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx"}
 androidx-material3-adaptive = {group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "adaptive"}

@@ -117,11 +117,13 @@ dependencies {
     implementation(libs.play.services.vision)
     //Google fonts
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.jetbrains.kotlinx.coroutines.play.services)
 
     testImplementation(libs.junit)
     //Coroutines test
     testImplementation(libs.jetbrains.kotlinx.coroutines.test)
 
+    androidTestImplementation(libs.androidx.navigation.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
