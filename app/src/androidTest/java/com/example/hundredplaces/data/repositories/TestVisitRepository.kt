@@ -1,6 +1,5 @@
 package com.example.hundredplaces.data.repositories
 
-import android.util.Log
 import com.example.hundredplaces.data.model.place.PlaceTypeEnum
 import com.example.hundredplaces.data.model.visit.Visit
 import com.example.hundredplaces.data.model.visit.repositories.VisitRepository
@@ -41,7 +40,6 @@ class TestVisitRepository: VisitRepository {
     }
 
     override suspend fun insertVisit(visit: Visit): Boolean {
-        Log.d("CAMERA", "ADDING VISIT")
         _visits.update { it + visit }
         return true
     }
