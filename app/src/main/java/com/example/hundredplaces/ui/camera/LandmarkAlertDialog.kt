@@ -43,13 +43,13 @@ fun LandmarkAlertDialog(
         confirmButton = {
             if (!isSuccess || !hasLandmark) return@AlertDialog
 
-            val (label, icon, onClick) = when {
-                hasPlaceId -> Triple(stringResource(R.string.read_more), R.drawable.rounded_arrow_forward_24, navigateToPlace(placeId, false))
-                else -> Triple(stringResource(R.string.search_more), R.drawable.rounded_open_in_new_24, searchWeb(landmark.name))
+            val (label, icon) = when {
+                hasPlaceId -> Pair(stringResource(R.string.read_more), R.drawable.rounded_arrow_forward_24)
+                else -> Pair(stringResource(R.string.search_more), R.drawable.rounded_open_in_new_24)
             }
 
             TextButton(
-                onClick = { onClick }
+                onClick = { if (hasPlaceId) navigateToPlace(placeId, false) else searchWeb(landmark.name)}
             ) {
                 Text(label)
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
