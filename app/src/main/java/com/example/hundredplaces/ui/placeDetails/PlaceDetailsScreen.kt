@@ -549,7 +549,6 @@ private suspend fun getDescriptionText(context: Context, path: String): String? 
                     } }
 
                 cachedFile.writeText(stringBuilder.toString())
-                cachedFile.setReadOnly()
 
                 return@withContext stringBuilder.toString()
             }

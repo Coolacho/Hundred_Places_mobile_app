@@ -36,13 +36,15 @@ class GeofenceAddingWorker(
             .sortedBy { (_, value) -> value }
             .take(20)
             .toMap()
-        val places = placeRepository.getAllPlaces().first().filter { place ->
-            if (distances.isNotEmpty()) {
-                distances.contains(place.id)
-            }
-            true
-        }.take(20)
 
+        if (distances.isEmpty()) {
+            Log.d(GEOFENCE_ADD_WORK_TAG, "Distances are empty. Retrying...")
+            Result.retry()
+        }
+
+        val places = placeRepository.getAllPlaces().first().filter { place ->
+            distances.contains(place.id)
+        }
 
         return try {
             if (applicationContext.checkSelfPermission(

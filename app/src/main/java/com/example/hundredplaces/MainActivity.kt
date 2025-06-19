@@ -173,7 +173,9 @@ class MainActivity : ComponentActivity() {
                     if (applicationContext.checkSelfPermission(
                             Manifest.permission.ACCESS_BACKGROUND_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED) {
-                        (application as HundredPlacesApplication).container.workManagerRepository.addGeofences()
+                        LaunchedEffect(Unit) {
+                            (application as HundredPlacesApplication).container.workManagerRepository.addGeofences()
+                        }
                     }
 
                     HundredPlacesApp(

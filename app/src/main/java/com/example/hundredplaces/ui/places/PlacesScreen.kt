@@ -228,7 +228,7 @@ fun PlacesListContent(
                     items(uiState.filteredPlaces, key = { it.place.id }) {
                         PlaceItem(
                             placeWithCityAndImages = it,
-                            userRating = uiState.ratings.getValue(it.place.id),
+                            userRating = uiState.ratings.getOrDefault(it.place.id, 0.0),
                             isFavorite = uiState.favorites.contains(it.place.id),
                             isSelected = navigator.currentDestination?.contentKey == it.place.id && navigator.isDetailExpanded(),
                             onClick = { onItemClick(it) },
