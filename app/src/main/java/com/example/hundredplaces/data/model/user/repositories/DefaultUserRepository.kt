@@ -25,7 +25,7 @@ const val USER_REPOSITORY_TAG = "User Repository"
 class DefaultUserRepository(
     private val userLocalDataSource: UserDao,
     private val userRemoteDataSource: UserRestApi,
-    private val networkConnection: NetworkMonitor,
+    private val networkMonitor: NetworkMonitor,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val refreshIntervalMs: Long = 60_000
 ) : UserRepository{
@@ -36,7 +36,7 @@ class DefaultUserRepository(
 
     private fun getIsUserExistingById(userId: Long): Flow<Boolean> = flow {
         while (true) {
-            if (networkConnection.isNetworkConnected) {
+            if (networkMonitor.isNetworkConnected) {
                 try {
                     val isUserExisting = userRemoteDataSource.getIsUserExistingById(userId)
                     emit(isUserExisting)
@@ -56,7 +56,7 @@ class DefaultUserRepository(
     override suspend fun pullUser(): Pair<String, String>? {
         return withContext(dispatcher) {
             var result: Pair<String, String>? = null
-            if (networkConnection.isNetworkConnected) {
+            if (networkMonitor.isNetworkConnected) {
                 try {
                     _currentUser?.let {
                         val response = userRemoteDataSource.getUserByEmailAndPassword(it.email, it.password)
@@ -84,7 +84,7 @@ class DefaultUserRepository(
 
         var user = userLocalDataSource.getUserByEmailAndPassword(email, password)
 
-        if (networkConnection.isNetworkConnected && user == null) {
+        if (networkMonitor.isNetworkConnected && user == null) {
             try {
                 val response = userRemoteDataSource.getUserByEmailAndPassword(email, password)
                 if (response.isSuccessful) {
@@ -140,7 +140,7 @@ class DefaultUserRepository(
 
     override suspend fun insertUser(user: User) : Boolean {
         var result = false
-        if (networkConnection.isNetworkConnected) {
+        if (networkMonitor.isNetworkConnected) {
             try {
                 userRemoteDataSource.insert(user)
                 userLocalDataSource.insert(user)
@@ -156,7 +156,7 @@ class DefaultUserRepository(
     override suspend fun deleteUser(user: User) : Boolean {
         var result = false
         withContext(dispatcher) {
-            if (networkConnection.isNetworkConnected) {
+            if (networkMonitor.isNetworkConnected) {
                 try {
                     userRemoteDataSource.delete(user)
                     userLocalDataSource.delete(user)
@@ -173,7 +173,7 @@ class DefaultUserRepository(
     override suspend fun updateUserDetails(name: String, email: String) : Boolean {
         var result = false
         withContext(dispatcher) {
-            if (networkConnection.isNetworkConnected) {
+            if (networkMonitor.isNetworkConnected) {
                 pullUser()
                 val newUser = _currentUser?.copy(
                     name = name,
@@ -197,7 +197,7 @@ class DefaultUserRepository(
         var result = false
         if (_currentUser?.password == oldPassword) {
             withContext(dispatcher) {
-                if (networkConnection.isNetworkConnected) {
+                if (networkMonitor.isNetworkConnected) {
                     pullUser()
                     val newUser = _currentUser?.copy(
                         password = newPassword
