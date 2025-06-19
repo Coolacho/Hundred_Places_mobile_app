@@ -39,7 +39,7 @@ class GeofenceAddingWorker(
 
         if (distances.isEmpty()) {
             Log.d(GEOFENCE_ADD_WORK_TAG, "Distances are empty. Retrying...")
-            Result.retry()
+            return Result.retry()
         }
 
         val places = placeRepository.getAllPlaces().first().filter { place ->
