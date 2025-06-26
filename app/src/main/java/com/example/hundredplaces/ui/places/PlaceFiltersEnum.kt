@@ -8,7 +8,7 @@ enum class PlaceFiltersEnum(
     val categoryName: Int
 ) {
     FAVORITES(R.string.favorites_category_name),
-    HUNDRED_PLACES(R.string.app_name),
+    HUNDRED_PLACES(R.string.hundred_places_category_name),
     RATING(R.string.rating_category_name),
     MUSEUM(R.string.museums_category_name),
     PEAK(R.string.peaks_category_name),

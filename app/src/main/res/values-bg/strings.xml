@@ -27,7 +27,7 @@
     <string name="monuments_visited">Посетени паметници</string>
     <string name="waterfalls_visited">Посетени водопади</string>
     <string name="others_visited">Други посетени обекти</string>
-    <string name="hundred_places_visited">Посетени обекти от 100те обекта</string>
+    <string name="hundred_places_visited">Посетени обекти от 100-те обекта</string>
     <string name="total_visited_places">Общо посетени обекти</string>
     <string name="log_in">Влез</string>
     <string name="create_an_account">Създай профил</string>
@@ -96,4 +96,5 @@
     <string name="old_password">Стара парола</string>
     <string name="new_password">Нова парола</string>
     <string name="repeat_new_password">Повтори новата парола</string>
+    <string name="hundred_places_category_name">100-те обекта</string>
 </resources>
