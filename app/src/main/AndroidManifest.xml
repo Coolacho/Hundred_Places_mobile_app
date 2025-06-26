@@ -45,16 +45,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter >
+            <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data android:scheme="http"
-                    android:host="192.168.2.150"
-                    android:port="8080"
-                    android:pathPrefix="/places/" />
+                    android:host="10.0.2.2"
+                    android:port="5173"
+                    android:pathPattern="/places/\\d+" />
             </intent-filter>
         </activity>
         <provider

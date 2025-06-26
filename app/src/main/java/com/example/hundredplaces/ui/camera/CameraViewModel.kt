@@ -94,7 +94,7 @@ class CameraViewModel(
         val barcode = barcodeResults[0]
         when(barcode.valueType) {
             Barcode.URL -> {
-                val pattern = Regex("""http://192\.168\.2\.150:8080/places/\d+$""")
+                val pattern = Regex("""http://10\.0\.2\.2:5173/places/\d+$""")
                 val url = barcode.url?.url
                 if (url != null && pattern.matches(url)) {
                     _uiState.update {
@@ -127,7 +127,7 @@ class CameraViewModel(
         val barcode = barcodes[0]
         when(barcode.valueType) {
             Barcode.URL -> {
-                val pattern = Regex("""http://192\.168\.2\.150:8080/places/\d+$""")
+                val pattern = Regex("""http://10\.0\.2\.2:5173/places/\d+$""")
                 val url = barcode.url?.url
                 if (url != null && pattern.matches(url)) {
                     _uiState.update {

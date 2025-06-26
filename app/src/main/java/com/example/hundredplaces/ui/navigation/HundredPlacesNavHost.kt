@@ -53,7 +53,7 @@ fun HundredPlacesNavHost(
         }
         composable(
             route = PlaceDetailsDestination.routeWithArgs,
-            deepLinks = listOf(navDeepLink<Long>(basePath = "http://192.168.2.150:8080/places/{${PlaceDetailsDestination.PLACE_ID_ARG}}?addVisit={${PlaceDetailsDestination.ADD_VISIT_ARG}}")),
+            deepLinks = listOf(navDeepLink<Long>(basePath = "http://10.0.2.2:5173/places/{${PlaceDetailsDestination.PLACE_ID_ARG}}?addVisit={${PlaceDetailsDestination.ADD_VISIT_ARG}}")),
             arguments = listOf(
                 navArgument(PlaceDetailsDestination.PLACE_ID_ARG) { type = NavType.LongType },
                 navArgument(PlaceDetailsDestination.ADD_VISIT_ARG) { type = NavType.BoolType })

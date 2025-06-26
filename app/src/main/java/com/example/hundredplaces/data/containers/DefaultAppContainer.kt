@@ -51,7 +51,7 @@ class DefaultAppContainer(
 
     //Retrofit Rest constants
     private val baseUrl =
-        "http://192.168.2.150:8080"
+        "http://10.0.2.2:8080"
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create(
