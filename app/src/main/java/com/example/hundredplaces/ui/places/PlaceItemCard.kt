@@ -239,7 +239,7 @@ fun PlaceItem(
                             ItemActionsEnum.SHARE -> Triple(
                                 R.string.share,
                                 R.drawable.rounded_ios_share_24
-                            ) { sharePlace(context, placeWithCityAndImages.place.name) }
+                            ) { sharePlace(context, placeWithCityAndImages.place.name, placeWithCityAndImages.place.id) }
 
                         }
 
@@ -431,11 +431,12 @@ fun PlaceDistance(
 
 fun sharePlace(
     context: Context,
-    placeName: String
+    placeName: String,
+    placeId: Long
 ) {
     val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, context.getString(R.string.place_share_text).format(placeName))
+        putExtra(Intent.EXTRA_TEXT, context.getString(R.string.place_share_text).format(placeName) + "http://10.0.2.2:5173/places/$placeId")
         type = "text/plain"
     }
     val intentChooser = Intent.createChooser(shareIntent, null)
