@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import com.example.hundredplaces.R
 
@@ -52,13 +53,14 @@ fun ImagePreviewScreen(
                 .background(Color.Transparent)
                 .padding(
                     horizontal = dimensionResource(R.dimen.padding_medium),
-                    vertical = dimensionResource(R.dimen.padding_small))
+                    vertical = dimensionResource(R.dimen.padding_small)
+                )
         ) {
             FilledTonalButton (
                 onClick = onDiscardClick
             ) {
                 Text(
-                    text = "Discard"
+                    text = stringResource(R.string.discard)
                 )
             }
             Spacer(
@@ -69,7 +71,7 @@ fun ImagePreviewScreen(
                 onClick = onSubmitClick
             ) {
                 Text(
-                    text = "Submit"
+                    text = stringResource(R.string.submit)
                 )
                 Spacer(
                     modifier = Modifier

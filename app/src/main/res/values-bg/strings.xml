@@ -97,4 +97,6 @@
     <string name="new_password">Нова парола</string>
     <string name="repeat_new_password">Повтори новата парола</string>
     <string name="hundred_places_category_name">100-те обекта</string>
+    <string name="discard">Отхвърли</string>
+    <string name="submit">Изпрати</string>
 </resources>
