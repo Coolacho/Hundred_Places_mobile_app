@@ -23,7 +23,7 @@ fun LandmarkAlertDialog(
     searchWeb: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isSuccess = requestResponse.success
+    val isSuccess = requestResponse.isSuccess
     val landmark = requestResponse.landmark
     val hasLandmark = landmark != null
     val hasPlaceId = placeId != null

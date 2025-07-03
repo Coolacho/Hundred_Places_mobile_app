@@ -198,7 +198,7 @@ class CameraViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val requestResult = landmarkService.getLandmark(multipartBody)
-                val landmark = if (requestResult.success) requestResult.landmark else null
+                val landmark = if (requestResult.isSuccess) requestResult.landmark else null
                 val placeId = if (landmark != null) placeRepository.findPlaceByCoordinates(landmark.latitude, landmark.longitude) else null
 
                 _uiState.update {

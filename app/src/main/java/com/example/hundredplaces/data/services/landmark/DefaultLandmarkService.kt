@@ -21,6 +21,6 @@ class DefaultLandmarkService(
                 Log.e("Landmark service", "Server timeout")
             }
         }
-        return RequestResponse(success = false, landmark = null)
+        return RequestResponse(isSuccess = false, landmark = null)
     }
 }
